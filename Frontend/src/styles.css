@@ -1,0 +1,35 @@
+/* Fondo general y color de texto */
+body {
+  background-color: #ffe6f0; /* fucsia claro */
+  color: #000000;            /* negro */
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Asegurar que todos los elementos hereden correctamente */
+* {
+  box-sizing: border-box;
+  color: inherit;
+  font-family: inherit;
+}
+
+/* Opcional: fondo para toda la app si usás un div raíz */
+app-root {
+  display: block;
+  min-height: 100vh;
+  background-color: #ffe6f0;
+}
+
+main.container {
+  padding-bottom: 110px; /* Deja espacio para el footer fijo */
+}
+@media (max-width: 768px) {
+  footer {
+    position: static;
+  }
+
+  body,
+  main.container {
+    padding-bottom: 0;
+  }
+}

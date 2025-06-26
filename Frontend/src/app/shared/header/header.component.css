@@ -1,0 +1,19 @@
+.site-header {
+  background-color: #d877aa; /* mismo fucsia oscuro del footer */
+  padding: 20px 0;
+  text-align: center;
+  color: #000;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.logo {
+  max-width: 120px;
+  margin-top: 8px;
+}

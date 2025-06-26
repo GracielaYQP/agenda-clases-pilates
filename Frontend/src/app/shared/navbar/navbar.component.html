@@ -1,0 +1,13 @@
+<nav class="navbar" *ngIf="auth.isLoggedIn(); else noLogueado">
+  <a routerLink="/">Inicio</a>
+  <a (click)="logout()" style="cursor:pointer;">Cerrar sesión</a>
+</nav>
+
+<ng-template #noLogueado>
+  <nav class="navbar">
+    <a routerLink="/">Inicio</a>
+    <a routerLink="/login">Iniciar Sesión</a>
+    <a routerLink="/register">Registrarse</a>
+  </nav>
+</ng-template>
+

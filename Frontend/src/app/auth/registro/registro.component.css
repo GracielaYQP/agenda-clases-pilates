@@ -1,0 +1,111 @@
+   .row{
+        display: flex;
+        justify-content: center;
+    }
+  .input_registro {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    width: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  .espacio_5px {
+    height: 10px;
+    width: 60%;
+}
+.mi_clase{
+  display: block;
+  align-items: center;
+}
+.logo_login{
+  width: 100%;
+  height: auto;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+div.row {
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+#calendar {
+  width: 10rem;
+  margin: 2rem;
+  margin: auto;
+}
+
+/* Contenedor del formulario de login */
+.singin-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px; /* Espaciado interno */
+  background-color: white; /* Fondo blanco */
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  text-align: center; /* Centra el texto */
+}
+
+/* Estilo para los encabezados */
+h2 {
+  color: #333; /* Color de texto */
+  margin-bottom: 20px; /* Espacio debajo del tÃ­tulo */
+}
+
+/* Estilo para los campos de entrada */
+input {
+  border: 1px solid #ccc; /* Borde gris claro */
+  border-radius: 5px; /* Bordes redondeados */
+  padding: 10px; /* Espaciado interno */
+  width: 100%; /* Los inputs ocupan el ancho completo */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  margin-bottom: 10px; /* Espacio entre campos */
+}
+
+#registro_alumnos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.text-danger {
+  color: red;
+  font-size: 12px;
+  margin: 2px 0 0 4px;
+}
+/* Botón fucsia */
+.btn-singin {
+  background-color: #d81b60;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 70%;
+  text-align: center;
+  display: block;
+  margin: 0 auto; /* <- ESTE ES EL CENTRADOR CLAVE */
+}
+
+/* Hover más oscuro */
+.btn-singin:hover {
+  background-color: #ad1457;
+}
+
+/* Centrado */
+.center-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}

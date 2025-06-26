@@ -1,0 +1,83 @@
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #d877aa; /* fucsia más oscuro */
+  color: #000000; /* texto negro */
+  padding: 4px 0;           /* reemplazado por nuevo valor */
+  font-family: Arial, sans-serif;
+  font-size: 11px;           /* nuevo valor */
+  border-top: 1px solid #b55d8e; /* detalle */
+  z-index: 1000; /* para que esté por encima */
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footerTurnos {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 10px;
+  padding-left: 0px;
+}
+
+.footerTurnos .container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center; /* para centrar verticalmente */
+}
+
+.footerTurnos p,
+.footerTurnos li {
+  font-size: 10px;        /* nuevo valor */
+  line-height: 1.1;       /* nuevo valor */
+  margin: 2px 0; /* menos separación vertical */
+}
+
+.footerTurnos ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 40px; /* espacio entre iconos */
+}
+
+.footerTurnos ul li a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #000;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footerTurnos ul li a:hover {
+  color: #fff;
+}
+
+.footerTurnos .copyright {
+  margin-top: 4px;
+  text-align: center;
+  font-size: 10px;
+  border-top: 1px solid #b55d8e;
+  padding-top: 4px;
+  color: #333333;
+  flex-basis: 100%; /* para que ocupe toda la línea */
+}
+
+.footerTurnos .contact-info {
+  flex: 1 1 auto;
+  text-align: left;
+  margin-left: -120px; /* Ajustá este valor según lo que necesites */
+}
+
+
+.footerTurnos .useful-links {
+  flex: 0 0 auto;
+  margin-left: auto;
+  text-align: right;
+}
+
