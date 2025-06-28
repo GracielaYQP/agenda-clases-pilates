@@ -8,6 +8,7 @@ import { NgIf } from '@angular/common';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css'],
   standalone: true,
   imports: [ReactiveFormsModule, NgIf],
 })
@@ -21,13 +22,29 @@ export class LoginComponent {
       password: ['', Validators.required],
     });
   }
+  get Email() {
+    return this.form.get('email');
+  }
+
+  get Password() {
+    return this.form.get('password');
+  }
 
   submit() {
     if (this.form.invalid) return;
 
     this.auth.login(this.form.value).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: (res) => {
+        // Guardar el token y el nombre
+        localStorage.setItem('token', res.access_token);
+        localStorage.setItem('nombreUsuario', res.nombre);
+
+        this.router.navigate(['/']);
+      },
       error: () => this.error = 'Email o contraseña incorrectos',
     });
   }
+
 }
+
+

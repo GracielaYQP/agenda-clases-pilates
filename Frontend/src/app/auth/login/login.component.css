@@ -1,0 +1,177 @@
+/* Contenedor principal horizontal */
+.registro-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  height: 100vh; 
+  padding: 0, 20px;
+  box-sizing: border-box;
+  margin: 0;
+  height: calc(100vh - 36px - 48px);
+  
+}   
+.row{
+  display: flex;
+  justify-content: center;
+}
+.input_registro {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 5px;
+  width: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.espacio_5px {
+  height: 10px;
+  width: 60%;
+}
+.mi_clase{
+  display: block;
+  align-items: center;
+}
+/* Columna izquierda: logo + título */
+.logo_login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40%;
+  height: 100%;
+  margin: 0;                   
+  padding: 0;
+}
+
+/* Título */
+.titulo-registro {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  margin: 8px 0 0 0;
+}
+
+div.row {
+  justify-content: space-around;
+  margin-bottom: 5px;
+}
+
+#cama {
+  width: 12rem;
+  margin: 0;                   
+  padding: 0;
+}
+
+/* Columna derecha: formulario */
+.singin-container {
+  width: 50%;
+  max-width: 400px;          
+  background-color: white;
+  padding: 20px;              
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 90vh;         
+  margin: 0;            
+}
+
+
+/* Estilo para los encabezados */
+h2 {
+  color: #333;
+  margin-bottom: 20px; 
+}
+
+/* Estilo para los campos de entrada */
+input {
+  border: 1px solid #ccc; 
+  border-radius: 5px; 
+  padding: 6px; 
+  width: 100%; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  margin-bottom: 8px; 
+}
+
+#registro_alumnos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.text-danger {
+  color: red;
+  font-size: 12px;
+  margin: 2px 0 0 4px;
+}
+/* Botón fucsia */
+.btn-singin {
+  background-color: #d81b60;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 70%;
+  text-align: center;
+  display: block;
+  margin: 0 auto; 
+}
+
+/* Hover más oscuro */
+.btn-singin:hover {
+  background-color: #ad1457;
+}
+
+/* Centrado */
+.center-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .registro-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .logo_login, .singin-container {
+    width: 90%;
+    height: auto;
+  }
+
+  .singin-container {
+    margin-top: 20px;
+  }
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.text-center {
+  text-align: center;
+}
+.alert-error {
+  color: red;
+  font-weight: bold;
+  background-color: #ffe6e6;
+  border: 1px solid #ff4d4d;
+  padding: 10px;
+  border-radius: 6px;
+  margin: 16px auto;
+  width: 80%;
+  text-align: center;
+}
+

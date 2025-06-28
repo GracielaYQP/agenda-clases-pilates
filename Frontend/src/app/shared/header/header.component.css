@@ -1,19 +1,46 @@
 .site-header {
-  background-color: #d877aa; /* mismo fucsia oscuro del footer */
-  padding: 20px 0;
-  text-align: center;
+  /* background-color: #d877aa;  */
+  background-color: #F5F5F5;
+  padding: 10px 20px; 
   color: #000;
+  padding: 10px 10px;
 }
 
+/* Contenedor flex para logo y texto */
 .header-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  align-items: center; 
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: nowrap;
+  max-width: 1200px; 
+  margin: 0 auto; 
 }
 
+/* Logo alineado a la izquierda, tamaño fijo */
 .logo {
-  max-width: 120px;
-  margin-top: 8px;
+  max-width: 100px;
+  height: auto;
+  margin-left: -120px; 
 }
+
+/* Título grande, centrado verticalmente, que ocupe todo el espacio restante */
+.header-container h1 {
+  font-size: 2.5rem; 
+  flex-grow: 1;
+  margin: 0;
+  text-align: center;
+  font-weight: bold;
+  line-height: 1.2;
+  /* color: #000; */
+  color: #b53490;
+}
+.bienvenida {
+  align-self: flex-end;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #000;
+  margin-left: auto; 
+  margin-bottom: 4px;
+}
+

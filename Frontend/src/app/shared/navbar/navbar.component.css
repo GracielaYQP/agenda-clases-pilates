@@ -1,16 +1,23 @@
 .navbar {
-  background-color: #d877aa;
-  padding: 10px 0;
-  text-align: center;
+  /* background-color: #d877aa; */
+  background-color: #F5F5F5;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  justify-content: flex-start; /* pega todo a la izquierda */
+  width: 100%; /* ocupa todo el ancho */
+  text-align: left;
 }
 
 .navbar a {
-  margin: 0 15px;
   text-decoration: none;
-  color: #000;
+  color: #b53490;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .navbar a:hover {
   text-decoration: underline;
 }
+

@@ -1,9 +1,11 @@
 /* Fondo general y color de texto */
-body {
+body, html {
   background-color: #ffe6f0; /* fucsia claro */
   color: #000000;            /* negro */
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
+  width: 100%;
 }
 
 /* Asegurar que todos los elementos hereden correctamente */
@@ -11,6 +13,8 @@ body {
   box-sizing: border-box;
   color: inherit;
   font-family: inherit;
+  margin: 0;
+  padding: 0;
 }
 
 /* Opcional: fondo para toda la app si usás un div raíz */
@@ -28,8 +32,21 @@ main.container {
     position: static;
   }
 
-  body,
-  main.container {
+body,
+main.container {
     padding-bottom: 0;
   }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
 }
