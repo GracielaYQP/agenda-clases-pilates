@@ -1,15 +1,13 @@
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
   width: 100%;
-  background-color: #d877aa; /* fucsia más oscuro */
-  color: #000000; /* texto negro */
-  padding: 4px 0;           /* reemplazado por nuevo valor */
+  /* background-color: #d877aa; */
+  background-color: #888888; 
+  color: #000000; 
+  padding: 4px 0;           
   font-family: Arial, sans-serif;
-  font-size: 11px;           /* nuevo valor */
-  border-top: 1px solid #b55d8e; /* detalle */
-  z-index: 1000; /* para que esté por encima */
+  font-size: 11px;          
+  border-top: 1px solid #b55d8e; 
+  z-index: 1000;
   box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.1);
 }
 

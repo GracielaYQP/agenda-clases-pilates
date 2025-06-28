@@ -2,6 +2,9 @@
   <div class="header-container">
     <img src="assets/logo.jpg" alt="Logo" class="logo" />
     <h1>Lucía Carletta - Estudio Pilates</h1>
+    <div class="bienvenida" *ngIf="localStorage.getItem('nombreUsuario')">
+      Bienvenid&#64;, {{ localStorage.getItem('nombreUsuario') }}
+    </div>
   </div>
 </header>
 

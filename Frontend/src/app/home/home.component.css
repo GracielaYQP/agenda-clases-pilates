@@ -1,17 +1,40 @@
-/* Estilos del contenido principal */  
-  section {
-    padding: 2em;
-  }
-  
   .slide img {
     height: 60vh;
   }
   
-  .portada {
-    height: 200px;
-    object-fit: cover;
-    object-position: center; 
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.475);
+.portada {
+  height: 200px;
+  object-fit: cover;
+  object-position: center; 
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.475);
   
-  }  
+}  
+
+section.welcome {
+  padding: 0;
+  margin: 0 auto; /* centra horizontalmente si hay ancho fijo */
+  width: 100vw;
+  max-width: 100%;
+  overflow-x: hidden;
+  text-align: center; /* <-- centraliza directamente todos los hijos de texto */
+}
+
+section.welcome h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-top: 20px;
+}
+section.welcome h2,
+section.welcome p {
+  text-align: center;
+}
+
+.carousel-item img {
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: 100%;
+  height: 400px; /* o lo que necesites */
+  object-fit: contain;
+}
