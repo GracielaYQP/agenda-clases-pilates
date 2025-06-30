@@ -1,22 +1,28 @@
+<!-- Navbar cuando está logueado -->
 <nav class="navbar" *ngIf="auth.isLoggedIn(); else noLogueado">
-  <a routerLink="/">Inicio</a>
-  <a (click)="logout()" style="cursor:pointer;">Cerrar sesión</a>
+  <div class="nav-left">
+    <a routerLink="/">Inicio</a>
+  </div>
+  <div class="nav-right">
+    <a (click)="logout()" class="action-btn" style="cursor:pointer;">Cerrar sesión</a>
+
+  </div>
 </nav>
 
+<!-- Navbar cuando NO está logueado -->
 <ng-template #noLogueado>
   <nav class="navbar">
-    <a routerLink="/">Inicio</a>
-    <a routerLink="/acerca-de">¿Qué es pilates?</a>
-    <a routerLink="/CvLucia">Lucía Carletta</a>
-    <a routerLink="/login">Iniciar Sesión</a>
-    <a routerLink="/register">Registrarse</a>
+    <div class="nav-left">
+      <a routerLink="/">Inicio</a>
+      <a routerLink="/acerca-de">¿Qué es pilates?</a>
+      <a routerLink="/CvLucia">Lucía Carletta</a>
+      <a routerLink="/clases">Clases</a>
+      <a routerLink="/planes">Planes</a>
+      <a routerLink="/horarios">Horarios disponibles</a>
+      <a routerLink="/register">Registrarse</a>
+    </div>
+    <div class="nav-right">
+      <a routerLink="/login" class="action-btn">Ingresar</a>
+    </div>
   </nav>
 </ng-template>
-
-<!-- <div class="navbar">
-  <a routerLink="/contacto">Contacto</a>
-  <a routerLink="/clases">Clases</a>
-  <a routerLink="/profesores">Profesores</a>
-  <a routerLink="/horarios">Horarios</a>
-  <a routerLink="/precios">Precios</a>
-  <a routerLink="/preguntas-frecuentes">Preguntas Frecuentes</a> -->

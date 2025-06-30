@@ -11,10 +11,7 @@
   height: calc(100vh - 36px - 48px);
   
 }   
-.row{
-  display: flex;
-  justify-content: center;
-}
+
 .input_registro {
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -30,17 +27,6 @@
   display: block;
   align-items: center;
 }
-/* Columna izquierda: logo + título */
-.logo_login {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 40%;
-  height: 100%;
-  margin: 0;                   
-  padding: 0;
-}
 
 /* Título */
 .titulo-registro {
@@ -50,23 +36,16 @@
   color: #333;
   margin: 8px 0 0 0;
 }
-
-div.row {
-  justify-content: space-around;
-  margin-bottom: 5px;
-}
-
-#cama {
-  width: 12rem;
-  margin: 0;                   
-  padding: 0;
-}
-
-/* Columna derecha: formulario */
+/*formulario */
 .singin-container {
   width: 50%;
   max-width: 400px;          
-  background-color: white;
+  background-image: url('/assets/logos/login.jpg');
+  background-repeat: no-repeat;      /* Evita que la imagen se repita */
+  background-size: cover;            /* Hace que la imagen cubra todo el contenedor */
+  background-position: center 220%; /* Sube la imagen hacia arriba */
+  background-color: rgba(255,255,255,0.7); /* Blanco semitransparente encima */
+  background-blend-mode: lighten;          /* Mezcla para aclarar la imagen */
   padding: 20px;              
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -74,7 +53,6 @@ div.row {
   max-height: 90vh;         
   margin: 0;            
 }
-
 
 /* Estilo para los encabezados */
 h2 {

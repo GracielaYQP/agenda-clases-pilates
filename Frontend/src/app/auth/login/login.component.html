@@ -1,15 +1,8 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
   <div class="registro-wrapper">
-
-    <div class="logo_login">
-      <div class="logo">
-        <img id="cama" src="assets/login.jpg" alt="imagenLogin" />
-      </div>
-      <p class="titulo-registro">INICIAR SESIÓN</p>
-    </div>
-
     <!-- Columna derecha -->
     <div id="registro_alumnos" class="singin-container">
+      <p class="titulo-registro">INICIAR SESIÓN</p>
       <div class="form-group">
         <label for="email">Email:</label>
         <input type="email" id="email" formControlName="email" />
@@ -37,7 +30,7 @@
       </div>
 
       <p class="form-footer">
-        ¿Todavía no tenés cuenta? <a routerLink="/register">Regístrate aquí</a>.
+        No tienes una cuenta? Debido a que este estudio trabaja de forma personalizada, solo permite la creación de nuevas cuentas de forma manual. Comunícate conmigo de forma presencial para tramitar tu alta.
       </p>
     </div>
   </div>

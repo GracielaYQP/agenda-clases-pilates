@@ -1,14 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
   <div class="registro-wrapper">
-    <div class="logo_login">
-      <div class="logo">
-        <img id="cama" src="assets/registro.png" alt="imagenCama">
-      </div>
-      <p class="titulo-registro">REGISTRO</p>
-    </div>
-
-
     <div id="registro_alumnos" class="singin-container">
+        <p class="titulo-registro">REGISTRO</p>   
       <div class="form-group">
         <label for="username">DNI:</label>
         <input type="text" id="username" formControlName="dni" />

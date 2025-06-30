@@ -1,6 +1,6 @@
 .parallax-section {
   position: relative;
-  height: 200vh; /* Ajustá según la cantidad de contenido */
+  height: 200vh; 
   overflow: hidden;
 }
 
@@ -10,22 +10,21 @@
   background-size: cover;
   background-repeat: no-repeat;
   position: absolute;
+  top: 0;
   left: 0;
   height: 50%;
   width: 100%;
   z-index: 1;
 }
-
-.parallax-background.joseph2 {
-  top: 0%;
-  background-image: url('/assets/fotos/joseph2.jpg');
+.parallax-background.img1 {
+  top: 0;
+  background-image: url('/assets/fotos/img1.jpg');
 }
 
-.parallax-background.joseph3 {
+.parallax-background.img2 {
   top: 50%;
-  background-image: url('/assets/fotos/joseph3.jpg');
+  background-image: url('/assets/fotos/img2.jpg');
 }
-
 .parallax-content {
   position: relative;
   z-index: 2; /* Encima de la imagen */
@@ -39,16 +38,4 @@
   padding: 40px;
   margin-bottom: 100px;
   border-radius: 10px;
-}
-.text-block-flex .creador-flex {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-}
-
-.img-joseph {
-  width: 180px;
-  height: auto;
-  border-radius: 8px;
-  object-fit: cover;
 }
