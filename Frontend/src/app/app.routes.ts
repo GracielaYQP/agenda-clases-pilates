@@ -5,6 +5,9 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { AcercaDeComponent } from './acerca-de/acerca-de.component';
 import { CvLuciaComponent } from './cv-lucia/cv-lucia.component';
+import { ClasesComponent } from './clases/clases.component';
+import { HorariosDisponiblesComponent } from './horarios-disponibles/horarios-disponibles.component';
+import { PlanesComponent } from './planes/planes.component';
 
 
 export const routes: Routes = [
@@ -13,6 +16,9 @@ export const routes: Routes = [
   { path: 'CvLucia', component: CvLuciaComponent  },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistroComponent },
+  { path: 'clases', component: ClasesComponent  },
+  { path: 'horarios-disponibles', component: HorariosDisponiblesComponent  },
+  { path: 'planes', component: PlanesComponent  },
 ];
 
 @NgModule({

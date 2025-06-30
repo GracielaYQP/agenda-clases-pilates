@@ -1,23 +1,41 @@
 .navbar {
-  /* background-color: #d877aa; */
   background-color: #F5F5F5;
   padding: 10px 20px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  justify-content: flex-start; /* pega todo a la izquierda */
-  width: 100%; /* ocupa todo el ancho */
-  text-align: left;
+  justify-content: space-between; /* Separa izquierda y derecha */
+  width: 100%;
 }
+
+.nav-left {
+  display: flex;
+  gap: 15px;
+}
+
 
 .navbar a {
   text-decoration: none;
   color: #b53490;
   font-weight: bold;
-  cursor: pointer;
 }
 
 .navbar a:hover {
   text-decoration: underline;
 }
 
+/* Solo para los botones de acción */
+.action-btn {
+  border: 2px solid #b53490;
+  padding: 8px 16px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+/* Hover + focus + active para acción: fondo fucsia + texto blanco */
+.action-btn:hover,
+.action-btn:focus,
+.action-btn:active {
+  background-color: #b53490;
+  color: #fff !important; /* fuerza que el texto sea blanco */
+  text-decoration: none;
+}
