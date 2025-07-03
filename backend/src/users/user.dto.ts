@@ -11,6 +11,9 @@ export class CreateUserDto {
   apellido: string;
 
   @IsNotEmpty()
+  nivel: string;
+
+  @IsNotEmpty()
   telefono: string;
 
   @IsEmail()

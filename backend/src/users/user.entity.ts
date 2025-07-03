@@ -14,6 +14,9 @@ export class User {
   @Column()
   apellido: string;
 
+  @Column({ default: 'principiante' })
+  nivel: string;
+
   @Column()
   telefono: string;
 
@@ -23,8 +26,8 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: 'user' })
-  role: string;
+  @Column({ default: 'alumno/a' })
+  rol: string;
 
   @CreateDateColumn()
   createdAt: Date;

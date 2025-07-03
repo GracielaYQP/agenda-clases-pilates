@@ -8,6 +8,9 @@ import { CvLuciaComponent } from './cv-lucia/cv-lucia.component';
 import { ClasesComponent } from './clases/clases.component';
 import { HorariosDisponiblesComponent } from './horarios-disponibles/horarios-disponibles.component';
 import { PlanesComponent } from './planes/planes.component';
+import { GestionTurnosComponent } from './gestion-turnos/gestion-turnos.component';
+import { AuthGuard } from './services/auth.guard';
+import { InvitacionesComponent } from './admin/invitaciones/invitaciones.component';
 
 
 export const routes: Routes = [
@@ -19,10 +22,13 @@ export const routes: Routes = [
   { path: 'clases', component: ClasesComponent  },
   { path: 'horarios-disponibles', component: HorariosDisponiblesComponent  },
   { path: 'planes', component: PlanesComponent  },
+  { path: 'gestion-turnos', component: GestionTurnosComponent, canActivate: [AuthGuard]  },
+  {
+    path: 'admin/invitaciones',
+    component: InvitacionesComponent,
+    canActivate: [AuthGuard], // protege primero si está logueado
+    data: { roles: ['admin'] } // 👈 pasas los roles permitidos
+  },
+
 ];
 
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}
