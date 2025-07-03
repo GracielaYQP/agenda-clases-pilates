@@ -1,0 +1,53 @@
+.celda-turno {
+  padding: 8px;
+  border-radius: 6px;
+  margin: 2px;
+  user-select: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 90px;
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Colores según nivel */
+.inicial {
+  background-color: #a8dadc; /* azul claro */
+  color: #1d3557;
+}
+
+.intermedio {
+  background-color: #ffe066; /* amarillo */
+  color: #333;
+}
+
+.avanzado {
+  background-color: #f94144; /* rojo suave */
+  color: white;
+}
+
+/* Sin turno */
+.sin-turno {
+  background-color: #e0e0e0;
+  color: #777;
+  font-style: italic;
+  cursor: default;
+}
+
+/* Bloqueado (viernes 8:00) */
+.bloqueado {
+  background-color: #ffcccc;
+  color: #a00;
+  font-weight: bold;
+  cursor: default;
+}
+
+/* Opcional: efecto hover en turnos disponibles */
+.celda-turno:hover:not(.sin-turno):not(.bloqueado) {
+  filter: brightness(0.9);
+}

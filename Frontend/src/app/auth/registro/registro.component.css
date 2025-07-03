@@ -137,3 +137,41 @@ input {
   font-weight: bold;
   margin-top: 20px;
 }
+
+.no-invitacion-container {
+
+  width: 50%;
+  max-width: 400px;          
+  background-image: url('/assets/logos/registro.png');
+  background-repeat: no-repeat;      /* Evita que la imagen se repita */
+  background-size: cover;            /* Hace que la imagen cubra todo el contenedor */
+  background-position: center;
+  background-color: rgba(255,255,255,0.7); /* Blanco semitransparente encima */
+  background-blend-mode: lighten;          /* Mezcla para aclarar la imagen */
+  padding: 80px;              
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 200vh; 
+  max-width: 500px;        
+  margin: 40px auto; 
+  text-align: center;  
+}
+
+.no-invitacion-text {
+  color: #b71c1c;                 /* Rojo oscuro */
+  font-size: 1.2rem;              /* Tamaño de letra más grande */
+  font-weight: bold;              /* Texto en negrita */
+  line-height: 1.5;               /* Espaciado de línea */
+}
+
+@media (max-width: 768px) {
+  .no-invitacion-container {
+    margin: 20px;
+    padding: 16px;
+  }
+
+  .no-invitacion-text {
+    font-size: 1rem;
+  }
+}

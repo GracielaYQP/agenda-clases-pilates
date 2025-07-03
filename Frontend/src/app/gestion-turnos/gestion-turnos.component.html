@@ -1,0 +1,50 @@
+<table border="1" cellspacing="0" cellpadding="6" style="width: 100%; text-align: center;">
+  <thead>
+    <tr>
+      <th>Hora</th>
+      <th *ngFor="let dia of dias">{{ dia }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let hora of horas">
+      <td><strong>{{ hora }}</strong></td>
+      <td *ngFor="let dia of dias">
+        <!-- Bloquear viernes 8:00 -->
+        <ng-container *ngIf="!(dia === 'Viernes' && hora === '8:00'); else bloqueado">
+          <ng-container *ngIf="hasTurno(dia, hora); else sinTurno">
+            <ng-container *ngFor="let turno of getTurnos(dia, hora)">
+              <div
+                class="celda-turno"
+                [ngClass]="{
+                  'inicial': turno.nivel === 'Inicial',
+                  'intermedio': turno.nivel === 'Intermedio',
+                  'avanzado': turno.nivel === 'Avanzado'
+                }"
+                (click)="reservar(turno)"
+                style="cursor: pointer;"
+                title="Reservar {{ turno.nivel }} - {{ dia }} {{ hora }}"
+              >
+                {{ turno.nivel }}<br />
+                Disponibles: {{ turno.totalCamas - turno.camasReservadas }}
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+
+        <ng-template #sinTurno>
+          <div class="celda-turno sin-turno" style="color: #999;">
+            No hay turno
+          </div>
+        </ng-template>
+
+        <ng-template #bloqueado>
+          <div class="celda-turno bloqueado" style="color: red; font-weight: bold;">
+            No disponible
+          </div>
+        </ng-template>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+

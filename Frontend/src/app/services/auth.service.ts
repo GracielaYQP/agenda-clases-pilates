@@ -10,14 +10,21 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
-      tap((res: any) => {
-        localStorage.setItem('token', res.access_token);
-        localStorage.setItem('nombreUsuario', res.nombre);
-      })
-    );
-  }
+login(credentials: { email: string; password: string }): Observable<any> {
+  return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
+    tap((res: any) => {
+      localStorage.setItem('token', res.access_token);
+      localStorage.setItem('nombreUsuario', res.nombre);
+      localStorage.setItem('rol', res.rol); // 👈 guarda el rol que te devuelve el backend
+    })
+  );
+}
+
+
+getRol(): string | null {
+  return localStorage.getItem('rol');
+}
+
 
 register(data: {
   dni: string;
@@ -33,6 +40,7 @@ register(data: {
 logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('nombreUsuario');
+  localStorage.removeItem('rol'); // 👈 limpia el rol
 }
 
 isLoggedIn(): boolean {

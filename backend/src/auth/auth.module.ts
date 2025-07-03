@@ -5,11 +5,13 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { InvitacionesModule } from 'src/invitaciones/invitaciones.module';
 
 
 @Module({
   imports: [
     UsersModule,
+    InvitacionesModule,
     JwtModule.register({
       secret: 'secretKey', // ⚠️ Usar .env
       signOptions: { expiresIn: '1d' },

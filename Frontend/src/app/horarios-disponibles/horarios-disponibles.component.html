@@ -1,1 +1,31 @@
-<p>horarios-disponibles works!</p>
+<!-- horario.component.html -->
+<div class="horario-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Horario</th>
+        <th *ngFor="let dia of dias">{{ dia }}</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let hora of horas">
+            <td>{{ hora }}</td>
+            <td *ngFor="let dia of dias"
+                [ngClass]="{
+                'inicial': usuarioNivel === 'Inicial',
+                'intermedio': usuarioNivel === 'Intermedio',
+                'avanzado': usuarioNivel === 'Avanzado',
+                'no-disponible': !isDisponible(dia, hora)
+                }"
+                (click)="isDisponible(dia, hora) && reservar(dia, hora)">
+            <span *ngIf="isDisponible(dia, hora)">
+                {{ usuarioNivel }}<br>
+                Camas libres: {{ getDisponibles(dia, hora) }}
+            </span>
+            <span *ngIf="!isDisponible(dia, hora)">No disponible</span>
+            </td>
+        </tr>
+        </tbody>
+  </table>
+</div>
+

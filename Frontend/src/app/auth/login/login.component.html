@@ -14,23 +14,26 @@
 
       <div class="form-group">
         <label for="password">Contraseña:</label>
-        <input type="password" id="password" formControlName="password" />
+        <div class="password-wrapper">
+          <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" />
+
+          <!-- Icono de ojo -->
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
+              <i [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
+          </button>
+        </div>
+
         <ng-container *ngIf="Password?.errors && Password?.touched">
           <p class="text-danger" *ngIf="Password?.hasError('required')">La contraseña es requerida.</p>
         </ng-container>
       </div>
 
+            <!-- Botón para ingresar -->
       <div class="form-group center-button">
         <button type="submit" class="btn-singin" [disabled]="form.invalid">Ingresar</button>
       </div>
-
-      <!-- Mensaje de error por credenciales inválidas -->
-      <div *ngIf="error" class="alert-error text-center">
-        {{ error }}
-      </div>
-
       <p class="form-footer">
-        No tienes una cuenta? Debido a que este estudio trabaja de forma personalizada, solo permite la creación de nuevas cuentas de forma manual. Comunícate conmigo de forma presencial para tramitar tu alta.
+         No tienes una cuenta? Debido a que este estudio trabaja de forma personalizada, solo permite la creación de nuevas cuentas a través de un link de invitación.. Comunícate conmigo de forma presencial para tramitar tu alta.
       </p>
     </div>
   </div>
