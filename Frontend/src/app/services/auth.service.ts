@@ -40,7 +40,8 @@ register(data: {
 logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('nombreUsuario');
-  localStorage.removeItem('rol'); // 👈 limpia el rol
+  localStorage.removeItem('rol');
+  localStorage.removeItem('nivelUsuario');
 }
 
 isLoggedIn(): boolean {

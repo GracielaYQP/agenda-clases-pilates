@@ -14,7 +14,7 @@ export class User {
   @Column()
   apellido: string;
 
-  @Column({ default: 'principiante' })
+  @Column({ default: 'inicial' })
   nivel: string;
 
   @Column()
