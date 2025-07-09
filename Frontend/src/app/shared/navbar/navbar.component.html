@@ -9,6 +9,7 @@
     <a routerLink="/horarios-disponibles">Horarios disponibles</a>
     <a routerLink="/gestion-turnos">Gestionar turnos</a>
     <a *ngIf="isAdmin" routerLink="/admin/invitaciones">Enviar invitación</a>
+    <a *ngIf="isAdmin" routerLink="/listar-alumnos">Listado de alumnos</a>
   </div>
   <div class="nav-right">
     <a (click)="logout()" class="action-btn" style="cursor:pointer;">Cerrar sesión</a>

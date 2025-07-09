@@ -16,9 +16,12 @@ export class AuthService {
     return this.usersService.create({
       email: dto.email,
       nombre: dto.nombre,
+      apellido: dto.apellido,  
+      dni: dto.dni,
+      telefono: dto.telefono,
       password: dto.password,
       nivel: dto.nivel,
-    }); // UsersService se encarga del hash
+    }); 
   }
 
   // Login normal
@@ -35,18 +38,25 @@ export class AuthService {
     return {
       access_token: token,
       nombre: user.nombre,
+      apellido: user.apellido, 
+      dni: user.dni, 
       rol: user.rol,
       nivel: user.nivel,
     };
   }
 
   // Crear usuario desde invitación
-  async createUser(data: { email: string; nombre: string; password: string; nivel: string }) {
+  async createUser(data: {
+    telefono: string; email: string; nombre: string; apellido: string; dni: string; password: string; nivel: string 
+}) {
     // NO hacer hash aquí — lo hace UsersService.create
     return this.usersService.create({
-      email: data.email,
+      dni: data.dni,
       nombre: data.nombre,
-      password: data.password, // raw password
+      apellido: data.apellido,  
+      telefono: data.telefono,
+      email: data.email,// Asegúrate de que el DTO tenga este campo 
+      password: data.password, 
       nivel: data.nivel,
     });
   }

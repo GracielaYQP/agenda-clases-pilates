@@ -8,7 +8,7 @@ export class Invitacion {
   @Column()
   email: string;
 
-  @Column()
+  @Column({ unique: true })
   token: string;
 
   @Column()

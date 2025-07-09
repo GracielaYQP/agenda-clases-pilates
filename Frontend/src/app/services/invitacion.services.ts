@@ -10,7 +10,13 @@ export class InvitacionService {
 
   constructor(private http: HttpClient) {}
 
+
   getInvitacion(token: string): Observable<{ email: string; nivel: string }> {
-    return this.http.get<{ email: string; nivel: string }>(`${this.apiUrl}/${token}`);
+    return this.http.get<{ valida: boolean; email: string; nivel: string }>(
+      `${this.apiUrl}/verificar`,
+      { params: { token } }
+    );
   }
+
+
 }

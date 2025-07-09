@@ -1,0 +1,94 @@
+/* Contenedor principal horizontal */
+.registro-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  height: calc(100vh - 36px - 48px);
+  padding: 0 20px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.singin-container {
+  width: 50%;
+  max-width: 400px;          
+  background-image: url('/assets/logos/dibupilates3.jpg');
+  background-repeat: no-repeat;  
+  background-size: cover;  
+  background-position: center 90%;
+  background-color: rgba(255,255,255,0.7);
+  background-blend-mode: lighten;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 90vh;
+  margin: 0;
+}
+
+#registro_alumnos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.titulo-registro {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  margin: 8px 0 0 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+input {
+  border: 1px solid #ccc; 
+  border-radius: 5px; 
+  padding: 6px; 
+  width: 100%; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  margin-bottom: 8px; 
+}
+
+select {
+  border: 1px solid #ccc; 
+  border-radius: 5px; 
+  padding: 6px; 
+  width: 100%; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+  margin-bottom: 8px; 
+  background-color: #fff;
+}
+
+.btn-singin {
+  background-color: #d81b60;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 70%;
+  text-align: center;
+  display: block;
+  margin: 0 auto; 
+}
+
+.btn-singin:hover {
+  background-color: #ad1457;
+}
+
+.center-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+

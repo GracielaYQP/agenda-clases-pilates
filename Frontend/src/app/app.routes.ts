@@ -11,6 +11,8 @@ import { PlanesComponent } from './planes/planes.component';
 import { GestionTurnosComponent } from './gestion-turnos/gestion-turnos.component';
 import { AuthGuard } from './services/auth.guard';
 import { InvitacionesComponent } from './admin/invitaciones/invitaciones.component';
+import { ListarAlumnosComponent } from './listar-alumnos/listar-alumnos.component';
+import { EditarUsuarioComponent } from './editar-usuario/editar-usuario.component';
 
 
 export const routes: Routes = [
@@ -29,6 +31,13 @@ export const routes: Routes = [
     canActivate: [AuthGuard], // protege primero si está logueado
     data: { roles: ['admin'] } // 👈 pasas los roles permitidos
   },
+  { path: 'listar-alumnos', 
+    component: ListarAlumnosComponent,   
+    canActivate: [AuthGuard],
+    data: { roles: ['admin'] },
+  },
+  { path: 'editar-usuario/:id', component: EditarUsuarioComponent },
+  { path: '**', redirectTo: 'listar-alumnos' }
 
 ];
 

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, NotFoundException, Param, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { InvitacionesService } from 'src/invitaciones/invitaciones.service';
 import { RegisterInvitacionDto } from './register-invitacion.dto';
@@ -31,6 +31,9 @@ export class AuthController {
     await this.authService.createUser({
       email: invitacion.email,
       nombre: dto.nombre,
+      apellido: dto.apellido,  
+      dni: dto.dni,
+      telefono: dto.telefono,
       password: dto.password,
       nivel: invitacion.nivel_asignado,
     });
@@ -56,6 +59,20 @@ export class AuthController {
     // Retornar el token para que el frontend genere el link
     return { token };
   }
+
+  @Get('validar/:token')
+    async validar(@Param('token') token: string) {
+      const invitacion = await this.invitacionesService.findByToken(token);
+
+      if (!invitacion || invitacion.estado !== 'pendiente') {
+        throw new NotFoundException('Invitación inválida o expirada.');
+      }
+
+      return {
+        email: invitacion.email,
+        nivel: invitacion.nivel_asignado,
+      };
+    }
 }
 
 
