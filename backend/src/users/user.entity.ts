@@ -5,7 +5,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-    @Column()
+  @Column({ unique: true })
   dni: string;
 
   @Column()
@@ -28,12 +28,18 @@ export class User {
 
   @Column({ default: 'alumno/a' })
   rol: string;
+    
+  @Column({ default: true })
+  activo: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+
+
 
 }
 

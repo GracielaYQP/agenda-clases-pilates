@@ -15,15 +15,26 @@ export class UsersService {
   async create(userData: {
     email: string;
     nombre: string;
+    apellido: string;
+    dni: string;
+    telefono: string; 
     password: string;
     nivel: string;
   }): Promise<User> {
-    const existing = await this.userRepository.findOne({
+    const existingEmail = await this.userRepository.findOne({
       where: { email: userData.email },
     });
 
-    if (existing) {
+    if (existingEmail) {
       throw new BadRequestException('El email ya está registrado');
+    }
+
+    const existingDNI = await this.userRepository.findOne({
+      where: { dni: userData.dni },
+    });
+
+    if (existingDNI) {
+      throw new BadRequestException('El DNI ya está registrado');
     }
 
     // Hashear la contraseña
@@ -32,6 +43,9 @@ export class UsersService {
     const user = this.userRepository.create({
       email: userData.email,
       nombre: userData.nombre,
+      apellido: userData.apellido,
+      dni: userData.dni,
+      telefono: userData.telefono,
       password: hashedPassword,
       nivel: userData.nivel,
     });
@@ -62,8 +76,24 @@ export class UsersService {
     return updatedUser;
   }
 
-
-  async delete(id: number): Promise<void> {
-    await this.userRepository.delete(id);
+  async obtenerListadoUsuarios() {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.activo = :activo', { activo: true })
+      .andWhere('LOWER(user.rol) != :rol', { rol: 'admin' })
+      .orderBy('user.apellido', 'ASC')
+      .addOrderBy('user.nombre', 'ASC')
+      .getMany();
   }
+
+
+  async inactivarUsuario(id: number): Promise<void> {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new BadRequestException('Usuario no encontrado');
+    }
+    user.activo = false;
+    await this.userRepository.save(user);
+  }
+
 }
