@@ -67,9 +67,11 @@ footer {
 }
 
 .footerTurnos .contact-info {
+  margin-right: 10px;
+  vertical-align: middle;
   flex: 1 1 auto;
   text-align: left;
-  margin-left: -120px; /* Ajustá este valor según lo que necesites */
+  margin-left: -120px; 
 }
 
 

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { HorariosService } from '../services/horarios.service';
 
 export interface Horario {
-  
+  id: number;
   dia: string;
   hora: string;
   nivel: string;
@@ -22,24 +22,13 @@ export interface Horario {
 export class HorariosDisponiblesComponent {
 
   nivelHorarios: Horario[] = [];
-  dias: string[] = [];
-  horas: string[] = [];
+  dias: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  horas: string[] = ['08:00', '09:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
   usuarioNivel: string = '';
 
-  horarios: Horario[] = [
-    
-  { "dia": "Lunes", "hora": "08:00", "nivel": "Avanzado", "totalCamas": 5, "camasReservadas": 0 },
-  { "dia": "Lunes", "hora": "09:00", "nivel": "Avanzado", "totalCamas": 5, "camasReservadas": 0 },
-  { "dia": "Lunes", "hora": "10:00", "nivel": "Intermedio", "totalCamas": 5, "camasReservadas": 0 },
-  { "dia": "Lunes", "hora": "11:00", "nivel": "Intermedio", "totalCamas": 5, "camasReservadas": 0 },
-  { "dia": "Lunes", "hora": "15:00", "nivel": "Intermedio", "totalCamas": 5, "camasReservadas": 0 },
-  { "dia": "Lunes", "hora": "16:00", "nivel": "Intermedio", "totalCamas": 5, "camasReservadas": 0 },
-  { "dia": "Lunes", "hora": "17:00", "nivel": "Inicial", "totalCamas": 5, "camasReservadas": 0 },
-  { "dia": "Lunes", "hora": "18:00", "nivel": "Inicial", "totalCamas": 5, "camasReservadas": 0 }
-  // Repetí esto mismo para Martes a Viernes
-]
+  horarios: Horario[] = [ ];
   
-    
+  
   constructor(private router: Router, private horariosService: HorariosService) {
  
     this.usuarioNivel = localStorage.getItem('nivelUsuario') || '';
@@ -73,13 +62,41 @@ export class HorariosDisponiblesComponent {
 
   ngOnInit() {
     this.horariosService.horarios$.subscribe(data => {
-      this.horarios = data;
-      this.cargarHorarios(); // recalcula nivelHorarios, dias y horas con los datos ya cargados
-      console.log('Horarios actualizados:', this.horarios);
+      this.horarios = (data && data.length > 0) ? data : this.generarHorariosBase();
+      
+      this.cargarHorarios();
+
+      console.log('✅ Datos recibidos desde el observable o generados localmente');
+      console.log('Usuario nivel:', this.usuarioNivel);
+      console.log('Horarios:', this.horarios);
     });
+
     this.horariosService.cargarHorarios();
-    console.log(this.horarios);
   }
+
+
+
+  generarHorariosBase(): Horario[] {
+  const horariosBase: Horario[] = [];
+  let idCounter = 1; // ✅ Declarás idCounter antes de usarlo
+
+  for (let dia of this.dias) {
+    for (let hora of this.horas) {
+      const nivel = this.getNivelParaHorario(dia, hora);
+
+      horariosBase.push({
+        id: idCounter++, // ✅ Asignás un id único
+        dia,
+        hora,
+        nivel,
+        totalCamas: 5,
+        camasReservadas: 0
+      });
+    }
+  }
+
+  return horariosBase;
+}
 
   cargarHorarios() {
     this.usuarioNivel = localStorage.getItem('nivelUsuario') || '';
@@ -89,24 +106,23 @@ export class HorariosDisponiblesComponent {
         h => h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase()
       );
     } else {
-      this.nivelHorarios = this.horarios;
+      this.nivelHorarios = this.horarios; // <=== MOSTRAR TODOS
     }
 
     this.dias = Array.from(new Set(this.horarios.map(h => h.dia)));
-    this.horas = Array.from(new Set(this.horarios.map(h => h.hora))).sort(
-      (a, b) => {
-        const ah = parseInt(a.split(':')[0], 10);
-        const bh = parseInt(b.split(':')[0], 10);
-        return ah - bh;
-      }
-    );
+    this.horas = Array.from(new Set(this.horarios.map(h => h.hora))).sort((a, b) => {
+      const ah = parseInt(a.split(':')[0], 10);
+      const bh = parseInt(b.split(':')[0], 10);
+      return ah - bh;
+    });
 
     console.log('Usuario nivel:', this.usuarioNivel);
     console.log('Horarios mostrados:', this.nivelHorarios);
     console.log('Días:', this.dias);
     console.log('Horas:', this.horas);
   }
- 
+
+  
 
   getNivelTurno(dia: string, hora: string): string {
     // Si hay usuario logueado, filtra por su nivel
@@ -124,64 +140,87 @@ export class HorariosDisponiblesComponent {
     }
   }
 
-  getDisponibles(dia: string, hora: string): string {
-    if (this.usuarioNivel) {
-      const turno = this.horarios.find(h =>
-        h.dia === dia &&
-        h.hora === hora &&
-        h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase()
-      );
-      return turno ? (turno.totalCamas - turno.camasReservadas).toString() : '0';
-    } else {
-      // Suma los disponibles de todos los niveles
-      const turnos = this.horarios.filter(h => h.dia === dia && h.hora === hora);
-      return turnos
-        .map(t => `${t.nivel}: ${t.totalCamas - t.camasReservadas}`)
-        .join(' | ');
-    }
-  }
 
-  isDisponible(dia: string, hora: string): boolean {
-    if (this.usuarioNivel) {
-      const turno = this.horarios.find(h =>
-        h.dia === dia &&
-        h.hora === hora &&
-        h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase()
-      );
-      return turno ? turno.totalCamas > turno.camasReservadas : false;
-    } else {
-      // Si no hay usuario, es disponible si hay algún turno con camas libres
-      return this.horarios.some(h =>
-        h.dia === dia &&
-        h.hora === hora &&
-        h.totalCamas > h.camasReservadas
-      );
-    }
-  }
-
-  reservar(dia: string, hora: string) {
-    if (!this.usuarioNivel) {
-      // No logueado: no hacer nada
-      return;
-    }
-    const nivelTurno = this.getNivelTurno(dia, hora);
-    this.router.navigate(['/gestion-turnos'], {
-      queryParams: {
-        dia,
-        hora,
-        nivel: nivelTurno || this.usuarioNivel
-      }
-    });
-  }
-
-  isClickable(dia: string, hora: string): boolean {
-    // Permite click solo si hay usuario logueado y hay turno disponible para su nivel
-    if (!this.usuarioNivel) return false;
-    const turno = this.horarios.find(
-      h => h.dia === dia && h.hora === hora && h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase()
+  getDisponibles(dia: string, hora: string, nivel: string): string {
+    if (nivel === 'No disponible') return '0';
+    const turno = this.horarios.find(h =>
+      h.dia === dia && h.hora === hora && h.nivel === nivel
     );
-    return turno ? this.isDisponible(dia, hora) : false;
+    return turno ? (turno.totalCamas - turno.camasReservadas).toString() : '5';
   }
 
+
+
+  isDisponible(dia: string, hora: string, nivel: string): boolean {
+    const turno = this.horarios.find(h =>
+      h.dia === dia &&
+      h.hora === hora &&
+      h.nivel.toLowerCase() === nivel.toLowerCase()
+    );
+    return turno ? turno.totalCamas > turno.camasReservadas : false;
+  }
+
+
+  reservar(dia: string, hora: string, nivel: string) {
+  if (!this.isClickable(dia, hora, nivel)) return;
+
+  const id = this.getIdTurno(dia, hora, nivel);
+  if (id === null) {
+    alert('Turno no encontrado.');
+    return;
+  }
+
+  this.horariosService.reservar(id).subscribe({
+    next: (turnoActualizado) => {
+      console.log('✅ Turno reservado:', turnoActualizado);
+    },
+    error: (err) => {
+      alert('No se pudo reservar el turno: ' + err.error.message || err.message);
+    }
+  });
+}
+
+
+  getIdTurno(dia: string, hora: string, nivel: string): number | null {
+    const turno = this.horarios.find(
+      h => h.dia === dia && h.hora === hora && h.nivel === nivel
+    );
+    return turno ? turno['id'] : null;
+  }
+
+
+
+  isClickable(dia: string, hora: string, nivel: string): boolean {
+  return (
+    !!this.usuarioNivel &&
+    this.usuarioNivel.toLowerCase() === nivel.toLowerCase() &&
+    this.isDisponible(dia, hora, nivel)
+  );
+}
+
+
+  getNivelParaHorario(dia: string, hora: string): string {
+    if (dia === 'Viernes' && hora === '08:00') {
+      return 'No disponible';
+    }
+    if (dia === 'Viernes' && hora === '18:00') {
+      return 'No disponible';
+    }
+    if (['08:00', '09:00'].includes(hora)) {
+      return 'Avanzado';
+    } else if (['10:00', '11:00', '15:00', '16:00'].includes(hora)) {
+      return 'Intermedio';
+    } else if (['17:00', '18:00'].includes(hora)) {
+      return 'Inicial';
+    } else {
+      return 'No definido';
+    }
+  }
 
 }
+
+
+
+
+
+
