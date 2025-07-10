@@ -1,5 +1,5 @@
-<!-- horario.component.html -->
-<div class="horario-wrapper">
+<div class="table-container" *ngIf="horarios.length > 0">
+  <h2>Horarios Disponibles</h2>
   <table>
     <thead>
       <tr>
@@ -8,24 +8,28 @@
       </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let hora of horas">
-            <td>{{ hora }}</td>
-            <td *ngFor="let dia of dias"
-                [ngClass]="{
-                'inicial': usuarioNivel === 'Inicial',
-                'intermedio': usuarioNivel === 'Intermedio',
-                'avanzado': usuarioNivel === 'Avanzado',
-                'no-disponible': !isDisponible(dia, hora)
-                }"
-                (click)="isDisponible(dia, hora) && reservar(dia, hora)">
-            <span *ngIf="isDisponible(dia, hora)">
-                {{ usuarioNivel }}<br>
-                Camas libres: {{ getDisponibles(dia, hora) }}
+      <tr *ngFor="let hora of horas">
+        <td class="hora-columna">{{ hora }}</td>
+        <td *ngFor="let dia of dias">
+          <div
+            [ngClass]="[
+              getNivelParaHorario(dia, hora).toLowerCase().replace(' ', '-'),
+              isClickable(dia, hora, getNivelParaHorario(dia, hora)) ? 'clickeable' : '',
+            
+              false ? 'no-disponible' : ''
+            ]"
+            (click)="reservar(dia, hora, getNivelParaHorario(dia, hora))"
+          >
+            <span *ngIf="getNivelParaHorario(dia, hora) !== 'No disponible'">
+              {{ getNivelParaHorario(dia, hora) }}<br>
+              Camas libres: {{ getDisponibles(dia, hora, getNivelParaHorario(dia, hora)) }}
             </span>
-            <span *ngIf="!isDisponible(dia, hora)">No disponible</span>
-            </td>
-        </tr>
-        </tbody>
+            <span *ngIf="getNivelParaHorario(dia, hora) === 'No disponible'">
+              No disponible
+            </span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
   </table>
 </div>
-

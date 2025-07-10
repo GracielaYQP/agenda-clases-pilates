@@ -14,7 +14,7 @@ export class Horario {
   @Column()
   nivel: string;
 
-  @Column()
+  @Column({ default: 5 })
   totalCamas: number;
 
   @Column({ default: 0 })
