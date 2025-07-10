@@ -15,7 +15,7 @@ export class InvitacionesController {
 
     return {
       valida: true,
-      email: invitacion.email,
+      telefono: invitacion.telefono,
       nivel: invitacion.nivel_asignado,
     };
   }

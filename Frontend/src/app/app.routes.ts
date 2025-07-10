@@ -24,7 +24,9 @@ export const routes: Routes = [
   { path: 'clases', component: ClasesComponent  },
   { path: 'horarios-disponibles', component: HorariosDisponiblesComponent  },
   { path: 'planes', component: PlanesComponent  },
-  { path: 'gestion-turnos', component: GestionTurnosComponent, canActivate: [AuthGuard]  },
+  { path: 'gestion-turnos', 
+    component: GestionTurnosComponent, 
+    canActivate: [AuthGuard]  },
   {
     path: 'admin/invitaciones',
     component: InvitacionesComponent,

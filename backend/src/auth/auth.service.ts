@@ -55,7 +55,7 @@ export class AuthService {
       nombre: data.nombre,
       apellido: data.apellido,  
       telefono: data.telefono,
-      email: data.email,// Asegúrate de que el DTO tenga este campo 
+      email: data.email,
       password: data.password, 
       nivel: data.nivel,
     });

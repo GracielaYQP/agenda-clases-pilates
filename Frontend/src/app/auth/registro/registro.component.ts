@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgIf } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { InvitacionService } from '../../services/invitacion.services';
-
-
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [ReactiveFormsModule, NgIf, NgClass,],
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css'],
 })
@@ -19,9 +17,10 @@ export class RegistroComponent {
   error: string = '';
   successMessage: string = '';
   invitacionValida: boolean = false;
+  showPassword: boolean = false; 
 
   // Datos de invitación
-  email: string = '';
+  telefono: string = '';
   nivel: string = '';
 
   constructor(
@@ -58,12 +57,9 @@ export class RegistroComponent {
           ),
         ],
       ],
-      telefono: [
+       email: [
         '',
-        [
-          Validators.required,
-          Validators.pattern(/^[0-9]{10,13}$/),
-        ],
+        [Validators.required, Validators.email]
       ],
       password: [
         '',
@@ -74,7 +70,13 @@ export class RegistroComponent {
           ),
         ],
       ],
-    });
+      repeat_password: [
+        '',
+        Validators.required
+      ],
+    },
+    { validators: this.passwordsMatchValidator }
+    );  
 
     // Procesa token de invitación de la URL
     const token = this.route.snapshot.queryParamMap.get('token');
@@ -85,11 +87,17 @@ export class RegistroComponent {
     }
   }
 
+  passwordsMatchValidator(form: FormGroup) {
+    const password = form.get('password')?.value;
+    const repeatPassword = form.get('repeat_password')?.value;
+    return password === repeatPassword ? null : { passwordMismatch: true };
+  }
+
   validarInvitacion(token: string) {
     this.invitacionService.getInvitacion(token).subscribe({
-      next: (res: { email: string; nivel: string; }) => {
+      next: (res: { telefono: string; nivel: string; }) => {
         this.invitacionValida = true;
-        this.email = res.email;
+        this.telefono = res.telefono;
         this.nivel = res.nivel;
       },
       error: () => {
@@ -104,7 +112,7 @@ export class RegistroComponent {
 
     const data = {
       ...this.form.value,
-      email: this.email,
+      telefono: this.telefono,
       nivel: this.nivel,
     };
 
@@ -118,7 +126,7 @@ export class RegistroComponent {
         }, 3000);
       },
       error: () => {
-        this.error = 'Error al registrar. Puede que ya esté registrado.';
+        this.error = 'Error al registrar. Puede que este usuario ya esté registrado.';
         this.successMessage = '';
       },
     });
@@ -143,5 +151,9 @@ export class RegistroComponent {
 
   get Password() {
     return this.form.get('password');
+  }
+
+  togglePasswordVisibility() {  
+    this.showPassword = !this.showPassword;
   }
 }

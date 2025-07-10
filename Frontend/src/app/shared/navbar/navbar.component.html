@@ -1,36 +1,36 @@
-<!-- Navbar cuando está logueado -->
-<nav class="navbar" *ngIf="auth.isLoggedIn(); else noLogueado">
+<!-- Navbar general -->
+<nav class="navbar">
   <div class="nav-left">
-    <a routerLink="/">Inicio</a> 
-    <a routerLink="/acerca-de">¿Qué es pilates?</a>
-    <a routerLink="/CvLucia">Lucía Carletta</a>
-    <a routerLink="/clases">Clases</a>
-    <a routerLink="/planes">Planes</a>
-    <a routerLink="/horarios-disponibles">Horarios disponibles</a>
-    <a routerLink="/gestion-turnos">Gestionar turnos</a>
-    <a *ngIf="isAdmin" routerLink="/admin/invitaciones">Enviar invitación</a>
-    <a *ngIf="isAdmin" routerLink="/listar-alumnos">Listado de alumnos</a>
-  </div>
-  <div class="nav-right">
-    <a (click)="logout()" class="action-btn" style="cursor:pointer;">Cerrar sesión</a>
-  </div>
-</nav>
+    <a routerLink="/">Inicio</a>
 
-<!-- Navbar cuando NO está logueado -->
-<ng-template #noLogueado>
-  <nav class="navbar">
-    <div class="nav-left">
-      <a routerLink="/">Inicio</a>
+    <!-- Solo para NO logueados o usuario común -->
+    <ng-container *ngIf="!auth.isLoggedIn() || (auth.isLoggedIn() && !isAdmin)">
       <a routerLink="/acerca-de">¿Qué es pilates?</a>
       <a routerLink="/CvLucia">Lucía Carletta</a>
       <a routerLink="/clases">Clases</a>
       <a routerLink="/planes">Planes</a>
-      <a routerLink="/horarios-disponibles">Horarios disponibles</a>
-      <a routerLink="/register">Registrarse</a>
-    </div>
-    <div class="nav-right">
-      <a routerLink="/login" class="action-btn">Ingresar</a>
-    </div>
-  </nav>
-</ng-template>
+    </ng-container>
+
+    <!-- Siempre visible -->
+    <a routerLink="/horarios-disponibles">Horarios disponibles</a>
+
+    <!-- Si está logueado y NO es admin -->
+    <a *ngIf="auth.isLoggedIn() && !isAdmin" routerLink="/gestion-turnos">Gestionar turnos</a>
+
+    <!-- Solo si es admin -->
+    <ng-container *ngIf="isAdmin">
+      <a routerLink="/gestion-turnos">Gestionar turnos</a>
+      <a routerLink="/admin/invitaciones">Enviar invitación</a>
+      <a routerLink="/listar-alumnos">Listado de alumnos</a>
+    </ng-container>
+
+    <!-- Mostrar "Registrarse" solo si no está logueado -->
+    <a *ngIf="!auth.isLoggedIn()" routerLink="/register">Registrarse</a>
+  </div>
+
+  <div class="nav-right">
+    <a *ngIf="auth.isLoggedIn()" (click)="logout()" class="action-btn" style="cursor:pointer;">Cerrar sesión</a>
+    <a *ngIf="!auth.isLoggedIn()" routerLink="/login" class="action-btn">Ingresar</a>
+  </div>
+</nav>
 

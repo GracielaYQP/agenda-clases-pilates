@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 interface Alumno {
   id: number;
@@ -16,12 +17,16 @@ interface Alumno {
 @Component({
   standalone: true,
   selector: 'app-listar-alumnos',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './listar-alumnos.component.html',
   styleUrl: './listar-alumnos.component.css',
 })
 export class ListarAlumnosComponent implements OnInit {
+  
   alumnos: Alumno[] = [];
+  filtroApellido: string = '';
+  filtroDni: string = '';
+  filtroTelefono: string = '';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -49,7 +54,13 @@ export class ListarAlumnosComponent implements OnInit {
       });
   }
 
-
+  get alumnosFiltrados() {
+  return this.alumnos.filter(alumno =>
+    alumno.apellido.toLowerCase().includes(this.filtroApellido.toLowerCase()) &&
+    alumno.dni.toString().includes(this.filtroDni) &&
+    alumno.telefono.toString().includes(this.filtroTelefono)
+  );
+}
 
   editarAlumno(id: number) {
     // Redirige a una ruta de edición, por ejemplo:

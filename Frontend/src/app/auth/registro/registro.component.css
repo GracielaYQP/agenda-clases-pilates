@@ -1,13 +1,21 @@
-/* Contenedor principal horizontal */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
 .registro-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh; 
-  padding: 0, 20px;
+  min-height: calc(100vh - 36px - 48px);
+  padding:80px 20px;
   box-sizing: border-box;
-  margin: 0;
-  height: calc(100vh - 36px - 48px);
+  padding-top: 90px;
+  padding-bottom: 30px;
+
    
 }   
 
@@ -36,19 +44,19 @@
 .singin-container {
   width: 50%;
   max-width: 400px;          
-  /* background-color: white; */
-  background-image: url('/assets/logos/registro.png');
-  background-repeat: no-repeat;      /* Evita que la imagen se repita */
-  background-size: cover;            /* Hace que la imagen cubra todo el contenedor */
+  background-image: url('/assets/logos/dibupilates6.jpg');
+  background-repeat: no-repeat;      
+  background-size: cover;            
   background-position: center;
   background-color: rgba(255,255,255,0.7); /* Blanco semitransparente encima */
   background-blend-mode: lighten;          /* Mezcla para aclarar la imagen */
   padding: 20px;              
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  max-height: 90vh;         
-  margin: 0;            
+  overflow-y: visible;
+  max-height: none;         
+  margin: 0;
+  overflow-x: hidden;            
 }
 
 
@@ -65,7 +73,8 @@ input {
   padding: 6px; 
   width: 100%; 
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
-  margin-bottom: 8px; 
+  margin-bottom: 8px;
+  background-color: #f5f5f5; 
 }
 
 #registro_alumnos {
@@ -142,12 +151,12 @@ input {
 
   width: 50%;
   max-width: 400px;          
-  background-image: url('/assets/logos/registro.png');
-  background-repeat: no-repeat;      /* Evita que la imagen se repita */
-  background-size: cover;            /* Hace que la imagen cubra todo el contenedor */
+  background-image: url('/assets/logos/dibupilates6.jpg');
+  background-repeat: no-repeat;      
+  background-size: cover;           
   background-position: center;
-  background-color: rgba(255,255,255,0.7); /* Blanco semitransparente encima */
-  background-blend-mode: lighten;          /* Mezcla para aclarar la imagen */
+  background-color: rgba(255,255,255,0.7); 
+  background-blend-mode: lighten;          
   padding: 80px;              
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -174,4 +183,23 @@ input {
   .no-invitacion-text {
     font-size: 1rem;
   }
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* espacio para el botón */
+}
+
+.password-wrapper .toggle-password {
+  position: absolute;
+  right: 10px; /* separa del borde derecho */
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }

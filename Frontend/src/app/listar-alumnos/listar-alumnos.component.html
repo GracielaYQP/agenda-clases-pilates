@@ -1,5 +1,11 @@
 <div class="table-container">
   <h2>Listado de Alumnos</h2>
+  <div class="filtros-alumnos">
+    <input type="text" [(ngModel)]="filtroApellido" placeholder="Buscar por apellido">
+    <input type="text" [(ngModel)]="filtroDni" placeholder="Buscar por DNI">
+    <input type="text" [(ngModel)]="filtroTelefono" placeholder="Buscar por teléfono">
+  </div>
+
   <table>
     <thead>
       <tr>
@@ -13,7 +19,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let alumno of alumnos">
+      <tr *ngFor="let alumno of alumnosFiltrados">
+
         <td>{{ alumno.apellido }}</td>
         <td>{{ alumno.nombre }}</td>
         <td>{{ alumno.dni }}</td>
