@@ -15,7 +15,7 @@
 .singin-container {
   width: 50%;
   max-width: 400px;          
-  background-image: url('/assets/logos/dibupilates6.jpg');
+  background-image: url('/assets/logos/dibupilates3.jpg');
   background-repeat: no-repeat;      /* Evita que la imagen se repita */
   background-size: cover;            /* Hace que la imagen cubra todo el contenedor */
   background-position: center 90%; /*sube la imagen hacia  */
@@ -45,7 +45,8 @@ input {
   padding: 6px; 
   width: 100%; 
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
-  margin-bottom: 8px; 
+  margin-bottom: 8px;
+  background-color: #F5F5F5; 
 }
 
 #registro_alumnos {
@@ -62,21 +63,31 @@ input {
 }
 
 .text-danger {
-  color: red;
+  color: #d32f2f;
   font-size: 12px;
   margin: 2px 0 0 4px;
+  font-weight: bold;
 }
+
+.alert-error {
+  color: #d32f2f;  
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 14px;  
+}
+
 /* Botón fucsia */
 .btn-singin {
   background-color: #d81b60;
   color: white;
-  padding: 10px 20px;
+  padding: 6px 12px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 14px;
   transition: background-color 0.3s ease;
-  width: 70%;
+  width: auto;
   text-align: center;
   display: block;
   margin: 0 auto; 
@@ -135,4 +146,12 @@ select {
 
 .text-center {
   text-align: center;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
 }

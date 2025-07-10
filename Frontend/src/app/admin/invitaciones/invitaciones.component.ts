@@ -17,11 +17,13 @@ export class InvitacionesComponent {
   generatedLink: string = '';
   success: string = '';
   error: string = '';
+  linkWhatsapp: string = '';
+
 
 
   constructor( private router: Router, private fb: FormBuilder, private http: HttpClient, public auth: AuthService) {
     this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{10,13}$/)]],
       nivel: ['', Validators.required],
     });
   }
@@ -32,7 +34,10 @@ export class InvitacionesComponent {
   }
   
   enviarInvitacion() {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched(); // 👈 Activa todos los mensajes de error
+      return;
+    }
 
     this.http.post<{ token: string }>('http://localhost:3000/auth/invitar', this.form.value)
       .subscribe({
@@ -40,9 +45,20 @@ export class InvitacionesComponent {
           this.generatedLink = `http://localhost:4200/register?token=${res.token}`;
           this.success = 'Invitación generada correctamente.';
           this.error = '';
-        },
-        error: () => {
-          this.error = 'Hubo un error al generar la invitación.';
+          // Generar link de WhatsApp
+        const numeroSinEspacios = this.form.value.telefono.replace(/\s/g, '');
+        const texto = encodeURIComponent(
+          `Hola! Soy Lucía Carletta! Te envío el link para que completes tu registro: ${this.generatedLink}`
+        );
+        this.linkWhatsapp = `https://wa.me/54${numeroSinEspacios}?text=${texto}`;
+      },
+        error: (err) => {
+          this.generatedLink = '';
+          if (err.error && err.error.message) {
+            this.error = err.error.message;   // Usa mensaje del backend (ej: "Correo ya registrado")
+          } else {
+            this.error = 'Hubo un error al generar la invitación. Usuario ya registrado o error del servidor.';
+          }
           this.success = '';
         }
       });
@@ -51,4 +67,9 @@ export class InvitacionesComponent {
     this.auth.logout();
     this.router.navigate(['/']); 
   }
+
+  copiarAlPortapapeles() {
+    navigator.clipboard.writeText(this.generatedLink || '');
+  }
+
 }

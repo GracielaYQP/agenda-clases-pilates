@@ -13,46 +13,55 @@ export class UsersService {
   ) {}
 
   async create(userData: {
-    email: string;
-    nombre: string;
-    apellido: string;
-    dni: string;
-    telefono: string; 
-    password: string;
-    nivel: string;
-  }): Promise<User> {
-    const existingEmail = await this.userRepository.findOne({
-      where: { email: userData.email },
-    });
-
-    if (existingEmail) {
-      throw new BadRequestException('El email ya está registrado');
-    }
-
-    const existingDNI = await this.userRepository.findOne({
-      where: { dni: userData.dni },
-    });
-
-    if (existingDNI) {
-      throw new BadRequestException('El DNI ya está registrado');
-    }
-
-    // Hashear la contraseña
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-
-    const user = this.userRepository.create({
-      email: userData.email,
-      nombre: userData.nombre,
-      apellido: userData.apellido,
-      dni: userData.dni,
-      telefono: userData.telefono,
-      password: hashedPassword,
-      nivel: userData.nivel,
-    });
-
-    const savedUser = await this.userRepository.save(user);
-    return savedUser;
+  email: string;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  telefono: string; 
+  password: string;
+  nivel: string;
+}): Promise<User> {
+  // Validar email único
+  const existingEmail = await this.userRepository.findOne({
+    where: { email: userData.email },
+  });
+  if (existingEmail) {
+    throw new BadRequestException('El email ya está registrado');
   }
+
+  // Validar DNI único
+  const existingDNI = await this.userRepository.findOne({
+    where: { dni: userData.dni },
+  });
+  if (existingDNI) {
+    throw new BadRequestException('El DNI ya está registrado');
+  }
+
+  // 🚨 Validar que la contraseña no esté repetida
+  const existingUsers = await this.userRepository.find();
+  for (const existing of existingUsers) {
+    const isSame = await bcrypt.compare(userData.password, existing.password);
+    if (isSame) {
+      throw new BadRequestException('La contraseña ya está en uso. Elegí una diferente.');
+    }
+  }
+
+  // Hashear la contraseña
+  const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+  const user = this.userRepository.create({
+    email: userData.email,
+    nombre: userData.nombre,
+    apellido: userData.apellido,
+    dni: userData.dni,
+    telefono: userData.telefono,
+    password: hashedPassword,
+    nivel: userData.nivel,
+  });
+
+  return await this.userRepository.save(user);
+}
+
 
   async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.userRepository.findOne({ where: { email } });

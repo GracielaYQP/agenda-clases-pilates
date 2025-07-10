@@ -6,7 +6,7 @@ export class Invitacion {
   id: number;
 
   @Column()
-  email: string;
+  telefono: string;
 
   @Column({ unique: true })
   token: string;

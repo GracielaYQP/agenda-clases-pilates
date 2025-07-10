@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Invitacion } from './invitaciones.entity';
@@ -24,15 +24,23 @@ export class InvitacionesService {
   }
 
   // (Opcional) Crear una nueva invitación
-  async crearInvitacion(email: string, nivel: string, token: string): Promise<Invitacion> {
+  async crearInvitacion(telefono: string, nivel: string, token: string): Promise<Invitacion> {
+    const invitacionExistente = await this.invitacionRepo.findOne({ where: { telefono } });
+
+    if (invitacionExistente) {
+      throw new BadRequestException('Este usuario ya tiene una invitación pendiente o fue registrado.');
+    }
+
     const invitacion = this.invitacionRepo.create({
-      email,
+      telefono,
       nivel_asignado: nivel,
       token,
       estado: 'pendiente',
     });
+
     return this.invitacionRepo.save(invitacion);
   }
+
 
   
 }

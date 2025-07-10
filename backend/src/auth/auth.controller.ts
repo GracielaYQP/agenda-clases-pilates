@@ -29,11 +29,11 @@ export class AuthController {
 
     // Aquí creas el usuario, usando el nivel asignado en la invitación
     await this.authService.createUser({
-      email: invitacion.email,
+      email: dto.email,
       nombre: dto.nombre,
       apellido: dto.apellido,  
       dni: dto.dni,
-      telefono: dto.telefono,
+      telefono: invitacion.telefono,
       password: dto.password,
       nivel: invitacion.nivel_asignado,
     });
@@ -45,16 +45,16 @@ export class AuthController {
   }
 
   @Post('invitar')
-  async invitar(@Body() dto: { email: string; nivel: string }) {
-    if (!dto.email || !dto.nivel) {
-      throw new BadRequestException('Email y nivel son requeridos');
+  async invitar(@Body() dto: { telefono: string; nivel: string }) {
+    if (!dto.telefono || !dto.nivel) {
+      throw new BadRequestException('Teléfono y nivel son requeridos');
     }
 
     // Generar un token único para la invitación
     const token = uuidv4();
 
     // Guardar la invitación en la DB (usa tu servicio)
-    await this.invitacionesService.crearInvitacion(dto.email, dto.nivel, token);
+    await this.invitacionesService.crearInvitacion(dto.telefono, dto.nivel, token);
 
     // Retornar el token para que el frontend genere el link
     return { token };
@@ -69,7 +69,7 @@ export class AuthController {
       }
 
       return {
-        email: invitacion.email,
+        telefono: invitacion.telefono,
         nivel: invitacion.nivel_asignado,
       };
     }

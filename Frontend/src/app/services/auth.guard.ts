@@ -18,7 +18,7 @@ export class AuthGuard implements CanActivate{
     const userRole: string = this.auth.getRol() || ''; 
     const allowedRoles = route.data['roles'] as string[] | undefined;
 
-    if (allowedRoles && !allowedRoles.includes(userRole)) {
+    if (allowedRoles && !allowedRoles.includes(userRole || '')) {
       // No tiene permiso
       this.router.navigate(['/']);
       return false;
