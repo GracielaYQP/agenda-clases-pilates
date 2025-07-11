@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { InvitacionesModule } from './invitaciones/invitaciones.module';
 import { HorariosModule } from './horarios/horarios.module';
+import { MailerService } from './auth/mailer/mailer.service';
+import { ReservaModule } from './reserva/reserva.module';
 
 
 
@@ -25,9 +27,11 @@ import { HorariosModule } from './horarios/horarios.module';
     UsersModule,
     InvitacionesModule,
     HorariosModule,
+    ReservaModule,
+    
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MailerService,],
 })
 export class AppModule {}
 

@@ -1,5 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HorariosService } from '../services/horarios.service';
+import { ActivatedRoute } from '@angular/router';
+
+export interface Reserva {
+  id: number;
+  nombre: string;
+  apellido: string;
+}
+
+export interface Horario {
+  id: number;
+  dia: string;
+  hora: string;
+  nivel: string;
+  totalCamas: number;
+  camasReservadas: number;
+  reservas: Reserva[];
+}
 
 @Component({
   selector: 'app-gestion-turnos',
@@ -10,42 +28,66 @@ import { CommonModule } from '@angular/common';
 })
 export class GestionTurnosComponent implements OnInit {
   usuarioNivel: string = '';
-
   dias: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-  horas: string[] = ['8:00', '9:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
-
+  horas: string[] = ['08:00', '09:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
   horarios: any[] = [];
 
+  constructor(
+    private horariosService: HorariosService,
+    private route: ActivatedRoute
+  ) {}
+  
   ngOnInit() {
-    const nivelGuardado = localStorage.getItem('nivelUsuario') || 'Intermedio';
-    this.usuarioNivel = nivelGuardado.trim();
-    console.log('Nivel del usuario:', this.usuarioNivel);
-
-    // Mock de horarios de ejemplo
-    this.horarios = [
-      { dia: 'Lunes', hora: '8:00', nivel: 'Avanzado', totalCamas: 5, camasReservadas: 2 },
-      { dia: 'Lunes', hora: '9:00', nivel: 'Avanzado', totalCamas: 5, camasReservadas: 1 },
-      { dia: 'Lunes', hora: '10:00', nivel: 'Intermedio', totalCamas: 5, camasReservadas: 3 },
-      { dia: 'Lunes', hora: '11:00', nivel: 'Intermedio', totalCamas: 5, camasReservadas: 0 },
-      { dia: 'Lunes', hora: '15:00', nivel: 'Intermedio', totalCamas: 5, camasReservadas: 5 },
-      { dia: 'Lunes', hora: '16:00', nivel: 'Intermedio', totalCamas: 5, camasReservadas: 1 },
-      { dia: 'Lunes', hora: '17:00', nivel: 'Inicial', totalCamas: 5, camasReservadas: 2 },
-      { dia: 'Lunes', hora: '18:00', nivel: 'Inicial', totalCamas: 5, camasReservadas: 0 },
-      // Repite para otros días según necesites...
-      { dia: 'Viernes', hora: '9:00', nivel: 'Avanzado', totalCamas: 5, camasReservadas: 2 },
-      { dia: 'Viernes', hora: '10:00', nivel: 'Intermedio', totalCamas: 5, camasReservadas: 2 },
-    ];
-  }
-
-  reservar(turno: any) {
-    if (turno.totalCamas - turno.camasReservadas <= 0) {
-      alert('No hay camas disponibles para este horario');
+    const nivelGuardado = localStorage.getItem('nivelUsuario');
+    if (!nivelGuardado) {
+      console.error('❌ Nivel de usuario no encontrado.');
       return;
     }
 
-    console.log(`Reservando: ${turno.dia} ${turno.hora} (${turno.nivel})`);
-    // Aquí luego harás POST al backend para registrar la reserva real.
+    this.usuarioNivel = nivelGuardado.trim();
+    console.log('Nivel del usuario:', this.usuarioNivel);
+
+    // 🔁 Forzar recarga al entrar a la vista
+    this.route.queryParams.subscribe(() => {
+      this.horariosService.cargarHorarios();
+    });
+
+    this.horariosService.horarios$.subscribe(data => {
+      this.horarios = data;
+      console.log('Horarios cargados desde backend:', this.horarios);
+
+      const turnosConReservas = this.horarios.filter(t => t.reservas && t.reservas.length > 0);
+      console.log('Turnos con reservas:', turnosConReservas);
+    });
   }
+
+
+  getNivelParaHorario(hora: string): string {
+    if (['08:00', '09:00'].includes(hora)) return 'Avanzado';
+    if (['10:00', '11:00', '15:00', '16:00'].includes(hora)) return 'Intermedio';
+    if (['17:00', '18:00'].includes(hora)) return 'Inicial';
+    return '';
+  }
+
+  reservar(turno: any) {
+    const nombre = localStorage.getItem('nombreUsuario') || 'Desconocido';
+    const apellido = localStorage.getItem('apellidoUsuario') || 'Desconocido';
+    const userId = Number(localStorage.getItem('userId'));
+
+    const mensaje = `¿Deseás reservar este turno?\n\nNombre: ${nombre}\nApellido: ${apellido}\nNivel: ${turno.nivel}\nDía: ${turno.dia}\nHora: ${turno.hora}`;
+
+    if (confirm(mensaje)) {
+      this.horariosService.reservar(turno.id, nombre, apellido, userId).subscribe({
+        next: () => {
+          alert('✅ ¡Turno reservado exitosamente!');
+        },
+        error: (err) => {
+          alert('❌ No se pudo reservar: ' + err.error.message);
+        }
+      });
+    }
+  }
+
 
     hasTurno(dia: string, hora: string): boolean {
       return this.horarios.some(

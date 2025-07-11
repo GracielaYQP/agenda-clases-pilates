@@ -19,12 +19,13 @@ export class LoginComponent {
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      usuario: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
-  get Email() {
-    return this.form.get('email');
+
+  get Usuario() {
+    return this.form.get('usuario');
   }
 
   get Password() {
@@ -37,6 +38,7 @@ export class LoginComponent {
 
   submit() {
     if (this.form.invalid) return;
+    console.log('🔐 Enviando datos de login:', this.form.value);
 
     this.auth.login(this.form.value).subscribe({
       next: (res) => {
@@ -48,7 +50,10 @@ export class LoginComponent {
 
         this.router.navigate(['/']);
       },
-      error: () => this.error = 'Email o contraseña incorrectos',
+      error: (err) => {
+        console.log('❌ Error al iniciar sesión:', err);
+        this.error = err.error?.message || 'Error desconocido al iniciar sesión';
+      }
     });
   }
 

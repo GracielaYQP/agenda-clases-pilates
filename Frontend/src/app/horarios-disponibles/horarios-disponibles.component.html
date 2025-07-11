@@ -15,7 +15,6 @@
             [ngClass]="[
               getNivelParaHorario(dia, hora).toLowerCase().replace(' ', '-'),
               isClickable(dia, hora, getNivelParaHorario(dia, hora)) ? 'clickeable' : '',
-            
               false ? 'no-disponible' : ''
             ]"
             (click)="reservar(dia, hora, getNivelParaHorario(dia, hora))"

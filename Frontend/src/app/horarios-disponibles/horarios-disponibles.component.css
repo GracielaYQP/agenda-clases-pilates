@@ -102,3 +102,29 @@ td > div {
   box-shadow: inset 0 0 0 1px #ddd;
 }
 
+.inicial,
+.intermedio,
+.avanzado {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.inicial .nivel,
+.intermedio .nivel,
+.avanzado .nivel {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.inicial .camas,
+.intermedio .camas,
+.avanzado .camas {
+  font-weight: normal;
+  font-size: 13px;
+}

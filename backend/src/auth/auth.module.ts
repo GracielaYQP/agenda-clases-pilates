@@ -6,6 +6,7 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { InvitacionesModule } from 'src/invitaciones/invitaciones.module';
+import { MailerService } from './mailer/mailer.service';
 
 
 @Module({
@@ -18,7 +19,7 @@ import { InvitacionesModule } from 'src/invitaciones/invitaciones.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, MailerService],
 })
 export class AuthModule {}
 

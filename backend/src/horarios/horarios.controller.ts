@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 import { HorariosService } from './horarios.service';
 
 @Controller('horarios')
@@ -15,9 +15,5 @@ export class HorariosController {
     return this.horariosService.findOne(+id);
   }
 
-  @Patch(':id/reservar')
-  reservar(@Param('id') id: string) {
-    return this.horariosService.reservar(+id);
-  }
 }
 
