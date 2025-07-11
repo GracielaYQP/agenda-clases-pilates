@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Reserva } from 'src/reserva/reserva.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 
 @Entity('user')
 export class User {
@@ -38,8 +39,14 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column('varchar', { nullable: true })
+  resetToken: string | null;
 
+  @Column('timestamp', { nullable: true })
+  resetTokenExpiry: Date | null;
 
+  @OneToMany(() => Reserva, reserva => reserva.usuario)
+  reservas: Reserva[]; 
 
 }
 

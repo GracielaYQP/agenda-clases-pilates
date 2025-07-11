@@ -15,8 +15,8 @@ export class AuthController {
   }
 
   @Post('login')
-  login(@Body() body: { email: string; password: string }) {
-    return this.authService.login(body.email, body.password);
+  login(@Body() body: { usuario: string; password: string }) {
+    return this.authService.loginFlexible(body.usuario, body.password);
   }
 
   @Post('register-invitacion')
@@ -73,6 +73,16 @@ export class AuthController {
         nivel: invitacion.nivel_asignado,
       };
     }
+    
+  @Post('forgot-password')
+    forgotPassword(@Body() body: { email: string }) {
+      return this.authService.sendResetPasswordEmail(body.email);
+    }
+
+  @Post('reset-password')
+    resetPassword(@Body() body: { token: string; newPassword: string }) {
+      return this.authService.resetPassword(body.token, body.newPassword);
+  }
 }
 
 

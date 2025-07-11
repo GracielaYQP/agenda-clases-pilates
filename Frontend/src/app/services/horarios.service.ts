@@ -19,10 +19,17 @@ export class HorariosService {
     this.http.get<Horario[]>(this.apiUrl).subscribe(data => this.horariosSubject.next(data));
   }
 
-  reservar(id: number): Observable<Horario> {
-    return this.http.patch<Horario>(`${this.apiUrl}/${id}/reservar`, {}).pipe(
-    tap(() => this.cargarHorarios())
-  );
-    
+
+  reservar(horarioId: number, nombre: string, apellido: string, userId: number): Observable<any> {
+    return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
+      userId,
+      nombre,
+      apellido
+    }).pipe(
+      tap(() => this.cargarHorarios())
+    );
   }
+
+
+
 }

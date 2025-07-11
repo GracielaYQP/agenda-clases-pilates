@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Reserva } from '../reserva/reserva.entity';
 
 @Entity('horarios')
 export class Horario {
@@ -19,4 +20,8 @@ export class Horario {
 
   @Column({ default: 0 })
   camasReservadas: number;
+
+  @OneToMany(() => Reserva, reserva => reserva.horario, { cascade: true })
+  reservas: Reserva[];
+
 }

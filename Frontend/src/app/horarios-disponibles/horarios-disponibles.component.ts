@@ -3,6 +3,12 @@ import { NgFor, NgClass, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { HorariosService } from '../services/horarios.service';
 
+export interface Reserva {
+  id: number;
+  nombre: string;
+  apellido: string;
+}
+
 export interface Horario {
   id: number;
   dia: string;
@@ -10,6 +16,7 @@ export interface Horario {
   nivel: string;
   totalCamas: number;
   camasReservadas: number;
+  reservas: Reserva[]; 
 }
 
 @Component({
@@ -63,7 +70,13 @@ export class HorariosDisponiblesComponent {
   ngOnInit() {
     this.horariosService.horarios$.subscribe(data => {
       this.horarios = (data && data.length > 0) ? data : this.generarHorariosBase();
-      
+      const ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+      this.dias = ordenDias.filter(dia => this.horarios.some(h => h.dia === dia));
+      this.horas = Array.from(new Set(this.horarios.map(h => h.hora))).sort((a, b) => {
+      const ah = parseInt(a.split(':')[0], 10);
+      const bh = parseInt(b.split(':')[0], 10);
+      return ah - bh;
+      });
       this.cargarHorarios();
 
       console.log('✅ Datos recibidos desde el observable o generados localmente');
@@ -75,28 +88,28 @@ export class HorariosDisponiblesComponent {
   }
 
 
-
   generarHorariosBase(): Horario[] {
-  const horariosBase: Horario[] = [];
-  let idCounter = 1; // ✅ Declarás idCounter antes de usarlo
+    const horariosBase: Horario[] = [];
+    let idCounter = 1; 
 
-  for (let dia of this.dias) {
-    for (let hora of this.horas) {
-      const nivel = this.getNivelParaHorario(dia, hora);
+    for (let dia of this.dias) {
+      for (let hora of this.horas) {
+        const nivel = this.getNivelParaHorario(dia, hora);
 
-      horariosBase.push({
-        id: idCounter++, // ✅ Asignás un id único
-        dia,
-        hora,
-        nivel,
-        totalCamas: 5,
-        camasReservadas: 0
-      });
+        horariosBase.push({
+          id: idCounter++,
+          dia,
+          hora,
+          nivel,
+          totalCamas: 5,
+          camasReservadas: 0,
+          reservas: []
+        });
+      }
     }
-  }
 
-  return horariosBase;
-}
+    return horariosBase;
+  }
 
   cargarHorarios() {
     this.usuarioNivel = localStorage.getItem('nivelUsuario') || '';
@@ -109,7 +122,9 @@ export class HorariosDisponiblesComponent {
       this.nivelHorarios = this.horarios; // <=== MOSTRAR TODOS
     }
 
-    this.dias = Array.from(new Set(this.horarios.map(h => h.dia)));
+    const ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    this.dias = ordenDias.filter(dia => this.horarios.some(h => h.dia === dia));
+
     this.horas = Array.from(new Set(this.horarios.map(h => h.hora))).sort((a, b) => {
       const ah = parseInt(a.split(':')[0], 10);
       const bh = parseInt(b.split(':')[0], 10);
@@ -123,7 +138,6 @@ export class HorariosDisponiblesComponent {
   }
 
   
-
   getNivelTurno(dia: string, hora: string): string {
     // Si hay usuario logueado, filtra por su nivel
     if (this.usuarioNivel) {
@@ -150,7 +164,6 @@ export class HorariosDisponiblesComponent {
   }
 
 
-
   isDisponible(dia: string, hora: string, nivel: string): boolean {
     const turno = this.horarios.find(h =>
       h.dia === dia &&
@@ -160,25 +173,14 @@ export class HorariosDisponiblesComponent {
     return turno ? turno.totalCamas > turno.camasReservadas : false;
   }
 
-
   reservar(dia: string, hora: string, nivel: string) {
-  if (!this.isClickable(dia, hora, nivel)) return;
+    if (!this.isClickable(dia, hora, nivel)) return;
 
-  const id = this.getIdTurno(dia, hora, nivel);
-  if (id === null) {
-    alert('Turno no encontrado.');
-    return;
+    this.router.navigate(['/gestion-turnos'], {
+      queryParams: { dia, hora, nivel }
+    });
+  
   }
-
-  this.horariosService.reservar(id).subscribe({
-    next: (turnoActualizado) => {
-      console.log('✅ Turno reservado:', turnoActualizado);
-    },
-    error: (err) => {
-      alert('No se pudo reservar el turno: ' + err.error.message || err.message);
-    }
-  });
-}
 
 
   getIdTurno(dia: string, hora: string, nivel: string): number | null {
@@ -189,7 +191,6 @@ export class HorariosDisponiblesComponent {
   }
 
 
-
   isClickable(dia: string, hora: string, nivel: string): boolean {
   return (
     !!this.usuarioNivel &&
@@ -197,7 +198,6 @@ export class HorariosDisponiblesComponent {
     this.isDisponible(dia, hora, nivel)
   );
 }
-
 
   getNivelParaHorario(dia: string, hora: string): string {
     if (dia === 'Viernes' && hora === '08:00') {

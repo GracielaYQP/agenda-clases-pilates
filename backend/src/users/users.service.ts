@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
-import { CreateUserDto } from './user.dto';
+
 
 @Injectable()
 export class UsersService {
@@ -73,7 +73,7 @@ export class UsersService {
     return user === null ? undefined : user;
   }
 
-  async update(id: number, updateData: Partial<CreateUserDto>): Promise<User> {
+  async update(id: number, updateData: Partial<User>): Promise<User> {
     if (updateData.password) {
       updateData.password = await bcrypt.hash(updateData.password, 10);
     }
@@ -103,6 +103,35 @@ export class UsersService {
     }
     user.activo = false;
     await this.userRepository.save(user);
+  }
+
+  async findByEmailOrTelefono(usuario: string): Promise<User | undefined> {
+    const user = await this.userRepository.findOne({
+      where: [
+        { email: usuario },
+        { telefono: usuario },
+      ],
+    });
+    return user ?? undefined;
+  }
+
+  async findByEmailOrTelefonoAndPassword(usuario: string, password: string): Promise<User | undefined> {
+    const user = await this.findByEmailOrTelefono(usuario);
+    if (user && await bcrypt.compare(password, user.password)) {
+      return user;
+    }
+    return undefined;
+  }
+
+  async setResetToken(id: number, token: string, expiry: Date) {
+    await this.userRepository.update(id, {
+      resetToken: token,
+      resetTokenExpiry: expiry,
+    });
+  }
+
+  async findByResetToken(token: string) {
+    return this.userRepository.findOne({ where: { resetToken: token } });
   }
 
 }

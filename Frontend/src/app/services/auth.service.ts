@@ -15,7 +15,8 @@ login(credentials: { email: string; password: string }): Observable<any> {
     tap((res: any) => {
       localStorage.setItem('token', res.access_token);
       localStorage.setItem('nombreUsuario', res.nombre);
-      localStorage.setItem('rol', res.rol); // 👈 guarda el rol que te devuelve el backend
+      localStorage.setItem('apellidoUsuario', res.apellido); 
+      localStorage.setItem('rol', res.rol);
     })
   );
 }
