@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Horario } from '../horarios-disponibles/horarios-disponibles.component';
 
@@ -20,14 +20,29 @@ export class HorariosService {
   }
 
 
-  reservar(horarioId: number, nombre: string, apellido: string, userId: number): Observable<any> {
+  reservar(horarioId: number, nombre: string, apellido: string): Observable<any> {
     return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
-      userId,
       nombre,
       apellido
     }).pipe(
       tap(() => this.cargarHorarios())
     );
+  }
+
+  // getMisReservas(): Observable<any[]> {
+  //   return this.http.get<any[]>('http://localhost:3000/reservas/mis-reservas');
+  // }
+
+
+  getMisReservas(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('❌ No se encontró el token en localStorage');
+      return new BehaviorSubject<any[]>([]).asObservable(); // o lanzar un error
+    }
+
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any[]>('http://localhost:3000/reservas/mis-reservas', { headers });
   }
 
 

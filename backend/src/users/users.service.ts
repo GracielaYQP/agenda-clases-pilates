@@ -134,4 +134,9 @@ export class UsersService {
     return this.userRepository.findOne({ where: { resetToken: token } });
   }
 
+
+  async findByTelefono(telefono: string) {
+    return this.userRepository.findOne({ where: { telefono } });
+  }
+
 }

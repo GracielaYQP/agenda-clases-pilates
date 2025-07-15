@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Reserva } from './reserva.entity';
@@ -50,6 +50,45 @@ export class ReservaService {
       relations: ['usuario'],
     });
   }
+
+  // async obtenerReservasPorUsuario(userId: number) {
+  //   try {
+  //     const reservas = await this.reservaRepo.find({
+  //       where: { usuario: { id: userId } },
+  //       relations: ['horario'],
+  //       order: { horario: { dia: 'ASC', hora: 'ASC' } },
+  //     });
+
+  //     console.log('🎯 Reservas encontradas:', reservas);
+  //     return reservas;
+  //   } catch (error) {
+  //     console.error('❌ Error al obtener reservas por usuario:', error);
+  //     throw new HttpException('No se pudieron obtener las reservas del usuario', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
+
+  async obtenerReservasPorUsuario(userId: number) {
+  try {
+    const reservas = await this.reservaRepo
+      .createQueryBuilder('reserva')
+      .leftJoinAndSelect('reserva.horario', 'horario')
+      .leftJoinAndSelect('reserva.usuario', 'usuario')
+      .where('reserva.usuarioId = :userId', { userId })
+      .orderBy('horario.dia', 'ASC')
+      .addOrderBy('horario.hora', 'ASC')
+      .getMany();
+
+    console.log('🎯 Reservas encontradas:', reservas);
+    return reservas;
+  } catch (error) {
+    console.error('❌ Error al obtener reservas por usuario:', error);
+    throw new HttpException(
+      'No se pudieron obtener las reservas del usuario',
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+  }
+}
+
 }
 
 

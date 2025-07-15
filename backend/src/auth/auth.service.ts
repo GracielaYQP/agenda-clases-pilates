@@ -71,29 +71,61 @@ export class AuthService {
     });
   }
 
-  async sendResetPasswordEmail(email: string) {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) throw new NotFoundException('Usuario no encontrado');
+  // async sendResetPasswordEmail(email: string) {
+  //   const user = await this.usersService.findByEmail(email);
+  //   if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    const token = uuidv4();
-    const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+  //   const token = uuidv4();
+  //   const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
-    await this.usersService.setResetToken(user.id, token, expiry);
+  //   await this.usersService.setResetToken(user.id, token, expiry);
 
-    const resetUrl = `http://localhost:4200/reset-password/${token}`;
-    await this.mailerService.sendMail({
-      to: email,
-      subject: 'Restablecer contraseña',
-      html: `
-        <p>Hola ${user.nombre},</p>
-        <p>Recibimos tu solicitud para cambiar la contraseña.</p>
-        <p><a href="${resetUrl}">Hacé clic aquí para restablecerla</a></p>
-        <p>Este enlace es válido por 1 hora.</p>
-      `,
-    });
+  //   const resetUrl = `http://localhost:4200/reset-password/${token}`;
+  //   await this.mailerService.sendMail({
+  //     to: email,
+  //     subject: 'Restablecer contraseña',
+  //     html: `
+  //       <p>Hola ${user.nombre},</p>
+  //       <p>Recibimos tu solicitud para cambiar la contraseña.</p>
+  //       <p><a href="${resetUrl}">Hacé clic aquí para restablecerla</a></p>
+  //       <p>Este enlace es válido por 1 hora.</p>
+  //     `,
+  //   });
 
-    return { message: 'Te enviamos un enlace a tu correo para restablecer tu contraseña' };
+  //   return { message: 'Te enviamos un enlace a tu correo para restablecer tu contraseña' };
+  // }
+
+  async sendResetPasswordWhatsappLink(telefono: string) {
+      const user = await this.usersService.findByTelefono(telefono);
+      if (!user) throw new NotFoundException('Usuario no encontrado');
+
+      const token = uuidv4();
+      const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+      await this.usersService.setResetToken(user.id, token, expiry);
+
+      const resetUrl = `http://localhost:4200/reset-password/${token}`;
+
+      const mensaje = `
+    Hola ${user.nombre} 👋,
+
+    Recibimos tu solicitud para cambiar la contraseña de tu cuenta en el sistema de Pilates. 
+
+    📎 Link para restablecer tu contraseña: ${resetUrl}
+
+    Este enlace es válido por 1 hora ⏳.
+
+    Gracias 💪
+    `;
+
+      return {
+        resetLink: resetUrl,
+        telefono: user.telefono,
+        mensaje,
+        whatsappUrl: `https://wa.me/${user.telefono}?text=${encodeURIComponent(mensaje)}`
+      };
   }
+
 
   async resetPassword(token: string, newPassword: string) {
     const user = await this.usersService.findByResetToken(token);
@@ -109,6 +141,9 @@ export class AuthService {
     });
 
     return { message: 'Contraseña restablecida exitosamente' };
+    console.log('🔐 Nueva contraseña encriptada:', hashedPassword);
+   
+
   }
   
 }

@@ -18,7 +18,7 @@ export class User {
   @Column({ default: 'inicial' })
   nivel: string;
 
-  @Column()
+  @Column({ unique: true })
   telefono: string;
 
   @Column({ unique: true })

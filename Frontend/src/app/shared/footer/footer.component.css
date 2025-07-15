@@ -82,3 +82,16 @@ footer {
   text-align: right;
 }
 
+.copyright {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre el logo y el texto */
+  justify-content: center; /* Opcional, centra horizontalmente */
+  font-size: 14px;
+}
+
+.logo-inline {
+  height: 40px; /* Ajustá según el tamaño de tu logo */
+  width: auto;
+}
+

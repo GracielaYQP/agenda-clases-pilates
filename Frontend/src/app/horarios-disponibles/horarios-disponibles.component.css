@@ -5,19 +5,38 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
+  background-image: url('/assets/fotos/estudio vacio.jpg');
+  background-repeat: no-repeat;      /* Evita que la imagen se repita */
+  background-size: cover;            /* Hace que la imagen cubra todo el contenedor */
+  background-position: center 90%; /*sube la imagen hacia  */
+  background-color: rgba(255,255,255,0.3); /* Blanco semitransparente encima */
+  background-blend-mode: lighten;
 }
 
 h2 {
+  display: inline-block; /* Para que se ajuste al contenido */
+  padding: 14px 16px;
+  text-transform: uppercase;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
   text-align: center;
   color: #b53490;
-  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(to bottom, #a19a9c, #dbccd1);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #ddd;
   margin-bottom: 16px;
+  display: block;
+  width: fit-content;
+  margin: 16px auto 16px auto;
 }
 
 /* Encabezado fucsia con gradiente */
 thead {
   background: linear-gradient(to bottom, #645f61, #a2979b);
   color: #B53490;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 
 }
 
@@ -38,6 +57,7 @@ th {
   text-align: center;
   background: linear-gradient(to bottom, #a19a9c, #dbccd1);
   color: #b53490;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   box-shadow: inset 0 0 0 1px #ddd;
 }
@@ -96,6 +116,7 @@ td > div {
 .hora-columna {
   background: linear-gradient(to bottom, #a19a9c, #dbccd1);
   color: #b53490;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   font-weight: bold;
   text-align: center;
   border-radius: 6px;

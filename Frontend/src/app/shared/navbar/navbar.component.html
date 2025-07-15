@@ -16,6 +16,7 @@
 
     <!-- Si está logueado y NO es admin -->
     <a *ngIf="auth.isLoggedIn() && !isAdmin" routerLink="/gestion-turnos">Gestionar turnos</a>
+    <a *ngIf="auth.isLoggedIn() && !isAdmin" routerLink="/mis-turnos">Mis turnos</a>
 
     <!-- Solo si es admin -->
     <ng-container *ngIf="isAdmin">

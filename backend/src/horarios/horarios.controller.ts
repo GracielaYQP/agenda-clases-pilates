@@ -7,8 +7,12 @@ export class HorariosController {
 
   @Get()
   findAll() {
-    return this.horariosService.findAll();
+    return this.horariosService.findAll().then(horarios => {
+      console.log('🧾 Horarios enviados al frontend:', horarios);
+      return horarios;
+    });
   }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
