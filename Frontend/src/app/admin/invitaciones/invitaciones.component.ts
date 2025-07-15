@@ -20,7 +20,6 @@ export class InvitacionesComponent {
   linkWhatsapp: string = '';
 
 
-
   constructor( private router: Router, private fb: FormBuilder, private http: HttpClient, public auth: AuthService) {
     this.form = this.fb.group({
       telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{10,13}$/)]],
