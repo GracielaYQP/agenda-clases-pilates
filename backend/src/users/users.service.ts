@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { User } from './user.entity';
 
 
@@ -74,9 +74,11 @@ export class UsersService {
   }
 
   async update(id: number, updateData: Partial<User>): Promise<User> {
-    if (updateData.password) {
+    
+    if (updateData.password && !updateData.password.startsWith('$2b$')) {
       updateData.password = await bcrypt.hash(updateData.password, 10);
     }
+
     await this.userRepository.update(id, updateData);
     const updatedUser = await this.findById(id);
     if (!updatedUser) {
