@@ -8,6 +8,7 @@ import { InvitacionesModule } from './invitaciones/invitaciones.module';
 import { HorariosModule } from './horarios/horarios.module';
 import { MailerService } from './auth/mailer/mailer.service';
 import { ReservaModule } from './reserva/reserva.module';
+import { ConfigModule } from '@nestjs/config';
 
 
 
@@ -28,6 +29,10 @@ import { ReservaModule } from './reserva/reserva.module';
     InvitacionesModule,
     HorariosModule,
     ReservaModule,
+    ConfigModule.forRoot({ 
+      isGlobal: true,
+      envFilePath: '.env',
+     }),
     
   ],
   controllers: [AppController],

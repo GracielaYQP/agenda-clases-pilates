@@ -42,6 +42,7 @@ export class LoginComponent {
 
     this.auth.login(this.form.value).subscribe({
       next: (res) => {
+         console.log('✅ Respuesta del login:', res);
         // Guardar el token y el nombre
         localStorage.setItem('token', res.access_token);
         localStorage.setItem('nombreUsuario', res.nombre);
@@ -56,6 +57,26 @@ export class LoginComponent {
       }
     });
   }
+
+  solicitarResetPorWhatsapp() {
+    const telefono = this.form.value.usuario;
+
+    if (!telefono || telefono.length < 8) {
+      this.error = 'Ingresá un número de teléfono válido para recuperar tu contraseña';
+      return;
+    }
+
+    this.auth.solicitarResetWhatsapp({ telefono }).subscribe({
+      next: (res) => {
+        const link = `https://wa.me/${res.telefono}?text=Hola!%20Aquí%20tenés%20el%20link%20para%20restablecer%20tu%20contraseña:%20${encodeURIComponent(res.resetLink)}`;
+        window.open(link, '_blank');
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'No se pudo enviar el link por WhatsApp.';
+      }
+    });
+  }
+
 
 }
 

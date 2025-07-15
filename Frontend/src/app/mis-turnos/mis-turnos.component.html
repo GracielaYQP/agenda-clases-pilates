@@ -1,0 +1,42 @@
+<!-- <h2>Mis turnos reservados</h2>
+
+<div *ngIf="misReservas.length === 0">No tenés turnos reservados.</div>
+
+<ul *ngIf="misReservas.length > 0">
+  <li *ngFor="let reserva of misReservas">
+    🗓️ Día: {{ reserva.horario.dia }} - 🕒 Hora: {{ reserva.horario.hora }} - Nivel: {{ reserva.horario.nivel }}
+  </li>
+</ul>
+ -->
+<div class="table-container" *ngIf="dias.length && horas.length">
+  <h2>Mis turnos</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Horario</th>
+        <th *ngFor="let dia of dias">{{ dia }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let hora of horas">
+        <td class="hora-columna">{{ hora }}</td>
+        <td *ngFor="let dia of dias">
+          <ng-container *ngIf="hasReserva(dia, hora); else sinTurno">
+          <div class="clickeable"
+              [ngClass]="[getNivel(dia, hora), hasReserva(dia, hora) ? 'con-reserva' : '']">
+              <div class="nivel"> {{ getNivel(dia, hora) }}</div>
+              <div class="camas">
+                {{ getNombreCompleto(dia, hora) }}
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #sinTurno>
+            <div class="no-disponible"> -- </div>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

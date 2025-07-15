@@ -77,7 +77,7 @@ export class GestionTurnosComponent implements OnInit {
     const mensaje = `¿Deseás reservar este turno?\n\nNombre: ${nombre}\nApellido: ${apellido}\nNivel: ${turno.nivel}\nDía: ${turno.dia}\nHora: ${turno.hora}`;
 
     if (confirm(mensaje)) {
-      this.horariosService.reservar(turno.id, nombre, apellido, userId).subscribe({
+      this.horariosService.reservar(turno.id, nombre, apellido).subscribe({
         next: () => {
           alert('✅ ¡Turno reservado exitosamente!');
         },
@@ -107,5 +107,5 @@ export class GestionTurnosComponent implements OnInit {
       );
     }
 
-
+    
 }

@@ -13,6 +13,8 @@ import { AuthGuard } from './services/auth.guard';
 import { InvitacionesComponent } from './admin/invitaciones/invitaciones.component';
 import { ListarAlumnosComponent } from './listar-alumnos/listar-alumnos.component';
 import { EditarUsuarioComponent } from './editar-usuario/editar-usuario.component';
+import { MisTurnosComponent } from './mis-turnos/mis-turnos.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 
 export const routes: Routes = [
@@ -27,6 +29,9 @@ export const routes: Routes = [
   { path: 'gestion-turnos', 
     component: GestionTurnosComponent, 
     canActivate: [AuthGuard]  },
+  { path: 'mis-turnos', 
+    component: MisTurnosComponent, 
+    canActivate: [AuthGuard]  },
   {
     path: 'admin/invitaciones',
     component: InvitacionesComponent,
@@ -39,7 +44,8 @@ export const routes: Routes = [
     data: { roles: ['admin'] },
   },
   { path: 'editar-usuario/:id', component: EditarUsuarioComponent },
-  { path: '**', redirectTo: 'listar-alumnos' }
+  { path: 'reset-password/:token', component: ResetPasswordComponent },
+  { path: '**', redirectTo: 'listar-alumnos' },
 
 ];
 

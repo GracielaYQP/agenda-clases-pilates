@@ -80,6 +80,7 @@ tbody tr:hover {
   box-shadow: inset 0 0 0 1px #ddd;
 }
 
+/* Nivel visual */
 .inicial {
   background-color: #d4edda;
   color: #1d3557;
@@ -152,17 +153,17 @@ tbody tr:hover {
 }
 
 /* Colores según nivel */
-.inicial {
+.Inicial {
   background-color: #a8dadc; /* azul claro */
   color: #1d3557;
 }
 
-.intermedio {
+.Intermedio {
   background-color: #ffe066; /* amarillo */
   color: #333;
 }
 
-.avanzado {
+.Avanzado {
   background-color: #f94144; /* rojo suave */
   color: white;
 }
@@ -192,4 +193,8 @@ tbody tr:hover {
   margin-top: 6px;
   font-size: 12px;
   color: #333;
+}
+
+.con-reserva {
+  border: 2px solid black !important;
 }

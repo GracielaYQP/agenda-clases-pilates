@@ -72,17 +72,18 @@ export class AuthController {
         telefono: invitacion.telefono,
         nivel: invitacion.nivel_asignado,
       };
-    }
+  }
     
-  @Post('forgot-password')
-    forgotPassword(@Body() body: { email: string }) {
-      return this.authService.sendResetPasswordEmail(body.email);
-    }
-
   @Post('reset-password')
     resetPassword(@Body() body: { token: string; newPassword: string }) {
       return this.authService.resetPassword(body.token, body.newPassword);
   }
+
+  @Post('reset-link-whatsapp')
+  resetLinkViaWhatsapp(@Body() body: { telefono: string }) {
+    return this.authService.sendResetPasswordWhatsappLink(body.telefono);
+  }
+
 }
 
 

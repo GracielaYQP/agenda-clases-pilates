@@ -10,44 +10,52 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-login(credentials: { email: string; password: string }): Observable<any> {
-  return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
-    tap((res: any) => {
-      localStorage.setItem('token', res.access_token);
-      localStorage.setItem('nombreUsuario', res.nombre);
-      localStorage.setItem('apellidoUsuario', res.apellido); 
-      localStorage.setItem('rol', res.rol);
-    })
-  );
-}
+  login(credentials: { usuario: string; password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
+      tap((res: any) => {
+        localStorage.setItem('token', res.access_token);
+        localStorage.setItem('nombreUsuario', res.nombre);
+        localStorage.setItem('apellidoUsuario', res.apellido); 
+        localStorage.setItem('rol', res.rol);
+      })
+    );
+  }
+
+  getRol(): string | null {
+    return localStorage.getItem('rol');
+  }
+
+  register(data: {
+    dni: string;
+    nombre: string;
+    apellido: string;
+    telefono: string;
+    email: string;
+    password: string;
+  }): Observable<any> {
+    return this.http.post('http://localhost:3000/users', data);
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('nombreUsuario');
+    localStorage.removeItem('rol');
+    localStorage.removeItem('nivelUsuario');
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token') && !!localStorage.getItem('nombreUsuario');
+  }
+
+  solicitarResetWhatsapp(data: { telefono: string }) {
+    return this.http.post<any>('http://localhost:3000/auth/reset-link-whatsapp', data);
+  }
+ 
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post<any>('http://localhost:3000/auth/reset-password', { token, newPassword });
+  }
 
 
-getRol(): string | null {
-  return localStorage.getItem('rol');
-}
-
-
-register(data: {
-  dni: string;
-  nombre: string;
-  apellido: string;
-  telefono: string;
-  email: string;
-  password: string;
-}): Observable<any> {
-  return this.http.post('http://localhost:3000/users', data);
-}
-
-logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('nombreUsuario');
-  localStorage.removeItem('rol');
-  localStorage.removeItem('nivelUsuario');
-}
-
-isLoggedIn(): boolean {
-  return !!localStorage.getItem('token') && !!localStorage.getItem('nombreUsuario');
-}
 
 }
 
