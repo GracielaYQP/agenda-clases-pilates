@@ -22,7 +22,10 @@
                   <div class="camas">Camas libres: {{ turno.totalCamas - turno.camasReservadas }}</div>
                   <div class="reservas" *ngIf="turno.reservas && turno.reservas.length > 0">
                     <div *ngFor="let r of turno.reservas">
-                    {{ r.nombre }} {{ r.apellido }}
+                      <!-- Mostrar nombre y apellido si sos admin o si el turno coincide con tu nivel -->
+                      <ng-container *ngIf="rolUsuario === 'admin' || turno.nivel.toLowerCase() === usuarioNivel.toLowerCase()">
+                        {{ r.nombre }} {{ r.apellido }}
+                      </ng-container>
                     </div>
                   </div>
                 </div>

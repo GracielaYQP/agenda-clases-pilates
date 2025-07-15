@@ -31,6 +31,7 @@ export class GestionTurnosComponent implements OnInit {
   dias: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
   horas: string[] = ['08:00', '09:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
   horarios: any[] = [];
+  rolUsuario: string = '';
 
   constructor(
     private horariosService: HorariosService,
@@ -39,15 +40,18 @@ export class GestionTurnosComponent implements OnInit {
   
   ngOnInit() {
     const nivelGuardado = localStorage.getItem('nivelUsuario');
-    if (!nivelGuardado) {
-      console.error('❌ Nivel de usuario no encontrado.');
+    const rolGuardado = localStorage.getItem('rol');
+
+    if (!nivelGuardado || !rolGuardado) {
+      console.error('❌ Nivel o rol de usuario no encontrado.');
       return;
     }
 
     this.usuarioNivel = nivelGuardado.trim();
+    this.rolUsuario = rolGuardado.trim().toLowerCase();
     console.log('Nivel del usuario:', this.usuarioNivel);
+    console.log('Rol del usuario:', this.rolUsuario);  
 
-    // 🔁 Forzar recarga al entrar a la vista
     this.route.queryParams.subscribe(() => {
       this.horariosService.cargarHorarios();
     });
@@ -60,6 +64,7 @@ export class GestionTurnosComponent implements OnInit {
       console.log('Turnos con reservas:', turnosConReservas);
     });
   }
+
 
 
   getNivelParaHorario(hora: string): string {
@@ -89,23 +94,22 @@ export class GestionTurnosComponent implements OnInit {
   }
 
 
-    hasTurno(dia: string, hora: string): boolean {
-      return this.horarios.some(
-        h =>
-          h.dia === dia &&
-          h.hora === hora &&
-          h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase()
-      );
-    }
+  hasTurno(dia: string, hora: string): boolean {
+    return this.horarios.some(h =>
+      h.dia === dia &&
+      h.hora === hora &&
+      (this.rolUsuario === 'admin' || h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase())
+    );
+  }
 
-    getTurnos(dia: string, hora: string) {
-      return this.horarios.filter(
-        h =>
-          h.dia === dia &&
-          h.hora === hora &&
-          h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase()
-      );
-    }
+  getTurnos(dia: string, hora: string) {
+    return this.horarios.filter(h =>
+      h.dia === dia &&
+      h.hora === hora &&
+      (this.rolUsuario === 'admin' || h.nivel.toLowerCase() === this.usuarioNivel.toLowerCase())
+    );
+  }
+
 
     
 }
