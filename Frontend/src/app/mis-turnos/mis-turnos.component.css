@@ -22,8 +22,8 @@ h2 {
   letter-spacing: 0.5px;
   text-align: center;
   color: #b53490;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(to bottom, #a19a9c, #dbccd1);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to bottom, #ffffff, #dbccd1);
   border-radius: 6px;
   box-shadow: inset 0 0 0 1px #ddd;
   margin-bottom: 16px;
@@ -34,9 +34,9 @@ h2 {
 
 
 thead {
-  background: linear-gradient(to bottom, #645f61, #a2979b);
+  background: linear-gradient(to bottom, #ffffff, #dbccd1);
   color: #B53490;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 table {
@@ -54,9 +54,9 @@ th {
   font-weight: bold;
   letter-spacing: 0.5px;
   text-align: center;
-  background: linear-gradient(to bottom, #a19a9c, #dbccd1);
+  background: linear-gradient(to bottom, #ffffff, #dbccd1);
   color: #b53490;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   border-radius: 6px;
   box-shadow: inset 0 0 0 1px #ddd;
 }
@@ -71,9 +71,9 @@ tbody tr:hover {
 }
 
 .hora-columna {
-  background: linear-gradient(to bottom, #a19a9c, #dbccd1);
+  background: linear-gradient(to bottom, #ffffff, #dbccd1);
   color: #b53490;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   font-weight: bold;
   text-align: center;
   border-radius: 6px;
@@ -131,8 +131,8 @@ tbody tr:hover {
 }
 
 .camas {
-  font-weight: normal;
-  font-size: 13px;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 .celda-turno {
@@ -154,18 +154,18 @@ tbody tr:hover {
 
 /* Colores según nivel */
 .Inicial {
-  background-color: #a8dadc; /* azul claro */
-  color: #1d3557;
+  background-color: #61fe89; /* azul claro */
+ 
 }
 
 .Intermedio {
-  background-color: #ffe066; /* amarillo */
-  color: #333;
+  background-color: #fded3e; /* amarillo */
+
 }
 
 .Avanzado {
-  background-color: #f94144; /* rojo suave */
-  color: white;
+  background-color: #fc263c; /* rojo suave */
+
 }
 
 /* Sin turno */

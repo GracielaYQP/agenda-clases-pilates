@@ -6,15 +6,15 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
   background-image: url('/assets/fotos/estudio vacio.jpg');
-  background-repeat: no-repeat;      /* Evita que la imagen se repita */
-  background-size: cover;            /* Hace que la imagen cubra todo el contenedor */
-  background-position: center 90%; /*sube la imagen hacia  */
-  background-color: rgba(255,255,255,0.5); /* Blanco semitransparente encima */
+  background-repeat: no-repeat;      
+  background-size: cover;           
+  background-position: center 90%; 
+  background-color: rgba(255,255,255,0.5); 
   background-blend-mode: lighten;
 }
 
 h2 {
-  display: inline-block; /* Para que se ajuste al contenido */
+  display: inline-block;
   padding: 14px 16px;
   text-transform: uppercase;
   font-size: 1.5rem;
@@ -75,7 +75,6 @@ td > div {
   font-weight: bold;
   box-shadow: inset 0 0 0 1px #ddd;
   border: 2px solid black;
-
 }
 
 tbody tr:hover {
@@ -94,18 +93,15 @@ tbody tr:hover {
 }
 
 .inicial {
-  background-color: #d4edda;
-  color: #1d3557;
+  background-color: #d4edda; 
 }
 
 .intermedio {
   background-color: #fff3cd;
-  color: #333;
 }
 
 .avanzado {
   background-color: #f8d7da;
-  color: #900;
 }
 
 .no-disponible,
@@ -143,7 +139,7 @@ tbody tr:hover {
 }
 
 .camas {
-  font-weight: normal;
+  font-weight: bold;
   font-size: 13px;
 }
 
@@ -152,7 +148,7 @@ tbody tr:hover {
   border-radius: 6px;
   margin: 2px;
   user-select: none;
-  font-weight: 600;
+  font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
   min-width: 90px;
@@ -162,23 +158,19 @@ tbody tr:hover {
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-
 }
 
 /* Colores según nivel */
 .inicial {
-  background-color: #a8dadc; /* azul claro */
-  color: #1d3557;
+  background-color: #d4edda; 
 }
 
 .intermedio {
-  background-color: #ffe066; /* amarillo */
-  color: #333;
+  background-color: #fff3cd;  
 }
 
 .avanzado {
-  background-color: #f94144; /* rojo suave */
-  color: white;
+  background-color: #f8d7da; 
 }
 
 /* Sin turno */
@@ -205,5 +197,6 @@ tbody tr:hover {
 .reservas {
   margin-top: 6px;
   font-size: 12px;
-  color: #333;
+  color: 	#000000;
+  font-weight: bold;
 }
