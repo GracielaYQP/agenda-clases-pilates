@@ -106,8 +106,9 @@ tbody tr:hover {
   justify-content: center;
   gap: 12px;
   margin: 20px auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   max-width: 800px;
+  align-items: center;
 }
 
 .filtros-alumnos input {
@@ -118,4 +119,29 @@ tbody tr:hover {
   font-size: 0.95rem;
   width: 200px;
   border: 2px solid black;
+  flex: 1 1 auto;
+  min-width: 160px;
 }
+
+.nuevo-alumno-btn {
+  white-space: nowrap;              
+  background-color: #b53490;
+  color: white !important;
+  fill: white;
+  padding: 10px 24px;               
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: inline-flex;             
+  align-items: center;
+  gap: 12px;                         
+}
+
+
+.nuevo-alumno-btn:hover {
+  background-color: #8e2b6e;
+}
+

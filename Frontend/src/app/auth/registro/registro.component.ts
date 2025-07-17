@@ -8,18 +8,17 @@ import { InvitacionService } from '../../services/invitacion.services';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgClass,],
+  imports: [ReactiveFormsModule, NgIf, NgClass],
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css'],
 })
 export class RegistroComponent {
-  form: FormGroup;
+  form!: FormGroup;
   error: string = '';
   successMessage: string = '';
   invitacionValida: boolean = false;
-  showPassword: boolean = false; 
-
-  // Datos de invitación
+  showPassword: boolean = false;
+  esAdmin: boolean = false;
   telefono: string = '';
   nivel: string = '';
 
@@ -30,61 +29,50 @@ export class RegistroComponent {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    // Inicializa form vacío
-    this.form = this.fb.group({
-      dni: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^[\d]{7,8}$/),
-        ],
-      ],
-      nombre: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(
-            /^([a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]{2,60}[\,\-\.]{0,1}[\s]{0,1}){1,3}$/
-          ),
-        ],
-      ],
-      apellido: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(
-            /^([a-zA-ZáéíóúüÁÉÍÓÚÜñÑ]{2,60}[\,\-\.]{0,1}[\s]{0,1}){1,3}$/
-          ),
-        ],
-      ],
-       email: [
-        '',
-        [Validators.required, Validators.email]
-      ],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(
-            /^(?=(?:.*\d))(?=.*[A-Z])(?=.*[a-z])(?=.*[.,*!?¿¡/#$%&])\S{8,20}$/
-          ),
-        ],
-      ],
-      repeat_password: [
-        '',
-        Validators.required
-      ],
-    },
-    { validators: this.passwordsMatchValidator }
-    );  
-
-    // Procesa token de invitación de la URL
+    const adminParam = this.route.snapshot.queryParamMap.get('admin');
+    this.esAdmin = adminParam === 'true';
+    
     const token = this.route.snapshot.queryParamMap.get('token');
+
     if (token) {
       this.validarInvitacion(token);
     } else {
       this.invitacionValida = false;
+      this.crearFormulario(); // crear formulario sin invitación
     }
+  }
+
+  private crearFormulario() {
+    this.form = this.fb.group(
+      {
+        dni: [
+          '',
+          [Validators.required, Validators.pattern(/^[\d]{7,8}$/)],
+        ],
+        nombre: [
+          '',
+          [Validators.required, Validators.pattern(/^([a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]{3,})$/)],
+        ],
+        apellido: [
+          '',
+          [Validators.required, Validators.pattern(/^([a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]{3,})$/)],
+        ],
+        email: ['', [Validators.required, Validators.email]],
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.pattern(/^(?=(?:.*\d))(?=.*[A-Z])(?=.*[a-z])(?=.*[.,*!?¿¡/#$%&])\S{8,20}$/),
+          ],
+        ],
+        repeat_password: ['', Validators.required],
+        ...(this.invitacionValida ? {} : {
+          telefono: ['', Validators.required],
+          nivel: ['', Validators.required]
+        })
+      },
+      { validators: this.passwordsMatchValidator }
+    );
   }
 
   passwordsMatchValidator(form: FormGroup) {
@@ -95,14 +83,16 @@ export class RegistroComponent {
 
   validarInvitacion(token: string) {
     this.invitacionService.getInvitacion(token).subscribe({
-      next: (res: { telefono: string; nivel: string; }) => {
+      next: (res: { telefono: string; nivel: string }) => {
         this.invitacionValida = true;
         this.telefono = res.telefono;
         this.nivel = res.nivel;
+        this.crearFormulario(); // Crear formulario después de validar
       },
       error: () => {
         this.invitacionValida = false;
         this.error = 'Invitación inválida o expirada.';
+        this.crearFormulario(); // Igual se crea el formulario
       },
     });
   }
@@ -112,8 +102,8 @@ export class RegistroComponent {
 
     const data = {
       ...this.form.value,
-      telefono: this.telefono,
-      nivel: this.nivel,
+      telefono: this.invitacionValida ? this.telefono : this.form.value.telefono,
+      nivel: this.invitacionValida ? this.nivel : this.form.value.nivel,
     };
 
     this.auth.register(data).subscribe({
@@ -153,7 +143,7 @@ export class RegistroComponent {
     return this.form.get('password');
   }
 
-  togglePasswordVisibility() {  
+  togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 }

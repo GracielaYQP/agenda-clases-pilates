@@ -1,4 +1,4 @@
-<div *ngIf="invitacionValida; else noInvitacion">
+<div *ngIf="invitacionValida || esAdmin; else noInvitacion">
   <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="registro-wrapper">
       <div id="registro_alumnos" class="singin-container">
@@ -40,11 +40,22 @@
           }
         </div>
 
-        <!-- Teléfono  precargado-->
-        <div class="form-group">
+        <!-- Si hay invitación, mostrar solo valor precargado de telefono -->
+        <div class="form-group" *ngIf="invitacionValida; else telefonoManual">
           <label for="telefono">Teléfono:</label>
           <input type="text" [value]="telefono" readonly />
         </div>
+        <!-- Si NO hay invitación, mostrar campo editable de telefono -->
+        <ng-template #telefonoManual>
+          <div class="form-group">
+            <label for="telefono">Teléfono:</label>
+            <input type="text" id="telefono" formControlName="telefono" />
+            <p class="text-danger" *ngIf="form.get('telefono')?.touched && form.get('telefono')?.invalid">
+              El teléfono es requerido.
+            </p>
+          </div>
+        </ng-template>
+
 
         <div class="form-group">
           <label for="email">Email:</label>
@@ -56,12 +67,27 @@
           </p>
         </div>
 
-
-        <!-- Nivel se muestra solo como texto -->
-        <div class="form-group">
+        <!-- Si hay invitación, mostrar solo valor precargado de nivel -->
+        <div class="form-group" *ngIf="invitacionValida; else nivelManual">
           <label>Nivel asignado:</label>
           <input type="text" [value]="nivel" readonly />
         </div>
+        <!-- Si NO hay invitación, mostrar campo editable de nivel -->
+        <ng-template #nivelManual>
+          <div class="form-group">
+            <label for="nivel">Nivel:</label>
+            <select id="nivel" formControlName="nivel">
+              <option value="">Seleccionar nivel</option>
+              <option value="Inicial">Inicial</option>
+              <option value="Intermedio">Intermedio</option>
+              <option value="Avanzado">Avanzado</option>
+            </select>
+            <p class="text-danger" *ngIf="form.get('nivel')?.touched && form.get('nivel')?.invalid">
+              El nivel es requerido.
+            </p>
+          </div>
+        </ng-template>
+
       
          <!-- Contraseña -->
         <div class="form-group">
