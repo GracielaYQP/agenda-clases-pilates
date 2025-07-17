@@ -68,12 +68,15 @@ export class ListarAlumnosComponent implements OnInit {
   }
 
   inactivarAlumno(id: number) {
-  if (confirm('¿Está seguro de marcar este alumno como inactivo?')) {
-    this.http.patch(`http://localhost:3000/users/inactivar/${id}`, {}).subscribe(() => {
-      alert('Alumno marcado como inactivo.');
-      this.obtenerAlumnos(); // refresca la lista
-    });
+    if (confirm('¿Está seguro de marcar este alumno como inactivo?')) {
+      this.http.patch(`http://localhost:3000/users/inactivar/${id}`, {}).subscribe(() => {
+        alert('Alumno marcado como inactivo.');
+        this.obtenerAlumnos(); // refresca la lista
+      });
+    }
   }
-}
 
+  irAFormularioRegistro() {
+    this.router.navigate(['/register'], { queryParams: { admin: true } });
+  }
 }
