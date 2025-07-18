@@ -3,11 +3,14 @@ import { AuthService } from './auth.service';
 import { InvitacionesService } from 'src/invitaciones/invitaciones.service';
 import { RegisterInvitacionDto } from './register-invitacion.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService, 
-              private readonly invitacionesService: InvitacionesService) {}
+              private readonly invitacionesService: InvitacionesService,
+              private readonly usersService: UsersService 
+            ) {}
 
   @Post('register')
   register(@Body() dto) {
@@ -50,15 +53,29 @@ export class AuthController {
       throw new BadRequestException('Teléfono y nivel son requeridos');
     }
 
-    // Generar un token único para la invitación
-    const token = uuidv4();
+    // Buscar usuario por teléfono
+    const user = await this.usersService.findByTelefono(dto.telefono);
+  
+    if (user) {
+      if (user.activo) {
+        throw new BadRequestException('Este usuario ya está registrado y activo.');
+      } else {
+        return {
+          reactivar: true,
+          userId: user.id,
+          telefono: user.telefono,
+          nombre: user.nombre,
+          mensaje: 'Este usuario ya estaba registrado como inactivo y fue reactivado.',
+        };
+      }
+    }
 
-    // Guardar la invitación en la DB (usa tu servicio)
-    await this.invitacionesService.crearInvitacion(dto.telefono, dto.nivel, token);
+      // Si no existe, generamos invitación como siempre
+      const token = uuidv4();
+      await this.invitacionesService.crearInvitacion(dto.telefono, dto.nivel, token);
 
-    // Retornar el token para que el frontend genere el link
-    return { token };
-  }
+      return { token };
+    }
 
   @Get('validar/:token')
     async validar(@Param('token') token: string) {

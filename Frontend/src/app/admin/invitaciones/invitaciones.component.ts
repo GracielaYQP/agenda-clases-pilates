@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { NgIf } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-invitaciones',
@@ -26,42 +27,92 @@ export class InvitacionesComponent {
       nivel: ['', Validators.required],
     });
   }
-
-  
+ 
   get esAdmin(): boolean {
     return localStorage.getItem('rol') === 'admin' && this.auth.isLoggedIn();
   }
   
-  enviarInvitacion() {
+ async enviarInvitacion() {
     if (this.form.invalid) {
-      this.form.markAllAsTouched(); // 👈 Activa todos los mensajes de error
+      this.form.markAllAsTouched();
       return;
     }
 
-    this.http.post<{ token: string }>('http://localhost:3000/auth/invitar', this.form.value)
-      .subscribe({
-        next: (res) => {
-          this.generatedLink = `http://localhost:4200/register?token=${res.token}`;
-          this.success = 'Invitación generada correctamente.';
-          this.error = '';
-          // Generar link de WhatsApp
-        const numeroSinEspacios = this.form.value.telefono.replace(/\s/g, '');
-        const texto = encodeURIComponent(
-          `Hola! Soy Lucía Carletta! Te envío el link para que completes tu registro: ${this.generatedLink}`
-        );
-        this.linkWhatsapp = `https://wa.me/54${numeroSinEspacios}?text=${texto}`;
-      },
-        error: (err) => {
-          this.generatedLink = '';
-          if (err.error && err.error.message) {
-            this.error = err.error.message;   // Usa mensaje del backend (ej: "Correo ya registrado")
-          } else {
-            this.error = 'Hubo un error al generar la invitación. Usuario ya registrado o error del servidor.';
-          }
+    try {
+      const res: any = await this.http.post(
+        'http://localhost:3000/auth/invitar',
+        this.form.value
+      ).toPromise();
+
+      if (res.reactivar && res.userId) {
+        const resultado = await Swal.fire({
+          title: 'Usuario inactivo encontrado',
+          text: `El usuario ${res.nombre} ya existe pero está inactivo. ¿Deseas reactivarlo?`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, reactivarlo',
+          cancelButtonText: 'Cancelar'
+        });
+
+        if (resultado.isConfirmed) {
+          await this.http.patch(`http://localhost:3000/users/reactivar/${res.userId}`, {}).toPromise();
+
+          const respuesta: any = await this.http.post(
+            'http://localhost:3000/auth/reset-link-whatsapp',
+            { telefono: res.telefono }
+          ).toPromise();
+
+          this.success = `✅ Usuario reactivado. Se le envió un WhatsApp para restablecer la contraseña.`;
+          this.linkWhatsapp = respuesta.whatsappUrl;
+
+          await Swal.fire({
+            title: 'Reactivado con éxito',
+            text: 'Se envió un mensaje por WhatsApp al usuario.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+          });
+
+          window.open(this.linkWhatsapp, '_blank');
+          return;
+        } else {
           this.success = '';
+          this.error = 'Operación cancelada por el administrador.';
+          return;
         }
+      }
+
+      if (res.token) {
+        this.generatedLink = `http://localhost:4200/register?token=${res.token}`;
+        this.success = 'Invitación generada correctamente.';
+        this.error = '';
+
+        const numeroSinEspacios = this.form.value.telefono.replace(/\s/g, '');
+        const texto = encodeURIComponent(`Hola! Soy Lucía Carletta! Te envío el link para que completes tu registro: ${this.generatedLink}`);
+        this.linkWhatsapp = `https://wa.me/54${numeroSinEspacios}?text=${texto}`;
+
+        await Swal.fire({
+          title: 'Invitación lista',
+          text: 'El link fue generado correctamente. ¡Podés enviarlo por WhatsApp!',
+          icon: 'success',
+          confirmButtonText: 'Copiar y abrir WhatsApp'
+        });
+
+        // Abrir WhatsApp
+        window.open(this.linkWhatsapp, '_blank');
+      }
+    } catch (err: any) {
+      this.generatedLink = '';
+      this.success = '';
+      this.error = err?.error?.message || 'Error al generar la invitación.';
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: this.error,
       });
+    }
   }
+
   logout() {
     this.auth.logout();
     this.router.navigate(['/']); 

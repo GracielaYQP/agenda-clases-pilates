@@ -3,10 +3,11 @@ import { InvitacionesService } from './invitaciones.service';
 import { InvitacionesController } from './invitaciones.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Invitacion } from './invitaciones.entity';
+import { User } from 'src/users/user.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Invitacion])],
+  imports: [TypeOrmModule.forFeature([Invitacion, User])],
   controllers: [InvitacionesController],
   providers: [InvitacionesService],
   exports: [InvitacionesService] // 👈 Si lo usas en AuthModule

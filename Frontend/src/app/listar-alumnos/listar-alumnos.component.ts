@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HorariosService } from '../services/horarios.service';
 
 interface Alumno {
   id: number;
@@ -28,7 +29,7 @@ export class ListarAlumnosComponent implements OnInit {
   filtroDni: string = '';
   filtroTelefono: string = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router, private horariosService: HorariosService) {}
 
   ngOnInit(): void {
     this.obtenerAlumnos();
@@ -71,7 +72,8 @@ export class ListarAlumnosComponent implements OnInit {
     if (confirm('¿Está seguro de marcar este alumno como inactivo?')) {
       this.http.patch(`http://localhost:3000/users/inactivar/${id}`, {}).subscribe(() => {
         alert('Alumno marcado como inactivo.');
-        this.obtenerAlumnos(); // refresca la lista
+        this.obtenerAlumnos(); //refresca la lista de alumnos
+        this.horariosService.refrescarHorarios(); //refresca los horarios
       });
     }
   }

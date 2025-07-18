@@ -4,7 +4,9 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Horario } from '../horarios-disponibles/horarios-disponibles.component';
 
 @Injectable({ providedIn: 'root' })
+
 export class HorariosService {
+
   private apiUrl = 'http://localhost:3000/horarios';
   private horariosSubject = new BehaviorSubject<Horario[]>([]);
   horarios$ = this.horariosSubject.asObservable();
@@ -19,6 +21,9 @@ export class HorariosService {
     this.http.get<Horario[]>(this.apiUrl).subscribe(data => this.horariosSubject.next(data));
   }
 
+  refrescarHorarios() {
+    this.cargarHorarios(); // 🔄 reutiliza el mismo método
+  }
 
   reservar(horarioId: number, nombre: string, apellido: string): Observable<any> {
     return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
@@ -28,11 +33,6 @@ export class HorariosService {
       tap(() => this.cargarHorarios())
     );
   }
-
-  // getMisReservas(): Observable<any[]> {
-  //   return this.http.get<any[]>('http://localhost:3000/reservas/mis-reservas');
-  // }
-
 
   getMisReservas(): Observable<any[]> {
     const token = localStorage.getItem('token');
@@ -44,7 +44,5 @@ export class HorariosService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<any[]>('http://localhost:3000/reservas/mis-reservas', { headers });
   }
-
-
 
 }

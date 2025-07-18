@@ -14,7 +14,7 @@ import { MailerService } from './mailer/mailer.service';
     UsersModule,
     InvitacionesModule,
     JwtModule.register({
-      secret: 'secretKey', // ⚠️ Usar .env
+      secret: 'secretKey', 
       signOptions: { expiresIn: '1d' },
     }),
   ],

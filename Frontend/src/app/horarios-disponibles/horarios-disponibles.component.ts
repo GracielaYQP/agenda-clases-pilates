@@ -32,10 +32,9 @@ export class HorariosDisponiblesComponent {
   dias: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
   horas: string[] = ['08:00', '09:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
   usuarioNivel: string = '';
-
   horarios: Horario[] = [ ];
-  
-  
+  mostrarMensajeActualizacion: boolean = false;
+ 
   constructor(private router: Router, private horariosService: HorariosService) {
  
     this.usuarioNivel = localStorage.getItem('nivelUsuario') || '';
@@ -78,10 +77,8 @@ export class HorariosDisponiblesComponent {
       return ah - bh;
       });
       this.cargarHorarios();
+      this.mostrarMensajeTemporal();
 
-      console.log('✅ Datos recibidos desde el observable o generados localmente');
-      console.log('Usuario nivel:', this.usuarioNivel);
-      console.log('Horarios:', this.horarios);
     });
 
     this.horariosService.cargarHorarios();
@@ -215,6 +212,13 @@ export class HorariosDisponiblesComponent {
     } else {
       return 'No definido';
     }
+  }
+
+  mostrarMensajeTemporal() {
+    this.mostrarMensajeActualizacion = true;
+    setTimeout(() => {
+      this.mostrarMensajeActualizacion = false;
+    }, 4000); // se oculta después de 4 segundos
   }
 
 }

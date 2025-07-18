@@ -25,12 +25,16 @@ export class UsersController {
   @Patch('/inactivar/:id')
     inactivarUsuario(@Param('id') id: number) {
       return this.usersService.inactivarUsuario(id);
-    }
-
+  }
 
   @Get('/:id')
     async findById(@Param('id') id: number) {
     return this.usersService.findById(id);
+  }
+
+  @Patch('/reactivar/:id')
+  reactivarUsuario(@Param('id') id: number) {
+    return this.usersService.reactivarUsuario(id);
   }
 
 }
