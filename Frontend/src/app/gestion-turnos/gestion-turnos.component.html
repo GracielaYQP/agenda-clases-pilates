@@ -17,7 +17,7 @@
               <ng-container *ngFor="let turno of getTurnos(dia, hora)">
                 <div
                   class="clickeable {{ turno.nivel.toLowerCase() }}"
-                  (click)="reservar(turno)">
+                  (click)="abrirTurno(turno)">
                   <div class="nivel">{{ turno.nivel }}</div>
                   <div class="camas">Camas libres: {{ turno.totalCamas - turno.camasReservadas }}</div>
                   <div class="reservas" *ngIf="turno.reservas && turno.reservas.length > 0">
@@ -45,5 +45,69 @@
     </tbody>
   </table>
 </div>
+<!-- ✅ MODAL PARA ADMIN -->
+<div *ngIf="modalAbierto" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Editar Turno: {{ turnoSeleccionado.dia }} - {{ turnoSeleccionado.hora }}</h3>
+    <p>Nivel: {{ turnoSeleccionado.nivel }}</p>
+
+    <div *ngIf="turnoSeleccionado.reservas?.length > 0">
+      <h4>Reservas actuales:</h4>
+
+      <ul>
+        <ng-container *ngFor="let r of turnoSeleccionado.reservas">
+          <li *ngIf="reservaEditandoId !== r.id">
+            {{ r.nombre }} {{ r.apellido }}
+            <button class="btn-anular" (click)="anularReserva(r.id)">Anular</button>
+            <button class="btn-editar" (click)="iniciarEdicionReserva(r)">📝 Editar</button>
+          </li>
+
+          <li *ngIf="reservaEditandoId === r.id" class="reserva-editando">
+            <input [(ngModel)]="nombreEditado" placeholder="Nombre" />
+            <input [(ngModel)]="apellidoEditado" placeholder="Apellido" />
+            <input [(ngModel)]="nuevoUserId" type="number" placeholder="Nuevo userId (opcional)" />
+            <button (click)="guardarEdicionReserva()">💾 Guardar</button>
+            <button (click)="reservaEditandoId = null">❌ Cancelar</button>
+          </li>
+        </ng-container>
+      </ul>
+    </div>
+
+    <div *ngIf="turnoSeleccionado.reservas?.length === 0">
+      <p>No hay reservas aún en este turno.</p>
+    </div>
+
+    <!-- 🔽 FORMULARIO PARA AGREGAR NUEVA RESERVA -->
+    <hr>
+    <button (click)="mostrarFormAgregar = !mostrarFormAgregar"
+      [ngClass]="mostrarFormAgregar ? 'btn-cancelar-toggle' : 'btn-agregar-toggle'">
+      {{ mostrarFormAgregar ? 'Cancelar' : '+ Agregar reserva para otro usuario' }}
+    </button>
+
+    <div *ngIf="mostrarFormAgregar" class="form-agregar">
+      <label>Buscar usuario por:</label>
+      <select [(ngModel)]="busquedaModo">
+        <option value="nombre-apellido">Nombre y Apellido</option>
+        <option value="telefono">Teléfono</option>
+      </select>
+
+      <!-- Campos dinámicos -->
+      <div *ngIf="busquedaModo === 'nombre-apellido'">
+        <input type="text" [(ngModel)]="nombreNuevo" placeholder="Nombre" />
+        <input type="text" [(ngModel)]="apellidoNuevo" placeholder="Apellido" />
+      </div>
+
+      <div *ngIf="busquedaModo === 'telefono'">
+        <input type="text" [(ngModel)]="telefonoNuevo" placeholder="Teléfono" />
+      </div>
+
+      <button (click)="agregarReserva(turnoSeleccionado.id)" class="btn-confirmar">Confirmar</button>
+    </div>
+
+    <!-- Botón para cerrar -->
+    <button class="btn-cerrar" (click)="cerrarModal()" class="btn-cerrar">Cerrar</button>
+  </div>
+</div>
+
 
 

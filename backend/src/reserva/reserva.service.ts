@@ -74,6 +74,44 @@ export class ReservaService {
     }
   }
 
+  async anularReserva(reservaId: number) {
+    const reserva = await this.reservaRepo.findOne({
+      where: { id: reservaId },
+      relations: ['horario'],
+    });
+
+    if (!reserva) throw new Error('Reserva no encontrada');
+
+    const horario = reserva.horario;
+    horario.camasReservadas--;
+
+    await this.horarioRepo.save(horario);
+    await this.reservaRepo.remove(reserva);
+
+    return { mensaje: 'Reserva anulada correctamente' };
+  }
+
+  async editarReserva(reservaId: number, datos: { nombre?: string; apellido?: string; nuevoUserId?: number }) {
+    const reserva = await this.reservaRepo.findOne({
+      where: { id: reservaId },
+      relations: ['usuario'],
+    });
+
+    if (!reserva) throw new Error('Reserva no encontrada');
+
+    if (datos.nombre) reserva.nombre = datos.nombre;
+    if (datos.apellido) reserva.apellido = datos.apellido;
+
+    if (datos.nuevoUserId) {
+      const nuevoUsuario = await this.userRepo.findOneBy({ id: datos.nuevoUserId });
+      if (!nuevoUsuario) throw new Error('Nuevo usuario no encontrado');
+      reserva.usuario = nuevoUsuario;
+    }
+
+    return this.reservaRepo.save(reserva);
+  }
+
+
 }
 
 

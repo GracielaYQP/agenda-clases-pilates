@@ -198,3 +198,60 @@ tbody tr:hover {
 .con-reserva {
   border: 2px solid black !important;
 }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* fondo oscuro semitransparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 400px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  background-image: url('/assets/logos/dibupilates3.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: lighten;
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  margin: auto;
+  background-position: center;
+}
+
+
+@keyframes fadeIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-content button {
+  background-color: #b53490;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+}
+
+.modal-content button:hover {
+  background-color: #a12780;
+}
+
+.modal-content button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(181, 52, 144, 0.3);
+}
