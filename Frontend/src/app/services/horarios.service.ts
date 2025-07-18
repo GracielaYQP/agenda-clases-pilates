@@ -45,4 +45,34 @@ export class HorariosService {
     return this.http.get<any[]>('http://localhost:3000/reservas/mis-reservas', { headers });
   }
 
+  anularReserva(reservaId: number): Observable<any> {
+    return this.http.post(`http://localhost:3000/reservas/anular/${reservaId}`, {}).pipe(
+      tap(() => this.cargarHorarios()) // para refrescar la vista
+    );
+  }
+
+  buscarPorNombreApellido(nombre: string, apellido: string): Observable<any> {
+    return this.http.get(`http://localhost:3000/users/buscar?nombre=${nombre}&apellido=${apellido}`);
+  }
+
+  buscarPorTelefono(telefono: string): Observable<any> {
+    return this.http.get(`http://localhost:3000/users/telefono/${telefono}`);
+  }
+
+  reservarComoAdmin(horarioId: number, nombre: string, apellido: string, userId: number): Observable<any> {
+    return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
+      nombre,
+      apellido,
+      userId
+    }).pipe(
+      tap(() => this.cargarHorarios()) // 🔄 Refresca horarios después de reservar
+    );
+  }
+
+  editarReserva(reservaId: number, data: any): Observable<any> {
+    return this.http.patch(`http://localhost:3000/reservas/${reservaId}`, data).pipe(
+      tap(() => this.cargarHorarios())
+    );
+  }
+
 }

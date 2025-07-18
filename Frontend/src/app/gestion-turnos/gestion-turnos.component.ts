@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HorariosService } from '../services/horarios.service';
 import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 export interface Reserva {
   id: number;
@@ -22,7 +23,7 @@ export interface Horario {
 @Component({
   selector: 'app-gestion-turnos',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './gestion-turnos.component.html',
   styleUrl: './gestion-turnos.component.css',
 })
@@ -32,6 +33,17 @@ export class GestionTurnosComponent implements OnInit {
   horas: string[] = ['08:00', '09:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
   horarios: any[] = [];
   rolUsuario: string = '';
+  modalAbierto: boolean = false;
+  turnoSeleccionado: any = null;
+  busquedaModo: string = 'nombre-apellido'; // valor por defecto
+  nombreNuevo: string = '';
+  apellidoNuevo: string = '';
+  telefonoNuevo: string = '';
+  reservaEditandoId: number | null = null;
+  nombreEditado: string = '';
+  apellidoEditado: string = '';
+  nuevoUserId: number | null = null;
+  mostrarFormAgregar: boolean = false;
 
   constructor(
     private horariosService: HorariosService,
@@ -65,8 +77,6 @@ export class GestionTurnosComponent implements OnInit {
     });
   }
 
-
-
   getNivelParaHorario(hora: string): string {
     if (['08:00', '09:00'].includes(hora)) return 'Avanzado';
     if (['10:00', '11:00', '15:00', '16:00'].includes(hora)) return 'Intermedio';
@@ -74,25 +84,44 @@ export class GestionTurnosComponent implements OnInit {
     return '';
   }
 
-  reservar(turno: any) {
-    const nombre = localStorage.getItem('nombreUsuario') || 'Desconocido';
-    const apellido = localStorage.getItem('apellidoUsuario') || 'Desconocido';
-    const userId = Number(localStorage.getItem('userId'));
+  // reservar(turno: any) {
+  //   const nombre = localStorage.getItem('nombreUsuario') || 'Desconocido';
+  //   const apellido = localStorage.getItem('apellidoUsuario') || 'Desconocido';
+  //   const userId = Number(localStorage.getItem('userId'));
 
-    const mensaje = `¿Deseás reservar este turno?\n\nNombre: ${nombre}\nApellido: ${apellido}\nNivel: ${turno.nivel}\nDía: ${turno.dia}\nHora: ${turno.hora}`;
+  //   const mensaje = `¿Deseás reservar este turno?\n\nNombre: ${nombre}\nApellido: ${apellido}\nNivel: ${turno.nivel}\nDía: ${turno.dia}\nHora: ${turno.hora}`;
 
-    if (confirm(mensaje)) {
-      this.horariosService.reservar(turno.id, nombre, apellido).subscribe({
-        next: () => {
-          alert('✅ ¡Turno reservado exitosamente!');
-        },
-        error: (err) => {
-          alert('❌ No se pudo reservar: ' + err.error.message);
-        }
-      });
+  //   if (confirm(mensaje)) {
+  //     this.horariosService.reservar(turno.id, nombre, apellido).subscribe({
+  //       next: () => {
+  //         alert('✅ ¡Turno reservado exitosamente!');
+  //       },
+  //       error: (err) => {
+  //         alert('❌ No se pudo reservar: ' + err.error.message);
+  //       }
+  //     });
+  //   }
+  // }
+
+  abrirTurno(turno: any) {
+    if (this.rolUsuario === 'admin') {
+      // 👉 Mostrar modal con las reservas actuales y permitir editar
+      this.abrirEditorDeReservas(turno);
+    } else {
+      // 👉 Alumno: reservar normalmente
+      const nombre = localStorage.getItem('nombreUsuario') || 'Desconocido';
+      const apellido = localStorage.getItem('apellidoUsuario') || 'Desconocido';
+
+      const mensaje = `¿Deseás reservar este turno?\n\nNombre: ${nombre}\nApellido: ${apellido}\nNivel: ${turno.nivel}\nDía: ${turno.dia}\nHora: ${turno.hora}`;
+
+      if (confirm(mensaje)) {
+        this.horariosService.reservar(turno.id, nombre, apellido).subscribe({
+          next: () => alert('✅ ¡Turno reservado exitosamente!'),
+          error: (err) => alert('❌ No se pudo reservar: ' + err.error.message)
+        });
+      }
     }
   }
-
 
   hasTurno(dia: string, hora: string): boolean {
     return this.horarios.some(h =>
@@ -110,6 +139,103 @@ export class GestionTurnosComponent implements OnInit {
     );
   }
 
+  abrirEditorDeReservas(turno: any) {
+    this.turnoSeleccionado = turno;
+    this.modalAbierto = true;
+  }
 
-    
+  cerrarModal() {
+    this.modalAbierto = false;
+    this.turnoSeleccionado = null;
+  }
+
+  anularReserva(reservaId: number) {
+    if (confirm('¿Estás seguro de que querés anular esta reserva?')) {
+      this.horariosService.anularReserva(reservaId).subscribe({
+        next: () => {
+          alert('✅ Reserva anulada');
+          this.cerrarModal(); // Cierra y refresca automáticamente
+        },
+        error: (err) => {
+          alert('❌ Error al anular la reserva: ' + err.error?.message || err.message);
+        }
+      });
+    }
+  }
+
+  agregarReserva(turnoId: number) {
+    if (this.busquedaModo === 'nombre-apellido') {
+      const nombre = this.nombreNuevo.trim();
+      const apellido = this.apellidoNuevo.trim();
+
+      if (!nombre || !apellido) {
+        alert('⚠️ Completá nombre y apellido');
+        return;
+      }
+
+      this.horariosService.buscarPorNombreApellido(nombre, apellido).subscribe({
+        next: (usuario) => {
+          this.horariosService.reservarComoAdmin(turnoId, nombre, apellido, usuario.id).subscribe({
+            next: () => {
+              alert('✅ Reserva creada');
+              this.cerrarModal();
+            },
+            error: err => alert('❌ Error al reservar: ' + err.error.message)
+          });
+        },
+        error: err => alert('❌ Usuario no encontrado: ' + err.error.message)
+      });
+
+    } else if (this.busquedaModo === 'telefono') {
+      const telefono = this.telefonoNuevo.trim();
+
+      if (!telefono) {
+        alert('⚠️ Ingresá un número de teléfono');
+        return;
+      }
+
+      this.horariosService.buscarPorTelefono(telefono).subscribe({
+        next: (usuario) => {
+          this.horariosService.reservarComoAdmin(turnoId, usuario.nombre, usuario.apellido, usuario.id).subscribe({
+            next: () => {
+              alert('✅ Reserva creada');
+              this.cerrarModal();
+            },
+            error: err => alert('❌ Error al reservar: ' + err.error.message)
+          });
+        },
+        error: err => alert('❌ Usuario no encontrado: ' + err.error.message)
+      });
+    }
+  }
+
+  iniciarEdicionReserva(reserva: any) {
+    this.reservaEditandoId = reserva.id;
+    this.nombreEditado = reserva.nombre;
+    this.apellidoEditado = reserva.apellido;
+    this.nuevoUserId = reserva.usuario?.id || null;
+  }
+
+  guardarEdicionReserva() {
+    if (!this.reservaEditandoId) return;
+
+    const body: any = {
+      nombre: this.nombreEditado,
+      apellido: this.apellidoEditado
+    };
+
+    if (this.nuevoUserId) body.nuevoUserId = this.nuevoUserId;
+
+    this.horariosService.editarReserva(this.reservaEditandoId, body).subscribe({
+      next: () => {
+        alert('✅ Reserva actualizada');
+        this.reservaEditandoId = null;
+        this.horariosService.cargarHorarios();
+      },
+      error: err => alert('❌ Error al actualizar: ' + err.error.message)
+    });
+  }
+
+
+
 }

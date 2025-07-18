@@ -23,8 +23,10 @@
         <td class="hora-columna">{{ hora }}</td>
         <td *ngFor="let dia of dias">
           <ng-container *ngIf="hasReserva(dia, hora); else sinTurno">
-          <div class="clickeable"
-              [ngClass]="[getNivel(dia, hora), hasReserva(dia, hora) ? 'con-reserva' : '']">
+            <div class="clickeable"
+              [ngClass]="[getNivel(dia, hora), hasReserva(dia, hora) ? 'con-reserva' : '']"
+              (click)="abrirModalDesdeCelda(dia, hora)">
+
               <div class="nivel"> {{ getNivel(dia, hora) }}</div>
               <div class="camas">
                 {{ getNombreCompleto(dia, hora) }}
@@ -40,3 +42,21 @@
     </tbody>
   </table>
 </div>
+<!-- ✅ MODAL CANCELACIÓN USUARIO -->
+<div *ngIf="modalAbierto" class="modal-overlay">
+  <div class="modal-content">
+    <h3>¿Cancelar este turno?</h3>
+    <p>
+      Día: <strong>{{ turnoAEliminar.horario.dia }}</strong><br>
+      Hora: <strong>{{ turnoAEliminar.horario.hora }}</strong><br>
+      Nivel: <strong>{{ turnoAEliminar.horario.nivel }}</strong>
+    </p>
+
+    <div style="text-align: center;">
+      <button class="btn-cancelar" (click)="confirmarCancelacion()">❌ Cancelar turno</button>
+      <button class="btn-cerrar" (click)="cerrarModal()">🚫 Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
