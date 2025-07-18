@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Invitacion } from './invitaciones.entity';
+import { User } from 'src/users/user.entity';
 
 
 @Injectable()
@@ -9,6 +10,8 @@ export class InvitacionesService {
   constructor(
     @InjectRepository(Invitacion)
     private readonly invitacionRepo: Repository<Invitacion>,
+    @InjectRepository(User) // 👉 agregalo así
+    private readonly userRepository: Repository<User>,
   ) {}
 
   // Buscar invitación por token
@@ -41,7 +44,4 @@ export class InvitacionesService {
     return this.invitacionRepo.save(invitacion);
   }
 
-
-  
 }
-

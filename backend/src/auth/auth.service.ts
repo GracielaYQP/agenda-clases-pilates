@@ -91,16 +91,16 @@ export class AuthService {
       const resetUrl = `http://localhost:4200/reset-password/${token}`;
 
       const mensaje = `
-    Hola ${user.nombre} 👋,
+          Hola ${user.nombre} 👋,
 
-    Recibimos tu solicitud para cambiar la contraseña de tu cuenta en el sistema de Pilates. 
+          Recibimos tu solicitud para cambiar la contraseña de tu cuenta en el sistema de Pilates. 
 
-    📎 Link para restablecer tu contraseña: ${resetUrl}
+          📎 Link para restablecer tu contraseña: ${resetUrl}
 
-    Este enlace es válido por 1 hora ⏳.
+          Este enlace es válido por 1 hora ⏳.
 
-    Gracias 💪
-    `;
+          Gracias 💪
+      `;
 
       return {
         resetLink: resetUrl,
@@ -137,7 +137,5 @@ export class AuthService {
 
     console.log(`🔐 Contraseña actualizada correctamente para ${user.telefono}`);
     return { message: 'Contraseña restablecida exitosamente' };
-  }
-
-  
+  }  
 }

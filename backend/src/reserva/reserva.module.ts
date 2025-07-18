@@ -10,7 +10,7 @@ import { User } from '../users/user.entity';
   imports: [TypeOrmModule.forFeature([Reserva, Horario, User])],
   controllers: [ReservaController],
   providers: [ReservaService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, ReservaService]
 })
 export class ReservaModule {}
 
