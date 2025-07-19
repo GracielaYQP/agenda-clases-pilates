@@ -40,4 +40,16 @@
     </tbody>
   </table>
 </div>
+  <!-- ✅ MODAL para confirmar inactivación -->
+<div *ngIf="modalConfirmacionInactivo" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Confirmar Inactivación</h3>
+    <p>¿Estás seguro de que querés marcar como inactivo a:</p>
+    <p><strong>{{ alumnoSeleccionadoApellido }}, {{ alumnoSeleccionadoNombre }}</strong>?</p>
+
+    <button class="btn-confirmar" (click)="confirmarInactivacion()">✅ Sí, inactivar</button>
+    <button class="btn-cerrar" (click)="cerrarModalInactivacion()">Cancelar</button>
+  </div>
+</div>
+
 

@@ -13,7 +13,7 @@
 .singin-container {
   width: 50%;
   max-width: 400px;          
-  background-image: url('/assets/logos/dibupilates3.jpg');
+  background-image: url('/assets/logos/dibupilates7.jpg');
   background-repeat: no-repeat;  
   background-size: cover;  
   background-position: center 90%;
@@ -67,7 +67,7 @@ select {
 }
 
 .btn-singin {
-  background-color: #d81b60;
+  background-color: #B53490;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -82,7 +82,7 @@ select {
 }
 
 .btn-singin:hover {
-  background-color: #ad1457;
+  background-color: #af1155;
 }
 
 .center-button {

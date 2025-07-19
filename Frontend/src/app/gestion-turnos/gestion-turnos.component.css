@@ -219,7 +219,7 @@ tbody tr:hover {
   max-width: 440px;
   padding: 30px 25px;
   background: rgba(255, 255, 255, 0.9);
-  background-image: url('/assets/logos/dibupilates6.jpg');
+  background-image: url('/assets/logos/dibupilates5.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -276,7 +276,7 @@ tbody tr:hover {
 
 .modal-content .btn-anular,
 .modal-content .btn-editar {
-  background-color: #ec407a;
+  background-color: #B53490;
   border: none;
   padding: 6px 12px;
   margin-left: 6px;
@@ -289,7 +289,7 @@ tbody tr:hover {
 
 .modal-content .btn-anular:hover,
 .modal-content .btn-editar:hover {
-  background-color: #c2185b;
+  background-color: #af1155;
 }
 
 .modal-content .reserva-editando {
@@ -311,12 +311,12 @@ tbody tr:hover {
 }
 
 .btn-confirmar {
-  background-color: #d81b60;
+  background-color: #B53490;
   color: white;
 }
 
 .btn-confirmar:hover {
-  background-color: #ad1457;
+  background-color: #af1155;
 }
 
 .btn-cerrar {
@@ -345,7 +345,7 @@ tbody tr:hover {
 }
 
 .btn-cancelar-toggle {
-  background-color: #ef5350;
+  background-color: #B53490;
   color: white;
   padding: 10px;
   border: none;
@@ -358,7 +358,7 @@ tbody tr:hover {
 }
 
 .btn-cancelar-toggle:hover {
-  background-color: #c62828;
+  background-color: #af1155;
 }
 
 .modal-overlay {
@@ -397,7 +397,7 @@ tbody tr:hover {
 }
 
 .btn-cancelar {
-  background-color: #d81b60;
+  background-color: #B53490;
   color: white;
   padding: 10px;
   border: none;
@@ -409,7 +409,7 @@ tbody tr:hover {
 }
 
 .btn-cancelar:hover {
-  background-color: #ad1457;
+  background-color: #af1155;
 }
 
 .btn-cerrar {

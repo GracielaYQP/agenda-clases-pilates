@@ -28,6 +28,11 @@ export class ListarAlumnosComponent implements OnInit {
   filtroApellido: string = '';
   filtroDni: string = '';
   filtroTelefono: string = '';
+  modalConfirmacionInactivo: boolean = false;
+  alumnoSeleccionadoId: number | null = null;
+  alumnoSeleccionadoNombre: string = '';
+  alumnoSeleccionadoApellido: string = '';
+
 
   constructor(private http: HttpClient, private router: Router, private horariosService: HorariosService) {}
 
@@ -69,14 +74,30 @@ export class ListarAlumnosComponent implements OnInit {
   }
 
   inactivarAlumno(id: number) {
-    if (confirm('¿Está seguro de marcar este alumno como inactivo?')) {
-      this.http.patch(`http://localhost:3000/users/inactivar/${id}`, {}).subscribe(() => {
-        alert('Alumno marcado como inactivo.');
-        this.obtenerAlumnos(); //refresca la lista de alumnos
-        this.horariosService.refrescarHorarios(); //refresca los horarios
-      });
+    const alumno = this.alumnos.find(a => a.id === id);
+    if (alumno) {
+      this.alumnoSeleccionadoId = alumno.id;
+      this.alumnoSeleccionadoNombre = alumno.nombre;
+      this.alumnoSeleccionadoApellido = alumno.apellido;
+      this.modalConfirmacionInactivo = true;
     }
   }
+
+  confirmarInactivacion() {
+    if (!this.alumnoSeleccionadoId) return;
+
+    this.http.patch(`http://localhost:3000/users/inactivar/${this.alumnoSeleccionadoId}`, {}).subscribe(() => {
+      this.modalConfirmacionInactivo = false;
+      this.obtenerAlumnos(); // Refresca lista
+      this.horariosService.refrescarHorarios(); // Refresca horarios
+    });
+  }
+
+  cerrarModalInactivacion() {
+    this.modalConfirmacionInactivo = false;
+    this.alumnoSeleccionadoId = null;
+  }
+
 
   irAFormularioRegistro() {
     this.router.navigate(['/register'], { queryParams: { admin: true } });
