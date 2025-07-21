@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
@@ -12,16 +12,40 @@ import { NgClass, NgIf } from '@angular/common';
   standalone: true,
   imports: [ReactiveFormsModule, NgIf, NgClass],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit{
   form: FormGroup;
   error: string = '';
-  showPassword: boolean = false; 
+  showPassword: boolean = false;
+  isAdmin: boolean = false;
+  email: string = '';
+  password: string = '';
+; 
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = this.fb.group({
       usuario: ['', Validators.required],
       password: ['', Validators.required],
     });
+  }
+ 
+  ngOnInit(): void {
+    this.checkIfAdmin(); 
+    this.form.get('usuario')?.valueChanges.subscribe(() => this.checkIfAdmin());
+  }
+
+  checkIfAdmin() {
+    const entrada = this.form.get('usuario')?.value?.trim().toLowerCase() || '';
+    console.log('📩 Usuario ingresado:', entrada); 
+    const adminTelefono = '3517152375';
+    const superadminTelefono = '3541603186';
+    const adminEmail = 'luciacarletta2016@gmail.com';
+
+    this.isAdmin =
+      entrada === adminTelefono ||
+      entrada === superadminTelefono ||
+      entrada === adminEmail;
+
+    console.log('🕵️‍♂️ ¿Es admin?', this.isAdmin);
   }
 
   get Usuario() {
@@ -39,7 +63,7 @@ export class LoginComponent {
   submit() {
     if (this.form.invalid) return;
     console.log('🔐 Enviando datos de login:', this.form.value);
-
+    this.checkIfAdmin();
     this.auth.login(this.form.value).subscribe({
       next: (res) => {
          console.log('✅ Respuesta del login:', res);
