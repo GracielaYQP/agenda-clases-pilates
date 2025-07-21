@@ -1,7 +1,10 @@
 .parallax-section {
   position: relative;
-  height: 200vh; 
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px;
 }
 
 .parallax-background {
@@ -12,8 +15,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  height: 50%;
-  width: 100%;
+  right: 0;
+  bottom: 0;
   z-index: 1;
 }
 .parallax-background.img1 {
@@ -30,12 +33,12 @@
   z-index: 2; /* Encima de la imagen */
   max-width: 800px;
   margin: 0 auto;
-  padding: 80px 20px; /* Espaciado para scroll */
+  padding: 40px 20px; 
 }
 
 .text-block {
   background-color: rgba(199, 197, 197, 0.8);
   padding: 40px;
-  margin-bottom: 100px;
+  margin-bottom: 40px;
   border-radius: 10px;
 }
