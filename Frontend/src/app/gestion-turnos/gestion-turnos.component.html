@@ -85,8 +85,8 @@
     </button>
 
     <div *ngIf="mostrarFormAgregar" class="form-agregar">
-      <label>Buscar usuario por:</label>
-      <select [(ngModel)]="busquedaModo">
+      <label for="modoBusqueda">Buscar usuario por:</label>
+      <select id="modoBusqueda" [(ngModel)]="busquedaModo">
         <option value="nombre-apellido">Nombre y Apellido</option>
         <option value="telefono">Teléfono</option>
       </select>
@@ -106,6 +106,20 @@
 
     <!-- Botón para cerrar -->
     <button class="btn-cerrar" (click)="cerrarModal()" class="btn-cerrar">Cerrar</button>
+  </div>
+</div>
+<!-- ✅ MODAL  PARA ALUMNO -->
+<div *ngIf="modalAlumnoAbierto" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Confirmar Reserva</h3>
+    <p><strong>Nombre:</strong> {{ nombreUsuario }}</p>
+    <p><strong>Apellido:</strong> {{ apellidoUsuario }}</p>
+    <p><strong>Día:</strong> {{ turnoSeleccionado?.dia }}</p>
+    <p><strong>Hora:</strong> {{ turnoSeleccionado?.hora }}</p>
+    <p><strong>Nivel:</strong> {{ turnoSeleccionado?.nivel }}</p>
+
+    <button class="btn-confirmar" (click)="confirmarReserva()">✅ Confirmar</button>
+    <button class="btn-cerrar" (click)="cerrarModalAlumno()">Cancelar</button>
   </div>
 </div>
 
