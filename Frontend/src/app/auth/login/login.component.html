@@ -38,14 +38,27 @@
         {{ error }}
       </div>
 
-      <div class="form-footer text-center">
+      <!-- Mostrar esto SOLO si es admin o superadmin -->
+      <div class="form-footer text-center" *ngIf="isAdmin">
+        <a
+          class="btn-singin"
+          href="https://wa.me/5493541603186?text=Hola,%20soy%20la%20admin%20y%20necesito%20una%20nueva%20contraseña"
+          target="_blank"
+        >
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+
+      <!-- Mostrar esto SOLO si NO es admin -->
+      <div class="form-footer text-center" *ngIf="!isAdmin">
         <p>¿Olvidaste tu contraseña?</p>
         <button class="btn-singin" type="button" (click)="solicitarResetPorWhatsapp()">Recibir link por WhatsApp</button>
       </div>
 
-      <p class="form-footer">
-         No tienes una cuenta? Debido a que este estudio trabaja de forma personalizada, solo permite la creación de nuevas cuentas a través de un link de invitación.. Comunícate conmigo de forma presencial para tramitar tu alta.
+      <p class="form-footer" *ngIf="!isAdmin">
+        No tienes una cuenta? Debido a que este estudio trabaja de forma personalizada, solo permite la creación de nuevas cuentas a través de un link de invitación. Comunícate conmigo de forma presencial para tramitar tu alta.
       </p>
+
     </div>
   </div>
 </form>
