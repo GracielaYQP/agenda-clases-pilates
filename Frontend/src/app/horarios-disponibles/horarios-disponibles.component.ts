@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NgFor, NgClass, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { HorariosService } from '../services/horarios.service';
+import { Horario } from '../gestion-turnos/gestion-turnos.component';
 
 export interface Reserva {
   id: number;
@@ -9,14 +10,18 @@ export interface Reserva {
   apellido: string;
 }
 
-export interface Horario {
-  id: number;
+
+export interface HorarioSemana {
+  idHorario: number;
   dia: string;
+  fecha: string;
   hora: string;
   nivel: string;
   totalCamas: number;
   camasReservadas: number;
-  reservas: Reserva[]; 
+  camasDisponibles: number;
+  reservadoPorUsuario: boolean;
+  canceladoPorUsuario: boolean;
 }
 
 @Component({
@@ -26,15 +31,17 @@ export interface Horario {
   templateUrl: './horarios-disponibles.component.html',
   styleUrl: './horarios-disponibles.component.css'
 })
+
 export class HorariosDisponiblesComponent {
 
-  nivelHorarios: Horario[] = [];
+  horarios: HorarioSemana[] = [];
+  nivelHorarios: HorarioSemana[] = [];
   dias: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
   horas: string[] = ['08:00', '09:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
   usuarioNivel: string = '';
-  horarios: Horario[] = [ ];
   mostrarMensajeActualizacion: boolean = false;
  
+  
   constructor(private router: Router, private horariosService: HorariosService) {
  
     this.usuarioNivel = localStorage.getItem('nivelUsuario') || '';
@@ -59,34 +66,40 @@ export class HorariosDisponiblesComponent {
       }
     );
 
-    console.log('Usuario nivel:', this.usuarioNivel);
-    console.log('Horarios mostrados:', this.nivelHorarios);
-    console.log('Días:', this.dias);
-    console.log('Horas:', this.horas);
+    // console.log('Usuario nivel:', this.usuarioNivel);
+    // console.log('Horarios mostrados:', this.nivelHorarios);
+    // console.log('Días:', this.dias);
+    // console.log('Horas:', this.horas);
   }
 
 
   ngOnInit() {
-    this.horariosService.horarios$.subscribe(data => {
-      this.horarios = (data && data.length > 0) ? data : this.generarHorariosBase();
+    this.horariosService.getHorariosDeLaSemana().subscribe(data => {
+      this.horarios = data;
       const ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-      this.dias = ordenDias.filter(dia => this.horarios.some(h => h.dia === dia));
-      this.horas = Array.from(new Set(this.horarios.map(h => h.hora))).sort((a, b) => {
-      const ah = parseInt(a.split(':')[0], 10);
-      const bh = parseInt(b.split(':')[0], 10);
-      return ah - bh;
+
+      const diasUnicos = Array.from(
+        new Set(data.map(h => `${h.dia} ${this.formatearFecha(h.fecha)}`))
+      );
+
+      // Ordenar según el orden de los días de la semana
+      this.dias = ordenDias
+      .map(dia =>
+        diasUnicos.find(d => d.startsWith(dia))
+      )
+      .filter((d): d is string => d !== undefined);
+
+      this.horas = Array.from(new Set(data.map(h => h.hora))).sort((a, b) => {
+        const ah = parseInt(a.split(':')[0], 10);
+        const bh = parseInt(b.split(':')[0], 10);
+        return ah - bh;
       });
-      this.cargarHorarios();
       this.mostrarMensajeTemporal();
-
     });
-
-    this.horariosService.cargarHorarios();
   }
 
-
-  generarHorariosBase(): Horario[] {
-    const horariosBase: Horario[] = [];
+  generarHorariosBase(): HorarioSemana[] {
+    const horariosBase: HorarioSemana[] = [];
     let idCounter = 1; 
 
     for (let dia of this.dias) {
@@ -94,14 +107,17 @@ export class HorariosDisponiblesComponent {
         const nivel = this.getNivelParaHorario(dia, hora);
 
         horariosBase.push({
-          id: idCounter++,
+          idHorario: idCounter++,
+          fecha:'',
           dia,
           hora,
           nivel,
           totalCamas: 5,
           camasReservadas: 0,
-          reservas: []
-        });
+          camasDisponibles: 5,
+          reservadoPorUsuario: false,
+          canceladoPorUsuario: false,
+          });
       }
     }
 
@@ -128,10 +144,10 @@ export class HorariosDisponiblesComponent {
       return ah - bh;
     });
 
-    console.log('Usuario nivel:', this.usuarioNivel);
-    console.log('Horarios mostrados:', this.nivelHorarios);
-    console.log('Días:', this.dias);
-    console.log('Horas:', this.horas);
+    // console.log('Usuario nivel:', this.usuarioNivel);
+    // console.log('Horarios mostrados:', this.nivelHorarios);
+    // console.log('Días:', this.dias);
+    // console.log('Horas:', this.horas);
   }
 
   
@@ -151,15 +167,20 @@ export class HorariosDisponiblesComponent {
     }
   }
 
-
-  getDisponibles(dia: string, hora: string, nivel: string): string {
+  getDisponibles(diaConFecha: string, hora: string, nivel: string): string {
     if (nivel === 'No disponible') return '0';
-    const turno = this.horarios.find(h =>
-      h.dia === dia && h.hora === hora && h.nivel === nivel
-    );
-    return turno ? (turno.totalCamas - turno.camasReservadas).toString() : '5';
-  }
 
+    const [dia, fecha] = diaConFecha.split(' ');
+
+    const turno = this.horarios.find(h =>
+      h.dia === dia &&
+      this.formatearFecha(h.fecha) === fecha &&
+      h.hora === hora &&
+      h.nivel === nivel
+    );
+
+    return turno ? turno.camasDisponibles.toString() : '0';
+  }
 
   isDisponible(dia: string, hora: string, nivel: string): boolean {
     const turno = this.horarios.find(h =>
@@ -170,13 +191,14 @@ export class HorariosDisponiblesComponent {
     return turno ? turno.totalCamas > turno.camasReservadas : false;
   }
 
-  reservar(dia: string, hora: string, nivel: string) {
-    if (!this.isClickable(dia, hora, nivel)) return;
+  reservar(diaConFecha: string, hora: string, nivel: string) {
+    if (!this.isClickable(diaConFecha, hora, nivel)) return;
+
+    const [dia, fecha] = diaConFecha.split(' ');
 
     this.router.navigate(['/gestion-turnos'], {
-      queryParams: { dia, hora, nivel }
+      queryParams: { dia, hora, nivel, fecha }
     });
-  
   }
 
 
@@ -184,35 +206,41 @@ export class HorariosDisponiblesComponent {
     const turno = this.horarios.find(
       h => h.dia === dia && h.hora === hora && h.nivel === nivel
     );
-    return turno ? turno['id'] : null;
+    return turno ? turno.idHorario : null;
   }
 
 
-  isClickable(dia: string, hora: string, nivel: string): boolean {
-  return (
-    !!this.usuarioNivel &&
-    this.usuarioNivel.toLowerCase() === nivel.toLowerCase() &&
-    this.isDisponible(dia, hora, nivel)
-  );
-}
+  isClickable(diaConFecha: string, hora: string, nivel: string): boolean {
+    const [dia, fecha] = diaConFecha.split(' ');
 
-  getNivelParaHorario(dia: string, hora: string): string {
-    if (dia === 'Viernes' && hora === '08:00') {
-      return 'No disponible';
-    }
-    if (dia === 'Viernes' && hora === '18:00') {
-      return 'No disponible';
-    }
-    if (['08:00', '09:00'].includes(hora)) {
-      return 'Avanzado';
-    } else if (['10:00', '11:00', '15:00', '16:00'].includes(hora)) {
-      return 'Intermedio';
-    } else if (['17:00', '18:00'].includes(hora)) {
-      return 'Inicial';
-    } else {
-      return 'No definido';
-    }
+    const turno = this.horarios.find(h =>
+      h.dia === dia &&
+      this.formatearFecha(h.fecha) === fecha &&
+      h.hora === hora &&
+      h.nivel === nivel
+    );
+
+    return (
+      !!this.usuarioNivel &&
+      this.usuarioNivel.toLowerCase() === nivel.toLowerCase() &&
+      !!turno &&
+      turno.camasDisponibles > 0
+    );
   }
+
+
+  getNivelParaHorario(diaConFecha: string, hora: string): string {
+    const [dia, fecha] = diaConFecha.split(' ');
+
+    const turno = this.horarios.find(h =>
+      h.dia === dia &&
+      this.formatearFecha(h.fecha) === fecha &&
+      h.hora === hora
+    );
+
+    return turno ? turno.nivel : 'No disponible';
+  }
+
 
   mostrarMensajeTemporal() {
     this.mostrarMensajeActualizacion = true;
@@ -220,6 +248,13 @@ export class HorariosDisponiblesComponent {
       this.mostrarMensajeActualizacion = false;
     }, 4000); // se oculta después de 4 segundos
   }
+
+  formatearFecha(fecha: string): string {
+    // Fuerza la hora 12:00 del mediodía para evitar desfases de zona horaria
+    const date = new Date(`${fecha}T12:00:00-03:00`);
+    return date.toLocaleDateString('es-AR');
+  }
+
 
 }
 

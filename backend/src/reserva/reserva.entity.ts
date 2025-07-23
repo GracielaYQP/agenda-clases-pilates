@@ -14,6 +14,12 @@ export class Reserva {
   @Column()
   apellido: string;
 
+  @Column({ type: 'date' }) 
+  fecha: string;
+
+  @Column({ default: 'reservado' })
+  estado: 'reservado' | 'cancelado';
+
   @ManyToOne(() => Horario, horario => horario.reservas, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'horarioId' }) // 👈 asegurate de tener esto
   horario: Horario;

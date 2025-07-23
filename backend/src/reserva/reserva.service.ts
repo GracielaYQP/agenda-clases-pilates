@@ -31,12 +31,18 @@ export class ReservaService {
     const usuario = await this.userRepo.findOne({ where: { id: userId } });
     if (!usuario) throw new Error('Usuario no encontrado');
 
+    const hoy = new Date(); // usar la fecha actual
+    const fecha = hoy.toISOString().split('T')[0]; // formato YYYY-MM-DD
+
     const nuevaReserva = this.reservaRepo.create({
       horario,
       usuario,
       nombre,
       apellido,
+      fecha,
+      estado: 'reservado',
     });
+
 
     horario.camasReservadas++;
 
@@ -109,6 +115,39 @@ export class ReservaService {
     }
 
     return this.reservaRepo.save(reserva);
+  }
+
+  async cancelarPorFecha(horarioId: number, userId: number, fecha: string) {
+    const horario = await this.horarioRepo.findOne({ where: { id: horarioId } });
+    if (!horario) throw new Error('Horario no encontrado');
+
+    const usuario = await this.userRepo.findOne({ where: { id: userId } });
+    if (!usuario) throw new Error('Usuario no encontrado');
+
+    // Verificar si ya existe una cancelación para ese día
+    const yaExiste = await this.reservaRepo.findOne({
+      where: {
+        usuario: { id: userId },
+        horario: { id: horarioId },
+        fecha,
+        estado: 'cancelado',
+      },
+    });
+
+    if (yaExiste) {
+      throw new Error('Ya se canceló ese día');
+    }
+
+    const reservaCancelada = this.reservaRepo.create({
+      usuario,
+      horario,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      fecha,
+      estado: 'cancelado',
+    });
+
+    return this.reservaRepo.save(reservaCancelada);
   }
 
 

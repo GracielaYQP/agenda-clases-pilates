@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Horario } from '../horarios-disponibles/horarios-disponibles.component';
+import { HorarioSemana } from '../horarios-disponibles/horarios-disponibles.component';
 
 @Injectable({ providedIn: 'root' })
 
 export class HorariosService {
 
   private apiUrl = 'http://localhost:3000/horarios';
-  private horariosSubject = new BehaviorSubject<Horario[]>([]);
+  private horariosSubject = new BehaviorSubject<HorarioSemana[]>([]);
   horarios$ = this.horariosSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
   getHorarios() {
-    return this.http.get<Horario[]>(this.apiUrl);
+    return this.http.get<HorarioSemana[]>(this.apiUrl);
   }
 
   cargarHorarios() {
-    this.http.get<Horario[]>(this.apiUrl).subscribe(data => this.horariosSubject.next(data));
+    this.http.get<HorarioSemana[]>(this.apiUrl).subscribe(data => this.horariosSubject.next(data));
   }
 
   refrescarHorarios() {
@@ -74,5 +74,18 @@ export class HorariosService {
       tap(() => this.cargarHorarios())
     );
   }
+
+  getHorariosDeLaSemana(): Observable<any[]> {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      return this.http.get<any[]>('http://localhost:3000/horarios/semana', { headers });
+    } else {
+      // 🔓 llamada pública sin autenticación
+      return this.http.get<any[]>('http://localhost:3000/horarios/semana');
+    }
+  }
+
 
 }

@@ -1,5 +1,8 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Req, UseGuards } from '@nestjs/common';
 import { HorariosService } from './horarios.service';
+import { AuthGuard } from '@nestjs/passport';
+import { Request as ExpressRequest } from 'express';
+
 
 @Controller('horarios')
 export class HorariosController {
@@ -13,11 +16,18 @@ export class HorariosController {
     });
   }
 
+  @Get('semana')
+  async getSemana(@Req() req: ExpressRequest & { user?: any }) {
+    const user = req.user;
+    const userId = user?.id ?? null;
+
+    return this.horariosService.getHorariosSemana(userId);
+  }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.horariosService.findOne(+id);
-  }
+    findOne(@Param('id') id: string) {
+      return this.horariosService.findOne(+id);
+    }
 
 }
 

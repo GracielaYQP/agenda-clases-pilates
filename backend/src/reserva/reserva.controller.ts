@@ -28,30 +28,6 @@ export class ReservaController {
     return this.reservaService.obtenerReservasPorUsuario(userId);
   }
 
-     // Reservar un horario (requiere token)
-  // @UseGuards(AuthGuard('jwt'))
-  // @Post(':horarioId')
-  // reservar(
-  //   @Param('horarioId') horarioIdParam: string,
-  //   @Req() req: Request,
-  //   @Body() body: { nombre: string; apellido: string },
-  // ) {
-  //   const horarioId = Number(horarioIdParam);
-  //   if (isNaN(horarioId)) {
-  //     throw new BadRequestException('ID de horario inválido');
-  //   }
-
-  //   const user = req.user as any;
-  //   const userId = user?.id;
-  //   const rol = user?.rol;
-
-  //   if (rol === 'admin') {
-  //     throw new BadRequestException('Los administradores no pueden reservar clases');
-  //   }
-
-  //   return this.reservaService.reservar(horarioId, userId, body.nombre, body.apellido);
-  // }
-
   @UseGuards(AuthGuard('jwt'))
   @Post(':horarioId')
   reservar(
@@ -111,6 +87,26 @@ export class ReservaController {
     @Body() body: { nombre?: string; apellido?: string; nuevoUserId?: number }
   ) {
     return this.reservaService.editarReserva(Number(reservaId), body);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('cancelar')
+  cancelarPorFecha(
+    @Req() req: Request,
+    @Body() body: { horarioId: number; fecha: string }
+  ) {
+    const user = req.user as any;
+    const userId = user?.id;
+
+    if (!userId || isNaN(Number(userId))) {
+      throw new BadRequestException('ID de usuario no válido');
+    }
+
+    if (!body.horarioId || !body.fecha) {
+      throw new BadRequestException('Faltan datos: horarioId o fecha');
+    }
+
+    return this.reservaService.cancelarPorFecha(body.horarioId, userId, body.fecha);
   }
 
 }

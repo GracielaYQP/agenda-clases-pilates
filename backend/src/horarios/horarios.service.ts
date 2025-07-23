@@ -4,6 +4,11 @@ import { Repository } from 'typeorm';
 import { Horario } from './horarios.entity';
 import { Reserva } from 'src/reserva/reserva.entity';
 import { User } from 'src/users/user.entity';
+import { addDays, startOfWeek, format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { toZonedTime } from 'date-fns-tz';
+
+
 
 @Injectable()
 export class HorariosService {
@@ -40,7 +45,7 @@ export class HorariosService {
 
     if (!turno) throw new Error('Turno no encontrado');
     if (turno.camasReservadas >= turno.totalCamas) {
-      throw new Error('No hay camas disponibles');
+      throw new Error('No hay turnos disponibles');
     }
 
   // Buscar el usuario
@@ -67,6 +72,74 @@ export class HorariosService {
     if (!turnoActualizado) throw new Error('No se pudo obtener el turno actualizado');
 
     return turnoActualizado;
+  }
+
+  async getHorariosSemana(userId?: number) {
+    const timeZone = 'America/Argentina/Buenos_Aires';
+    const hoy = new Date();
+    const hoyBuenosAires = toZonedTime(hoy, 'America/Argentina/Buenos_Aires');
+    const lunes = startOfWeek(hoyBuenosAires, { weekStartsOn: 1 });
+
+    console.log('🗓️ Fecha hoy (BA):', hoyBuenosAires.toLocaleString('es-AR'));
+    console.log('📅 Lunes generado:', lunes.toLocaleString('es-AR'));
+
+    const semana: Date[] = [];
+    for (let i = 0; i < 5; i++) {
+      semana.push(addDays(lunes, i));
+    }
+
+    const todosHorarios = await this.horariosRepository.find({
+      relations: ['reservas', 'reservas.usuario'],
+    });
+
+    const resultado: {
+      idHorario: number;
+      dia: string;
+      fecha: string;
+      hora: string;
+      nivel: string;
+      totalCamas: number;
+      camasReservadas: number;
+      camasDisponibles: number;
+      reservadoPorUsuario: boolean;
+      canceladoPorUsuario: boolean;
+    }[] = [];
+
+    for (const fecha of semana) {
+      const diaNombre = format(fecha, 'EEEE', { locale: es });
+      const diaCapitalizado = diaNombre.charAt(0).toUpperCase() + diaNombre.slice(1);
+      const fechaISO = format(fecha, 'yyyy-MM-dd');
+
+      const horariosDelDia = todosHorarios.filter(h => h.dia === diaCapitalizado);
+
+      for (const horario of horariosDelDia) {
+        const reservasDeEseDia = horario.reservas.filter(r => r.fecha === fechaISO);
+        const cantidadReservadas = reservasDeEseDia.filter(r => r.estado === 'reservado').length;
+
+        const estaReservadoPorUsuario = userId
+          ? reservasDeEseDia.some(r => r.usuario.id === userId && r.estado === 'reservado')
+          : false;
+
+        const estaCanceladoPorUsuario = userId
+          ? reservasDeEseDia.some(r => r.usuario.id === userId && r.estado === 'cancelado')
+          : false;
+
+        resultado.push({
+          idHorario: horario.id,
+          dia: diaCapitalizado,
+          fecha: fechaISO,
+          hora: horario.hora,
+          nivel: horario.nivel,
+          totalCamas: horario.totalCamas,
+          camasReservadas: cantidadReservadas,
+          camasDisponibles: horario.totalCamas - cantidadReservadas,
+          reservadoPorUsuario: estaReservadoPorUsuario,
+          canceladoPorUsuario: estaCanceladoPorUsuario,
+        });
+      }
+    }
+
+    return resultado;
   }
 
 }
