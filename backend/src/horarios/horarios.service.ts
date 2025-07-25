@@ -113,7 +113,7 @@ export class HorariosService {
       const horariosDelDia = todosHorarios.filter(h => h.dia === diaCapitalizado);
 
       for (const horario of horariosDelDia) {
-        const reservasDeEseDia = horario.reservas.filter(r => r.fecha === fechaISO);
+        const reservasDeEseDia = horario.reservas.filter(r => r.fechaTurno === fechaISO);
         const cantidadReservadas = reservasDeEseDia.filter(r => r.estado === 'reservado').length;
 
         const estaReservadoPorUsuario = userId

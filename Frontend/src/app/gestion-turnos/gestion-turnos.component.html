@@ -4,7 +4,10 @@
     <thead>
       <tr>
         <th>Horario</th>
-        <th *ngFor="let dia of dias">{{ dia }}</th>
+        <th *ngFor="let dia of dias">
+          <div>{{ dia.split(' ')[0] }}</div>
+          <div>{{ dia.split(' ')[1] }}</div>
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -100,10 +103,13 @@
       <div *ngIf="busquedaModo === 'telefono'">
         <input type="text" [(ngModel)]="telefonoNuevo" placeholder="Teléfono" />
       </div>
-
-      <button (click)="agregarReserva(turnoSeleccionado.id)" class="btn-confirmar">Confirmar</button>
+      <button (click)="agregarReserva()" class="btn-confirmar">Confirmar</button>
     </div>
-
+    <!-- ✅ Mensaje de confirmación para admin -->
+    <div *ngIf="mostrarConfirmacionAdmin"
+        [ngClass]="{'mensaje-confirmacion': true, 'success': !esErrorAdmin, 'error': esErrorAdmin}">
+      {{ mensajeAdminReserva }}
+    </div>
     <!-- Botón para cerrar -->
     <button class="btn-cerrar" (click)="cerrarModal()" class="btn-cerrar">Cerrar</button>
   </div>
@@ -120,6 +126,12 @@
 
     <button class="btn-confirmar" (click)="confirmarReserva()">✅ Confirmar</button>
     <button class="btn-cerrar" (click)="cerrarModalAlumno()">Cancelar</button>
+
+    <div *ngIf="mostrarConfirmacion"
+        [ngClass]="{'mensaje-confirmacion': true, 'success': !esErrorReserva, 'error': esErrorReserva}">
+      {{ mensajeReserva }}
+    </div>
+  
   </div>
 </div>
 

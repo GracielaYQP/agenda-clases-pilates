@@ -33,7 +33,7 @@ export class ReservaController {
   reservar(
     @Param('horarioId') horarioIdParam: string,
     @Req() req: Request,
-    @Body() body: { nombre: string; apellido: string; userId?: number }, // 👈 Agregamos opcional userId
+    @Body() body: { nombre: string; apellido: string; userId?: number; fechaTurno: string }
   ) {
     const horarioId = Number(horarioIdParam);
     if (isNaN(horarioId)) {
@@ -43,20 +43,21 @@ export class ReservaController {
     const user = req.user as any;
     const rol = user?.rol;
     const idFromToken = user?.id;
-
-    // 👇 Si hay userId en el body (ej: admin), lo usamos. Si no, usamos el del token.
     const userId = body.userId ?? idFromToken;
 
     if (!userId || isNaN(Number(userId))) {
       throw new BadRequestException('ID de usuario no válido');
     }
 
-    // ✅ Si el usuario es admin, pero no mandó userId, evitamos que se autorreserve por accidente
     if (rol === 'admin' && !body.userId) {
       throw new BadRequestException('Un administrador debe indicar el usuario para reservar');
     }
 
-    return this.reservaService.reservar(horarioId, userId, body.nombre, body.apellido);
+    if (!body.fechaTurno) {
+      throw new BadRequestException('Debe indicarse la fecha del turno');
+    }
+
+    return this.reservaService.reservar(horarioId, userId, body.nombre, body.apellido, body.fechaTurno);
   }
 
 
@@ -93,7 +94,7 @@ export class ReservaController {
   @Post('cancelar')
   cancelarPorFecha(
     @Req() req: Request,
-    @Body() body: { horarioId: number; fecha: string }
+    @Body() body: { horarioId: number; fechaTurno: string }
   ) {
     const user = req.user as any;
     const userId = user?.id;
@@ -102,11 +103,11 @@ export class ReservaController {
       throw new BadRequestException('ID de usuario no válido');
     }
 
-    if (!body.horarioId || !body.fecha) {
+    if (!body.horarioId || !body.fechaTurno) {
       throw new BadRequestException('Faltan datos: horarioId o fecha');
     }
 
-    return this.reservaService.cancelarPorFecha(body.horarioId, userId, body.fecha);
+    return this.reservaService.cancelarPorFecha(body.horarioId, userId, body.fechaTurno);
   }
 
 }

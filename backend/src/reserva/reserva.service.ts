@@ -16,7 +16,7 @@ export class ReservaService {
     private userRepo: Repository<User>,
   ) {}
 
-  async reservar(horarioId: number, userId: number, nombre: string, apellido: string) {
+  async reservar(horarioId: number, userId: number, nombre: string, apellido: string, fechaTurno: string) {
     const horario = await this.horarioRepo.findOne({
       where: { id: horarioId },
       relations: ['reservas'],
@@ -31,24 +31,24 @@ export class ReservaService {
     const usuario = await this.userRepo.findOne({ where: { id: userId } });
     if (!usuario) throw new Error('Usuario no encontrado');
 
-    const hoy = new Date(); // usar la fecha actual
-    const fecha = hoy.toISOString().split('T')[0]; // formato YYYY-MM-DD
+    const fechaReserva = new Date().toISOString().split('T')[0]; // la fecha actual (YYYY-MM-DD)
 
     const nuevaReserva = this.reservaRepo.create({
       horario,
       usuario,
       nombre,
       apellido,
-      fecha,
+      fechaReserva,
+      fechaTurno, // 👈 ya viene desde el frontend
       estado: 'reservado',
     });
-
 
     horario.camasReservadas++;
 
     await this.horarioRepo.save(horario);
     return this.reservaRepo.save(nuevaReserva);
   }
+
 
   async obtenerReservasPorHorario(horarioId: number) {
     return this.reservaRepo.find({
@@ -117,19 +117,19 @@ export class ReservaService {
     return this.reservaRepo.save(reserva);
   }
 
-  async cancelarPorFecha(horarioId: number, userId: number, fecha: string) {
+  async cancelarPorFecha(horarioId: number, userId: number, fechaTurno: string) {
     const horario = await this.horarioRepo.findOne({ where: { id: horarioId } });
     if (!horario) throw new Error('Horario no encontrado');
 
     const usuario = await this.userRepo.findOne({ where: { id: userId } });
     if (!usuario) throw new Error('Usuario no encontrado');
 
-    // Verificar si ya existe una cancelación para ese día
+    // Verificar si ya existe una cancelación para ese día y usuario
     const yaExiste = await this.reservaRepo.findOne({
       where: {
         usuario: { id: userId },
         horario: { id: horarioId },
-        fecha,
+        fechaTurno,
         estado: 'cancelado',
       },
     });
@@ -138,17 +138,21 @@ export class ReservaService {
       throw new Error('Ya se canceló ese día');
     }
 
+    const fechaReserva = new Date().toISOString().split('T')[0]; // día en que se realiza la cancelación
+
     const reservaCancelada = this.reservaRepo.create({
       usuario,
       horario,
       nombre: usuario.nombre,
       apellido: usuario.apellido,
-      fecha,
+      fechaTurno,
+      fechaReserva,
       estado: 'cancelado',
     });
 
     return this.reservaRepo.save(reservaCancelada);
   }
+
 
 
 }

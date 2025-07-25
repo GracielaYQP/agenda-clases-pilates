@@ -25,10 +25,11 @@ export class HorariosService {
     this.cargarHorarios(); // 🔄 reutiliza el mismo método
   }
 
-  reservar(horarioId: number, nombre: string, apellido: string): Observable<any> {
+  reservar(horarioId: number, nombre: string, apellido: string, fechaTurno: string): Observable<any> {
     return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
       nombre,
-      apellido
+      apellido,
+      fechaTurno
     }).pipe(
       tap(() => this.cargarHorarios())
     );
@@ -59,11 +60,12 @@ export class HorariosService {
     return this.http.get(`http://localhost:3000/users/telefono/${telefono}`);
   }
 
-  reservarComoAdmin(horarioId: number, nombre: string, apellido: string, userId: number): Observable<any> {
+  reservarComoAdmin(horarioId: number, nombre: string, apellido: string, userId: number, fechaTurno: string): Observable<any> {
     return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
       nombre,
       apellido,
-      userId
+      userId,
+      fechaTurno
     }).pipe(
       tap(() => this.cargarHorarios()) // 🔄 Refresca horarios después de reservar
     );
@@ -86,6 +88,4 @@ export class HorariosService {
       return this.http.get<any[]>('http://localhost:3000/horarios/semana');
     }
   }
-
-
 }

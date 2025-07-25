@@ -1,13 +1,3 @@
-<!-- <h2>Mis turnos reservados</h2>
-
-<div *ngIf="misReservas.length === 0">No tenés turnos reservados.</div>
-
-<ul *ngIf="misReservas.length > 0">
-  <li *ngFor="let reserva of misReservas">
-    🗓️ Día: {{ reserva.horario.dia }} - 🕒 Hora: {{ reserva.horario.hora }} - Nivel: {{ reserva.horario.nivel }}
-  </li>
-</ul>
- -->
 <div class="table-container" *ngIf="dias.length && horas.length">
   <h2>Mis turnos</h2>
 
@@ -15,7 +5,10 @@
     <thead>
       <tr>
         <th>Horario</th>
-        <th *ngFor="let dia of dias">{{ dia }}</th>
+        <th *ngFor="let dia of dias">
+          <div>{{ dia.split(' ')[0] }}</div>
+          <div>{{ dia.split(' ')[1] }}</div>
+        </th>
       </tr>
     </thead>
     <tbody>

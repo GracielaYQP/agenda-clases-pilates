@@ -422,3 +422,23 @@ tbody tr:hover {
   width: 100%;
   margin-top: 10px;
 }
+
+.mensaje-confirmacion {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.success {
+  background-color: #e1f3e8;
+  color: #155724;
+}
+
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+

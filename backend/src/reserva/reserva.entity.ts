@@ -15,7 +15,10 @@ export class Reserva {
   apellido: string;
 
   @Column({ type: 'date' }) 
-  fecha: string;
+  fechaTurno: string;
+
+  @Column({ type: 'date' }) 
+  fechaReserva: string;
 
   @Column({ default: 'reservado' })
   estado: 'reservado' | 'cancelado';

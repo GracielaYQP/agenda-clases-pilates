@@ -11,7 +11,8 @@ import { CommonModule, NgIf } from '@angular/common';
 })
 export class MisTurnosComponent {
 
-  dias: string[] = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  dias: string[] = [];
+  fechaInicioSemana: Date = new Date();
   horas: string[] = ['08:00', '09:00', '10:00', '11:00', '15:00', '16:00', '17:00', '18:00'];
   misReservas: any[] = [];
   modalAbierto = false;
@@ -20,6 +21,7 @@ export class MisTurnosComponent {
   constructor(private horariosService: HorariosService) {} 
 
   ngOnInit() {
+    this.generarDiasConFechas();
     this.horariosService.getMisReservas().subscribe({
       next: (data: any[]) => {
         this.misReservas = data;
@@ -31,22 +33,38 @@ export class MisTurnosComponent {
     });
   }
 
+  // Esta función genera días como "Lunes 29/07/2025"
+  generarDiasConFechas() {
+    const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+
+    const hoy = new Date();
+    const diaActual = hoy.getDay(); // 0 (domingo) a 6 (sábado)
+    const diasDesdeLunes = (diaActual + 6) % 7; // cuántos días retroceder hasta llegar a lunes
+    const lunes = new Date(hoy);
+    lunes.setDate(hoy.getDate() - diasDesdeLunes);
+
+    this.dias = Array.from({ length: 5 }, (_, i) => {
+      const fecha = new Date(lunes);
+      fecha.setDate(lunes.getDate() + i);
+      const nombreDia = diasSemana[fecha.getDay()];
+      const fechaStr = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1)
+        .toString().padStart(2, '0')}/${fecha.getFullYear()}`;
+      return `${nombreDia} ${fechaStr}`;
+    });
+  }
+
   // Devuelve true si el usuario tiene una reserva para ese día y hora
   hasReserva(dia: string, hora: string): boolean {
-    return this.misReservas.some(r => r.horario.dia === dia && r.horario.hora === hora);
+    return this.misReservas.some(r => dia.startsWith(r.horario.dia) && r.horario.hora === hora);
   }
 
   getNivel(dia: string, hora: string): string {
-    const reserva = this.misReservas.find(r => r.horario.dia === dia && r.horario.hora === hora);
-    return reserva ? reserva.horario.nivel: '';
-  }
-
-  getNivelClase(dia: string, hora: string): string {
-    return this.getNivel(dia, hora).toLowerCase();
+    const reserva = this.misReservas.find(r => dia.startsWith(r.horario.dia) && r.horario.hora === hora);
+    return reserva ? reserva.horario.nivel : '';
   }
 
   getNombreCompleto(dia: string, hora: string): string {
-    const reserva = this.misReservas.find(r => r.horario.dia === dia && r.horario.hora === hora);
+    const reserva = this.misReservas.find(r => dia.startsWith(r.horario.dia) && r.horario.hora === hora);
     return reserva ? `${reserva.nombre} ${reserva.apellido}` : '';
   }
 
