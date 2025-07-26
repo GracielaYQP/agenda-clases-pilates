@@ -103,6 +103,15 @@
       <div *ngIf="busquedaModo === 'telefono'">
         <input type="text" [(ngModel)]="telefonoNuevo" placeholder="Teléfono" />
       </div>
+      <!-- Checklist para indicar si es una recuperación -->
+      <div class="form-group">
+        <label for="tipoReserva"><strong>Tipo de reserva:</strong></label>
+        <select id="tipoReserva" [(ngModel)]="reservaAutomatica">
+          <option [ngValue]="true">Clase habitual (recurrente)</option>
+          <option [ngValue]="false">Recuperación</option>
+        </select>
+      </div>
+
       <button (click)="agregarReserva()" class="btn-confirmar">Confirmar</button>
     </div>
     <!-- ✅ Mensaje de confirmación para admin -->
@@ -123,6 +132,15 @@
     <p><strong>Día:</strong> {{ turnoSeleccionado?.dia }}</p>
     <p><strong>Hora:</strong> {{ turnoSeleccionado?.hora }}</p>
     <p><strong>Nivel:</strong> {{ turnoSeleccionado?.nivel }}</p>
+    <!-- Checklist para indicar si es una recuperación -->
+    <div class="form-group">
+      <label for="tipoReserva"><strong>Tipo de reserva:</strong></label>
+      <select id="tipoReserva" [(ngModel)]="reservaAutomatica">
+        <option [ngValue]="true">Clase habitual (recurrente)</option>
+        <option [ngValue]="false">Recuperación</option>
+      </select>
+    </div>
+
 
     <button class="btn-confirmar" (click)="confirmarReserva()">✅ Confirmar</button>
     <button class="btn-cerrar" (click)="cerrarModalAlumno()">Cancelar</button>

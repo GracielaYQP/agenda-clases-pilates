@@ -23,6 +23,19 @@ export class Reserva {
   @Column({ default: 'reservado' })
   estado: 'reservado' | 'cancelado';
 
+  @Column({ default: true })
+  automatica: boolean;
+
+  @Column({ default: false })
+  cancelacionMomentanea: boolean;
+
+  @Column({ default: false })
+  cancelacionPermanente: boolean;
+
+  @Column({ type: 'date', nullable: true })
+  fechaCancelacion: Date;
+
+
   @ManyToOne(() => Horario, horario => horario.reservas, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'horarioId' }) // 👈 asegurate de tener esto
   horario: Horario;

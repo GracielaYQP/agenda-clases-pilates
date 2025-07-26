@@ -57,6 +57,7 @@ export class RegistroComponent {
           '',
           [Validators.required, Validators.pattern(/^([a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]{3,})$/)],
         ],
+        planMensual: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         password: [
           '',

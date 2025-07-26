@@ -25,11 +25,18 @@ export class HorariosService {
     this.cargarHorarios(); // 🔄 reutiliza el mismo método
   }
 
-  reservar(horarioId: number, nombre: string, apellido: string, fechaTurno: string): Observable<any> {
+  reservar(
+    horarioId: number, 
+    nombre: string, 
+    apellido: string, 
+    fechaTurno: string,
+    automatica: boolean
+  ): Observable<any> {
     return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
       nombre,
       apellido,
-      fechaTurno
+      fechaTurno,
+      automatica
     }).pipe(
       tap(() => this.cargarHorarios())
     );
@@ -46,10 +53,8 @@ export class HorariosService {
     return this.http.get<any[]>('http://localhost:3000/reservas/mis-reservas', { headers });
   }
 
-  anularReserva(reservaId: number): Observable<any> {
-    return this.http.post(`http://localhost:3000/reservas/anular/${reservaId}`, {}).pipe(
-      tap(() => this.cargarHorarios()) // para refrescar la vista
-    );
+  anularReserva(reservaId: number, tipo: 'momentanea' | 'permanente') {
+    return this.http.patch(`http://localhost:3000/reservas/cancelar/${reservaId}`, { tipo });
   }
 
   buscarPorNombreApellido(nombre: string, apellido: string): Observable<any> {
@@ -60,14 +65,22 @@ export class HorariosService {
     return this.http.get(`http://localhost:3000/users/telefono/${telefono}`);
   }
 
-  reservarComoAdmin(horarioId: number, nombre: string, apellido: string, userId: number, fechaTurno: string): Observable<any> {
+  reservarComoAdmin(
+    horarioId: number, 
+    nombre: string, 
+    apellido: string, 
+    userId: number, 
+    fechaTurno: string,
+    automatica: boolean
+  ): Observable<any> {
     return this.http.post(`http://localhost:3000/reservas/${horarioId}`, {
       nombre,
       apellido,
       userId,
-      fechaTurno
+      fechaTurno,
+      automatica
     }).pipe(
-      tap(() => this.cargarHorarios()) // 🔄 Refresca horarios después de reservar
+      tap(() => this.cargarHorarios())
     );
   }
 

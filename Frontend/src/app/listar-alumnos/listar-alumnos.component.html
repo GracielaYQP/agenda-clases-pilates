@@ -16,6 +16,7 @@
         <th>Teléfono</th>
         <th>Email</th>
         <th>Nivel</th>
+        <th>Plan</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -28,7 +29,11 @@
         <td>{{ alumno.telefono }}</td>
         <td>{{ alumno.email }}</td>
         <td>{{ alumno.nivel }}</td>
+        <td>{{ alumno.planMensual }}</td>
         <td class="actions-cell">
+          <button class="action-btn calendar-btn" (click)="verAsistencia(alumno.id, alumno.nombre, alumno.apellido)">
+            📅
+          </button>
           <button class="action-btn edit-btn" (click)="editarAlumno(alumno.id)">
             ✏️
           </button>
@@ -46,10 +51,35 @@
     <h3>Confirmar Inactivación</h3>
     <p>¿Estás seguro de que querés marcar como inactivo a:</p>
     <p><strong>{{ alumnoSeleccionadoApellido }}, {{ alumnoSeleccionadoNombre }}</strong>?</p>
-
     <button class="btn-confirmar" (click)="confirmarInactivacion()">✅ Sí, inactivar</button>
     <button class="btn-cerrar" (click)="cerrarModalInactivacion()">Cancelar</button>
   </div>
 </div>
+<!-- modal asistencia -->
+<div *ngIf="modalAsistencia" class="modal-overlay">
+  <div class="modal-content-asistencia">
+    <h3>Asistencias de {{ asistenciaNombre }} {{ asistenciaApellido }}</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th>Asistencias</th>
+          <th>Ausencias</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mes of asistenciaMeses">
+          <td>{{ mes }}</td>
+          <td>{{ asistenciaData[mes].asistencias }}</td>
+          <td>{{ asistenciaData[mes].ausencias }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button class="btn-cerrar" (click)="cerrarModalAsistencia()">Cerrar</button>
+  </div>
+</div>
+
 
 

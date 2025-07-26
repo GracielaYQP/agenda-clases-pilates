@@ -53,6 +53,8 @@ export class GestionTurnosComponent implements OnInit {
   mensajeAdminReserva: string = '';
   mostrarConfirmacionAdmin: boolean = false;
   esErrorAdmin: boolean = false;
+  esRecuperacion: boolean = false;
+  reservaAutomatica: boolean = true;
 
 
   constructor(
@@ -163,7 +165,7 @@ export class GestionTurnosComponent implements OnInit {
 
   anularReserva(reservaId: number) {
     if (confirm('¿Estás seguro de que querés anular esta reserva?')) {
-      this.horariosService.anularReserva(reservaId).subscribe({
+      this.horariosService.anularReserva(reservaId, 'permanente').subscribe({
         next: () => {
           alert('✅ Reserva anulada');
           this.cerrarModal(); // Cierra y refresca automáticamente
@@ -199,7 +201,14 @@ export class GestionTurnosComponent implements OnInit {
 
       this.horariosService.buscarPorNombreApellido(nombre, apellido).subscribe({
         next: (usuario) => {
-          this.horariosService.reservarComoAdmin(turnoId, nombre, apellido, usuario.id, this.turnoSeleccionado.fecha).subscribe({
+          this.horariosService.reservarComoAdmin(
+            turnoId, 
+            nombre, 
+            apellido, 
+            usuario.id, 
+            this.turnoSeleccionado.fecha,
+            !this.esRecuperacion
+        ).subscribe({
             next: () => {
               this.mensajeAdminReserva = '✅ Reserva creada correctamente';
               this.esErrorAdmin = false;
@@ -236,7 +245,14 @@ export class GestionTurnosComponent implements OnInit {
 
       this.horariosService.buscarPorTelefono(telefono).subscribe({
         next: (usuario) => {
-          this.horariosService.reservarComoAdmin(turnoId, usuario.nombre, usuario.apellido, usuario.id, this.turnoSeleccionado.fecha).subscribe({
+          this.horariosService.reservarComoAdmin(
+            turnoId, 
+            usuario.nombre, 
+            usuario.apellido, 
+            usuario.id, 
+            this.turnoSeleccionado.fecha,
+            !this.esRecuperacion
+          ).subscribe({
             next: () => {
               this.mensajeAdminReserva = '✅ Reserva creada correctamente';
               this.esErrorAdmin = false;
@@ -310,7 +326,8 @@ export class GestionTurnosComponent implements OnInit {
       idHorario,
       this.nombreUsuario,
       this.apellidoUsuario,
-      this.turnoSeleccionado.fecha
+      this.turnoSeleccionado.fecha,
+      this.reservaAutomatica
     ).subscribe({
       next: () => {
         this.mensajeReserva = '✅ ¡Turno reservado exitosamente!';
@@ -320,17 +337,27 @@ export class GestionTurnosComponent implements OnInit {
         setTimeout(() => {
           this.mostrarConfirmacion = false;
           this.cerrarModalAlumno();
-        }, 3000);
+        }, 2000);
       },
       error: err => {
-        this.mensajeReserva = '❌ No se pudo reservar: ' + (err.error.message || err.message);
+        const mensajeBackend = err?.error?.message || err?.message || 'Error desconocido';
+
+        if (mensajeBackend.includes('Ya alcanzaste tu límite mensual de')) {
+          this.mensajeReserva = '⚠️ Ya alcanzaste el máximo de clases de tu plan mensual. Usá esta reserva como recuperación.';
+        } else if (mensajeBackend.includes('Ya alcanzaste tu límite semanal de')) {
+          this.mensajeReserva = '⚠️ Ya alcanzaste el límite semanal de clases de tu plan. Probá en otro día o como recuperación.';
+        } else {
+          this.mensajeReserva = '❌ No se pudo reservar: ' + mensajeBackend;
+        }
+
         this.esErrorReserva = true;
         this.mostrarConfirmacion = true;
 
         setTimeout(() => {
           this.mostrarConfirmacion = false;
-        }, 4000);
+        }, 3000);
       }
+
     });
   }
 }

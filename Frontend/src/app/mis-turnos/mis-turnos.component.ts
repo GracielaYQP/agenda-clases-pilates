@@ -78,10 +78,10 @@ export class MisTurnosComponent {
     this.modalAbierto = false;
   }
 
-  confirmarCancelacion() {
+  confirmarCancelacion(tipo: 'momentanea' | 'permanente') {
     const reservaId = this.turnoAEliminar.id;
 
-    this.horariosService.anularReserva(reservaId).subscribe({
+    this.horariosService.anularReserva(reservaId, tipo).subscribe({
       next: () => {
         this.misReservas = this.misReservas.filter(r => r.id !== reservaId);
         this.cerrarModal();
@@ -93,9 +93,18 @@ export class MisTurnosComponent {
   }
 
   abrirModalDesdeCelda(dia: string, hora: string) {
-    const reserva = this.misReservas.find(r => r.horario.dia === dia && r.horario.hora === hora);
+    // Buscamos la reserva correspondiente a ese día y hora
+    const reserva = this.misReservas.find(r =>
+      r.horario.dia === dia &&
+      r.horario.hora === hora
+    );
+
     if (reserva) {
-      this.abrirModalCancelacion(reserva);
+      this.turnoAEliminar = reserva;
+      this.modalAbierto = true;
+    } else {
+      console.warn('⚠️ No se encontró la reserva para mostrar en el modal');
     }
   }
+
 }

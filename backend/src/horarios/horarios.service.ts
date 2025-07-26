@@ -77,11 +77,8 @@ export class HorariosService {
   async getHorariosSemana(userId?: number) {
     const timeZone = 'America/Argentina/Buenos_Aires';
     const hoy = new Date();
-    const hoyBuenosAires = toZonedTime(hoy, 'America/Argentina/Buenos_Aires');
+    const hoyBuenosAires = toZonedTime(hoy, timeZone);
     const lunes = startOfWeek(hoyBuenosAires, { weekStartsOn: 1 });
-
-    console.log('🗓️ Fecha hoy (BA):', hoyBuenosAires.toLocaleString('es-AR'));
-    console.log('📅 Lunes generado:', lunes.toLocaleString('es-AR'));
 
     const semana: Date[] = [];
     for (let i = 0; i < 5; i++) {
@@ -103,6 +100,7 @@ export class HorariosService {
       camasDisponibles: number;
       reservadoPorUsuario: boolean;
       canceladoPorUsuario: boolean;
+      reservas: { nombre: string; apellido: string }[];
     }[] = [];
 
     for (const fecha of semana) {
@@ -114,6 +112,7 @@ export class HorariosService {
 
       for (const horario of horariosDelDia) {
         const reservasDeEseDia = horario.reservas.filter(r => r.fechaTurno === fechaISO);
+
         const cantidadReservadas = reservasDeEseDia.filter(r => r.estado === 'reservado').length;
 
         const estaReservadoPorUsuario = userId
@@ -123,6 +122,13 @@ export class HorariosService {
         const estaCanceladoPorUsuario = userId
           ? reservasDeEseDia.some(r => r.usuario.id === userId && r.estado === 'cancelado')
           : false;
+
+        const reservasSimples = reservasDeEseDia
+          .filter(r => r.estado === 'reservado')
+          .map(r => ({
+            nombre: r.nombre,
+            apellido: r.apellido
+          }));
 
         resultado.push({
           idHorario: horario.id,
@@ -135,11 +141,13 @@ export class HorariosService {
           camasDisponibles: horario.totalCamas - cantidadReservadas,
           reservadoPorUsuario: estaReservadoPorUsuario,
           canceladoPorUsuario: estaCanceladoPorUsuario,
+          reservas: reservasSimples
         });
       }
     }
 
     return resultado;
   }
+
 
 }

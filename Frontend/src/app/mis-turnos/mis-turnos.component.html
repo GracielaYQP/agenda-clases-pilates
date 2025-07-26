@@ -38,18 +38,21 @@
 <!-- ✅ MODAL CANCELACIÓN USUARIO -->
 <div *ngIf="modalAbierto" class="modal-overlay">
   <div class="modal-content">
-    <h3>¿Cancelar este turno?</h3>
+    <h3>¿Querés cancelar este turno?</h3>
     <p>
       Día: <strong>{{ turnoAEliminar.horario.dia }}</strong><br>
       Hora: <strong>{{ turnoAEliminar.horario.hora }}</strong><br>
       Nivel: <strong>{{ turnoAEliminar.horario.nivel }}</strong>
     </p>
 
+    <p>¿Cómo querés cancelarlo?</p>
     <div style="text-align: center;">
-      <button class="btn-cancelar" (click)="confirmarCancelacion()">❌ Cancelar turno</button>
+      <button class="btn-cancelar" (click)="confirmarCancelacion('momentanea')">🕒 Solo por esta vez</button>
+      <button class="btn-cancelar" (click)="confirmarCancelacion('permanente')">❌ Cancelar permanentemente</button>
       <button class="btn-cerrar" (click)="cerrarModal()">🚫 Cerrar</button>
     </div>
   </div>
 </div>
+
 
 

@@ -110,8 +110,28 @@ export class ReservaController {
     return this.reservaService.cancelarPorFecha(body.horarioId, userId, body.fechaTurno);
   }
 
-}
+  @Get('recurrentes/:userId/:fecha')
+  contarRecurrentes(@Param('userId') userId: number, @Param('fecha') fecha: string) {
+    return this.reservaService.contarReservasAutomaticasDelMes(userId, fecha);
+  }
 
+  @Get('asistencia-mensual/:userId')
+  getAsistenciaMensual(@Param('userId') userId: number) {
+    return this.reservaService.getAsistenciaMensual(userId);
+  }
+
+  @Patch('cancelar/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async cancelarReserva(
+    @Param('id') id: number,
+    @Body('tipo') tipo: 'momentanea' | 'permanente',
+    @Req() req: Request
+  ) {
+    const user = req.user;
+    return this.reservaService.cancelarReservaPorUsuario(id, tipo, user);
+  }
+
+}
 
 
 

@@ -13,6 +13,7 @@ interface Alumno {
   telefono: string;
   email: string;
   nivel: string;
+  planMensual: string;
 }
 
 @Component({
@@ -32,7 +33,11 @@ export class ListarAlumnosComponent implements OnInit {
   alumnoSeleccionadoId: number | null = null;
   alumnoSeleccionadoNombre: string = '';
   alumnoSeleccionadoApellido: string = '';
-
+  modalAsistencia: boolean = false;
+  asistenciaNombre: string = '';
+  asistenciaApellido: string = '';
+  asistenciaData: any = {};
+  asistenciaMeses: string[] = [];
 
   constructor(private http: HttpClient, private router: Router, private horariosService: HorariosService) {}
 
@@ -85,7 +90,6 @@ export class ListarAlumnosComponent implements OnInit {
 
   confirmarInactivacion() {
     if (!this.alumnoSeleccionadoId) return;
-
     this.http.patch(`http://localhost:3000/users/inactivar/${this.alumnoSeleccionadoId}`, {}).subscribe(() => {
       this.modalConfirmacionInactivo = false;
       this.obtenerAlumnos(); // Refresca lista
@@ -98,8 +102,24 @@ export class ListarAlumnosComponent implements OnInit {
     this.alumnoSeleccionadoId = null;
   }
 
-
   irAFormularioRegistro() {
     this.router.navigate(['/register'], { queryParams: { admin: true } });
   }
+
+ 
+  cerrarModalAsistencia() {
+    this.modalAsistencia = false;
+  }
+
+  verAsistencia(userId: number, nombre: string, apellido: string) {
+  this.http.get<any>(`http://localhost:3000/reservas/asistencia-mensual/${userId}`)
+    .subscribe(data => {
+      this.asistenciaData = data;
+      this.asistenciaMeses = Object.keys(data);
+      this.asistenciaNombre = nombre;
+      this.asistenciaApellido = apellido;
+      this.modalAsistencia = true;
+    });
+}
+
 }

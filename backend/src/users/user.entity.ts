@@ -18,6 +18,12 @@ export class User {
   @Column({ default: 'inicial' })
   nivel: string;
 
+  @Column({ type: 'enum', enum: ['4', '8', '12'], default: '4' })
+  planMensual: '4' | '8' | '12';
+
+  @Column({ type: 'int', default: 0 })
+  asistenciasDelMes: number;
+
   @Column({ unique: true })
   telefono: string;
 

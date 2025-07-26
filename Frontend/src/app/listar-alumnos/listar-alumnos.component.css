@@ -232,3 +232,25 @@ tbody tr:hover {
 .btn-cancelar-toggle:hover {
   background-color: #af1155;
 }
+
+.calendar-btn:hover {
+  color: #4CAF50; /* Verde */
+  transform: scale(1.2);
+}
+
+.modal-content-asistencia {
+  width: 96%;
+  max-width: 800px; /* aumentamos el ancho */
+  padding: 30px 25px;
+  background: rgba(255, 255, 255, 0.95);
+  background-image: url('/assets/logos/dibupilates8.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: lighten;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  max-height: 90vh; /* no se sale de la pantalla */
+  overflow-x: hidden; /* quita scroll horizontal */
+}

@@ -40,6 +40,19 @@
           }
         </div>
 
+        <div class="form-group">
+          <label for="planMensual">Plan mensual:</label>
+          <select id="planMensual" formControlName="planMensual">
+            <option value="">Seleccionar plan</option>
+            <option value="4">4 clases / mes</option>
+            <option value="8">8 clases / mes</option>
+            <option value="12">12 clases / mes</option>
+          </select>
+          <p class="text-danger" *ngIf="form.get('planMensual')?.touched && form.get('planMensual')?.invalid">
+            El plan mensual es requerido.
+          </p>
+        </div>
+
         <!-- Si hay invitación, mostrar solo valor precargado de telefono -->
         <div class="form-group" *ngIf="invitacionValida; else telefonoManual">
           <label for="telefono">Teléfono:</label>
