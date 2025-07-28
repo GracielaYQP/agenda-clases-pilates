@@ -21,7 +21,7 @@ export class Reserva {
   fechaReserva: string;
 
   @Column({ default: 'reservado' })
-  estado: 'reservado' | 'cancelado';
+  estado: 'reservado' | 'cancelado' |'recuperada';
 
   @Column({ default: true })
   automatica: boolean;

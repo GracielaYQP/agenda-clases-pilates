@@ -9,6 +9,7 @@ import { HorariosModule } from './horarios/horarios.module';
 import { MailerService } from './auth/mailer/mailer.service';
 import { ReservaModule } from './reserva/reserva.module';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 
@@ -33,6 +34,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
       envFilePath: '.env',
      }),
+     ScheduleModule.forRoot(),
     
   ],
   controllers: [AppController],

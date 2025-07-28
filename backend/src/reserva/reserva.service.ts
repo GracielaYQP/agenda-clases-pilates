@@ -1,9 +1,12 @@
 import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, LessThan, Repository } from 'typeorm';
 import { Reserva } from './reserva.entity';
 import { Horario } from '../horarios/horarios.entity';
 import { User } from '../users/user.entity';
+import { addDays, format, startOfWeek } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Cron } from '@nestjs/schedule'; 
 
 @Injectable()
 export class ReservaService {
@@ -257,12 +260,20 @@ export class ReservaService {
       relations: ['usuario', 'horario']
     });
 
+    console.log('🟣 ID de reserva:', id);
+    console.log('🟢 Usuario logueado: ID =', user.sub, '| Rol =', user.rol);
+    console.log('🔵 Dueño de la reserva:', reserva!.usuario?.id);
+
+
     if (!reserva) throw new NotFoundException('Reserva no encontrada');
 
     // 🔐 Permitir solo al dueño de la reserva o al admin
-    if (reserva.usuario.id !== user.sub && user.rol !== 'admin') {
+    if (!reserva.usuario || (reserva.usuario.id !== user.id && user.rol !== 'admin')) {
       throw new ForbiddenException('No podés cancelar esta reserva');
     }
+
+    console.log('🔎 Reserva.usuario.id:', reserva.usuario?.id);
+    console.log('🧾 Usuario logueado:', user.sub, user.rol);
 
     // ✅ Cancelación momentánea
     if (tipo === 'momentanea') {
@@ -272,6 +283,8 @@ export class ReservaService {
       await this.reservaRepo.save(reserva);
       return { mensaje: 'Turno cancelado por hoy. Se recuperará automáticamente en 24 hs.' };
     }
+    console.log('🔎 Reserva.usuario.id:', reserva.usuario?.id);
+    console.log('🧾 Usuario logueado:', user.sub, user.rol);
 
     // ✅ Cancelación permanente
     if (tipo === 'permanente') {
@@ -285,7 +298,113 @@ export class ReservaService {
     throw new BadRequestException('Tipo de cancelación no válido');
   }
 
+  async generarReservasRecurrentesSemanaActual() {
+    const hoy = new Date();
+    const lunes = startOfWeek(hoy, { weekStartsOn: 1 });
+
+    for (let i = 0; i < 5; i++) {
+      const fecha = addDays(lunes, i);
+      const fechaTurno = format(fecha, 'yyyy-MM-dd');
+
+      const diaNombre = format(fecha, 'EEEE', { locale: es });
+      const diaCapitalizado = diaNombre.charAt(0).toUpperCase() + diaNombre.slice(1);
+
+      const horariosDelDia = await this.horarioRepo.find({
+        where: { dia: diaCapitalizado },
+        relations: ['reservas', 'reservas.usuario']
+      });
+
+      for (const horario of horariosDelDia) {
+        const reservasPrevias = await this.reservaRepo.find({
+          where: {
+            horario: { id: horario.id },
+            estado: 'reservado',
+            automatica: true
+          },
+          relations: ['usuario']
+        });
+
+        for (const reserva of reservasPrevias) {
+          // ✅ Verificar si ya existe la misma reserva para ese día
+          const yaExiste = await this.reservaRepo.findOne({
+            where: {
+              usuario: { id: reserva.usuario.id },
+              horario: { id: horario.id },
+              fechaTurno,
+              estado: 'reservado'
+            }
+          });
+
+          if (yaExiste) {
+            console.log(`⚠️ Ya existe reserva para ${reserva.nombre} ${reserva.apellido} - ${diaCapitalizado} ${horario.hora} (${fechaTurno})`);
+            continue;
+          }
+
+          // ✅ Verificar si hay camas disponibles
+          const reservasDelTurno = await this.reservaRepo.find({
+            where: {
+              horario: { id: horario.id },
+              fechaTurno,
+              estado: 'reservado'
+            }
+          });
+
+          if (reservasDelTurno.length >= horario.totalCamas) {
+            console.log('🚫 Cupo completo:', reserva.nombre, reserva.apellido, horario.dia, horario.hora);
+            continue;
+          }
+
+          // ✅ Crear nueva reserva automática
+          const nuevaReserva = this.reservaRepo.create({
+            horario,
+            usuario: reserva.usuario,
+            nombre: reserva.nombre,
+            apellido: reserva.apellido,
+            fechaTurno,
+            fechaReserva: format(new Date(), 'yyyy-MM-dd'),
+            estado: 'reservado',
+            automatica: true
+          });
+
+          await this.reservaRepo.save(nuevaReserva);
+          console.log('✅ Reserva recurrente creada:', nuevaReserva);
+        }
+      }
+    }
+  }
+
+  async marcarReservasMomentaneasComoRecuperadas() {
+    const hoy = new Date().toISOString().split('T')[0];
+
+    const reservasRecuperadas = await this.reservaRepo.find({
+      where: {
+        automatica: false,
+        estado: 'reservado',
+        fechaTurno: LessThan(hoy),
+      },
+      relations: ['horario'],
+    });
+
+    for (const reserva of reservasRecuperadas) {
+      // Liberar la cama
+      if (reserva.horario) {
+        reserva.horario.camasReservadas = Math.max(0, reserva.horario.camasReservadas - 1);
+        await this.horarioRepo.save(reserva.horario);
+      }
+
+      // Marcar como "recuperada"
+      reserva.estado = 'recuperada';
+      reserva.fechaCancelacion = new Date(); // opcional, puede llamarse fechaRegistroFinal si querés
+
+      await this.reservaRepo.save(reserva);
+      console.log(`✅ Reserva marcada como recuperada: ${reserva.nombre} ${reserva.apellido} (${reserva.fechaTurno})`);
+    }
+  }
+
+  @Cron('0 4 * * 0') // domingo a las 04:00
+  async marcarRecuperadasCron() {
+    console.log('📆 Ejecutando CRON: domingo 04:00 → marcando reservas recuperadas...');
+    await this.marcarReservasMomentaneasComoRecuperadas();
+  }
 
 }
-
-

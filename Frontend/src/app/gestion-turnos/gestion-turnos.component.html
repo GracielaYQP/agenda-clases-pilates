@@ -22,7 +22,7 @@
                   class="clickeable {{ turno.nivel.toLowerCase() }}"
                   (click)="abrirTurno(turno)">
                   <div class="nivel">{{ turno.nivel }}</div>
-                  <div class="camas">Camas libres: {{ turno.totalCamas - turno.camasReservadas }}</div>
+                  <div class="camas">Camas libres: {{ turno.camasDisponibles }}</div>
                   <div class="reservas" *ngIf="turno.reservas && turno.reservas.length > 0">
                     <div *ngFor="let r of turno.reservas">
                       <!-- Mostrar nombre y apellido si sos admin o si el turno coincide con tu nivel -->
@@ -59,21 +59,13 @@
 
       <ul>
         <ng-container *ngFor="let r of turnoSeleccionado.reservas">
-          <li *ngIf="reservaEditandoId !== r.id">
+          <li>
             {{ r.nombre }} {{ r.apellido }}
-            <button class="btn-anular" (click)="anularReserva(r.id)">Anular</button>
-            <button class="btn-editar" (click)="iniciarEdicionReserva(r)">📝 Editar</button>
-          </li>
-
-          <li *ngIf="reservaEditandoId === r.id" class="reserva-editando">
-            <input [(ngModel)]="nombreEditado" placeholder="Nombre" />
-            <input [(ngModel)]="apellidoEditado" placeholder="Apellido" />
-            <input [(ngModel)]="nuevoUserId" type="number" placeholder="Nuevo userId (opcional)" />
-            <button (click)="guardarEdicionReserva()">💾 Guardar</button>
-            <button (click)="reservaEditandoId = null">❌ Cancelar</button>
+            <button class="btn-anular" (click)="abrirModalTipoCancelacion(r)">Anular</button>
           </li>
         </ng-container>
       </ul>
+
     </div>
 
     <div *ngIf="turnoSeleccionado.reservas?.length === 0">
@@ -150,6 +142,16 @@
       {{ mensajeReserva }}
     </div>
   
+  </div>
+</div>
+<!-- 🔽 MODAL CONFIRMAR TIPO DE CANCELACIÓN -->
+<div *ngIf="mostrarModalTipoCancelacion" class="modal-confirmacion">
+  <p>¿Querés cancelar la reserva de <b>{{ reservaSeleccionada.nombre }} {{ reservaSeleccionada.apellido }}</b>?</p>
+
+  <div style="text-align: center;">
+    <button class="btn-cancelar" (click)="confirmarCancelacion('momentanea')">🕒 Solo por esta vez</button>
+    <button class="btn-cancelar" (click)="confirmarCancelacion('permanente')">❌ Cancelar permanentemente</button>
+    <button class="btn-cerrar" (click)="cerrarModalTipo()">🚫 Cerrar</button>
   </div>
 </div>
 

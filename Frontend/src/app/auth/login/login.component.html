@@ -1,10 +1,9 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
   <div class="registro-wrapper">
-    <!-- Columna derecha -->
     <div id="registro_alumnos" class="singin-container">
       <p class="titulo-registro">INICIAR SESIÓN</p>
 
-      <!-- Campo de usuario (email o teléfono) -->
+      <!-- Usuario -->
       <div class="form-group">
         <label for="usuario">Correo o Teléfono:</label>
         <input id="usuario" formControlName="usuario" type="text" placeholder="ej: lucia@gmail.com o 3511234567" />
@@ -13,53 +12,40 @@
         </ng-container>
       </div>
 
-      <!-- Campo de contraseña -->
+      <!-- Contraseña -->
       <div class="form-group">
         <label for="password">Contraseña:</label>
         <div class="password-wrapper">
           <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password" />
-
-          <!-- Icono de ojo -->
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility()" aria-label="Mostrar u ocultar contraseña">
             <i [ngClass]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
           </button>
         </div>
-
         <ng-container *ngIf="Password?.errors && Password?.touched">
           <p class="text-danger" *ngIf="Password?.hasError('required')">La contraseña es requerida.</p>
         </ng-container>
       </div>
 
-      <!-- Botón para ingresar -->
+      <!-- Botón ingresar -->
       <div class="form-group center-button">
         <button type="submit" class="btn-singin" [disabled]="form.invalid">Ingresar</button>
       </div>
+
+      <!-- Error -->
       <div *ngIf="error" class="text-danger" style="margin-top: 10px;">
         {{ error }}
       </div>
 
-      <!-- Mostrar esto SOLO si es admin o superadmin -->
-      <div class="form-footer text-center" *ngIf="isAdmin">
-        <a
-          class="btn-singin"
-          href="https://wa.me/5493541603186?text=Hola,%20soy%20la%20admin%20y%20necesito%20una%20nueva%20contraseña"
-          target="_blank"
-        >
-          ¿Olvidaste tu contraseña?
-        </a>
-      </div>
-
-      <!-- Mostrar esto SOLO si NO es admin -->
-      <div class="form-footer text-center" *ngIf="!isAdmin">
+      <!-- Recuperar contraseña (SIEMPRE visible para todos) -->
+      <div class="form-footer text-center">
         <p>¿Olvidaste tu contraseña?</p>
         <button class="btn-singin" type="button" (click)="solicitarResetPorWhatsapp()">Recibir link por WhatsApp</button>
       </div>
 
-      <p class="form-footer" *ngIf="!isAdmin">
-        No tienes una cuenta? Debido a que este estudio trabaja de forma personalizada, solo permite la creación de nuevas cuentas a través de un link de invitación. Comunícate conmigo de forma presencial para tramitar tu alta.
+      <!-- Info extra -->
+      <p class="form-footer">
+        ¿No tienes una cuenta? Debido a que este estudio trabaja de forma personalizada, solo permite la creación de nuevas cuentas a través de un link de invitación. Comunícate conmigo de forma presencial para tramitar tu alta.
       </p>
-
     </div>
   </div>
 </form>
-

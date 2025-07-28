@@ -147,7 +147,7 @@ tbody tr:hover {
   padding: 8px;
   border-radius: 6px;
   margin: 2px;
-  user-select: none;
+  /* user-select: none; */
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -423,6 +423,21 @@ tbody tr:hover {
   margin-top: 10px;
 }
 
+.modal-confirmacion {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(250, 250, 250, 0.95);
+  padding: 30px;
+  border-radius: 12px;
+  z-index: 9999;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  max-width: 90%;
+  width: 400px;
+  text-align: center;
+}
+
 .mensaje-confirmacion {
   margin-top: 12px;
   padding: 10px 16px;
@@ -442,3 +457,81 @@ tbody tr:hover {
   color: #721c24;
 }
 
+#modal-tipo-cancelacion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+#modal-tipo-cancelacion .modal-confirm-content {
+  width: 90%;
+  max-width: 360px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 14px;
+  padding: 26px 24px;
+  text-align: center;
+  background-image: url('/assets/logos/dibupilates4.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: lighten;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+#modal-tipo-cancelacion h3 {
+  color: #b53490;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#modal-tipo-cancelacion .botones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#modal-tipo-cancelacion .botones button {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#modal-tipo-cancelacion .btn-momentanea {
+  background-color: #f3d250;
+  color: #333;
+}
+
+#modal-tipo-cancelacion .btn-momentanea:hover {
+  background-color: #e0b700;
+}
+
+#modal-tipo-cancelacion .btn-permanente {
+  background-color: #ff5252;
+  color: white;
+}
+
+#modal-tipo-cancelacion .btn-permanente:hover {
+  background-color: #d32f2f;
+}
+
+#modal-tipo-cancelacion .btn-cerrar {
+  background-color: #999;
+  color: white;
+  margin-top: 16px;
+}
+
+#modal-tipo-cancelacion .btn-cerrar:hover {
+  background-color: #666;
+}

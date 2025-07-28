@@ -131,6 +131,10 @@ export class ReservaController {
     return this.reservaService.cancelarReservaPorUsuario(id, tipo, user);
   }
 
+  @Post('marcar-recuperadas')
+    async marcarRecuperadas() {
+      return this.reservaService.marcarReservasMomentaneasComoRecuperadas();
+    }
 }
 
 

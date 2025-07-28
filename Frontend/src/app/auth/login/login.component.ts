@@ -29,23 +29,7 @@ export class LoginComponent implements OnInit{
   }
  
   ngOnInit(): void {
-    this.checkIfAdmin(); 
-    this.form.get('usuario')?.valueChanges.subscribe(() => this.checkIfAdmin());
-  }
 
-  checkIfAdmin() {
-    const entrada = this.form.get('usuario')?.value?.trim().toLowerCase() || '';
-    console.log('📩 Usuario ingresado:', entrada); 
-    const adminTelefono = '3517152375';
-    const superadminTelefono = '3541603186';
-    const adminEmail = 'luciacarletta2016@gmail.com';
-
-    this.isAdmin =
-      entrada === adminTelefono ||
-      entrada === superadminTelefono ||
-      entrada === adminEmail;
-
-    console.log('🕵️‍♂️ ¿Es admin?', this.isAdmin);
   }
 
   get Usuario() {
@@ -63,7 +47,6 @@ export class LoginComponent implements OnInit{
   submit() {
     if (this.form.invalid) return;
     console.log('🔐 Enviando datos de login:', this.form.value);
-    this.checkIfAdmin();
     this.auth.login(this.form.value).subscribe({
       next: (res) => {
          console.log('✅ Respuesta del login:', res);

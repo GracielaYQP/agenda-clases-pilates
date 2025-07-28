@@ -53,20 +53,42 @@ export class MisTurnosComponent {
     });
   }
 
-  // Devuelve true si el usuario tiene una reserva para ese día y hora
-  hasReserva(dia: string, hora: string): boolean {
-    return this.misReservas.some(r => dia.startsWith(r.horario.dia) && r.horario.hora === hora);
+  // ✅ Devuelve true si el usuario tiene una reserva para esa fecha y hora
+  hasReserva(diaCompleto: string, hora: string): boolean {
+    const fechaFormateada = this.obtenerFechaFormateadaDesdeDia(diaCompleto);
+    return this.misReservas.some(r =>
+      r.fechaTurno === fechaFormateada &&
+      r.horario.hora === hora
+    );
   }
 
-  getNivel(dia: string, hora: string): string {
-    const reserva = this.misReservas.find(r => dia.startsWith(r.horario.dia) && r.horario.hora === hora);
+  // ✅ Devuelve el nivel del turno reservado en esa celda
+  getNivel(diaCompleto: string, hora: string): string {
+    const fechaFormateada = this.obtenerFechaFormateadaDesdeDia(diaCompleto);
+    const reserva = this.misReservas.find(r =>
+      r.fechaTurno === fechaFormateada &&
+      r.horario.hora === hora
+    );
     return reserva ? reserva.horario.nivel : '';
   }
 
-  getNombreCompleto(dia: string, hora: string): string {
-    const reserva = this.misReservas.find(r => dia.startsWith(r.horario.dia) && r.horario.hora === hora);
+  private obtenerFechaFormateadaDesdeDia(diaCompleto: string): string {
+    const partes = diaCompleto.split(' '); // ["Martes", "30/07/2025"]
+    const fechaTexto = partes[1];          // "30/07/2025"
+    const fechaParts = fechaTexto.split('/'); // ["30", "07", "2025"]
+    return `${fechaParts[2]}-${fechaParts[1]}-${fechaParts[0]}`; // "2025-07-30"
+  }
+
+
+  getNombreCompleto(diaCompleto: string, hora: string): string {
+    const fechaFormateada = this.obtenerFechaFormateadaDesdeDia(diaCompleto);
+    const reserva = this.misReservas.find(r =>
+      r.fechaTurno === fechaFormateada &&
+      r.horario.hora === hora
+    );
     return reserva ? `${reserva.nombre} ${reserva.apellido}` : '';
   }
+
 
   abrirModalCancelacion(reserva: any) {
     this.turnoAEliminar = reserva;
@@ -92,10 +114,15 @@ export class MisTurnosComponent {
     });
   }
 
-  abrirModalDesdeCelda(dia: string, hora: string) {
-    // Buscamos la reserva correspondiente a ese día y hora
+  abrirModalDesdeCelda(diaCompleto: string, hora: string) {
+    const partes = diaCompleto.split(' '); // ["Martes", "30/07/2025"]
+    const fechaTexto = partes[1]; // "30/07/2025"
+
+    const fechaParts = fechaTexto.split('/'); // ["30", "07", "2025"]
+    const fechaFormateada = `${fechaParts[2]}-${fechaParts[1]}-${fechaParts[0]}`; // "2025-07-30"
+
     const reserva = this.misReservas.find(r =>
-      r.horario.dia === dia &&
+      r.fechaTurno === fechaFormateada &&
       r.horario.hora === hora
     );
 

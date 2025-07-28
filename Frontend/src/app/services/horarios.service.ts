@@ -54,8 +54,12 @@ export class HorariosService {
   }
 
   anularReserva(reservaId: number, tipo: 'momentanea' | 'permanente') {
-    return this.http.patch(`http://localhost:3000/reservas/cancelar/${reservaId}`, { tipo });
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.patch(`http://localhost:3000/reservas/cancelar/${reservaId}`, { tipo }, { headers });
   }
+
 
   buscarPorNombreApellido(nombre: string, apellido: string): Observable<any> {
     return this.http.get(`http://localhost:3000/users/buscar?nombre=${nombre}&apellido=${apellido}`);
@@ -101,4 +105,11 @@ export class HorariosService {
       return this.http.get<any[]>('http://localhost:3000/horarios/semana');
     }
   }
+
+
+  marcarRecuperadas() {
+    return this.http.post(`http://localhost:3000/reservas/marcar-recuperadas`, {});
+
+  }
+
 }
