@@ -24,8 +24,9 @@ export class MisTurnosComponent {
     this.generarDiasConFechas();
     this.horariosService.getMisReservas().subscribe({
       next: (data: any[]) => {
-        this.misReservas = data;
-        console.log('🗓️ Mis reservas:', data);
+        this.misReservas = data.filter(r => r.estado !== 'cancelado');
+        console.log('🗓️ Mis reservas:', this.misReservas);
+        this.cerrarModal();
       },
       error: (err: any) => {
         console.error('❌ Error al cargar mis reservas', err);

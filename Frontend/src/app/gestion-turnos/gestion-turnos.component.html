@@ -17,22 +17,26 @@
           <!-- Bloqueo específico para Viernes 8:00 y 19:00 -->
           <ng-container *ngIf="!(dia === 'Viernes' && (hora === '08:00' || hora === '18:00')); else bloqueado">
             <ng-container *ngIf="hasTurno(dia, hora); else sinTurno">
-              <ng-container *ngFor="let turno of getTurnos(dia, hora)">
-                <div
-                  class="clickeable {{ turno.nivel.toLowerCase() }}"
-                  (click)="abrirTurno(turno)">
-                  <div class="nivel">{{ turno.nivel }}</div>
-                  <div class="camas">Camas libres: {{ turno.camasDisponibles }}</div>
-                  <div class="reservas" *ngIf="turno.reservas && turno.reservas.length > 0">
-                    <div *ngFor="let r of turno.reservas">
-                      <!-- Mostrar nombre y apellido si sos admin o si el turno coincide con tu nivel -->
-                      <ng-container *ngIf="rolUsuario === 'admin' || turno.nivel.toLowerCase() === usuarioNivel.toLowerCase()">
-                        {{ r.nombre }} {{ r.apellido }}
-                      </ng-container>
-                    </div>
+            <ng-container *ngFor="let turno of getTurnos(dia, hora)">
+              <div
+                class="clickeable {{ turno.nivel.toLowerCase() }}"
+                (click)="abrirTurno(turno)">
+                
+                <div class="nivel">{{ turno.nivel }}</div>
+                <div class="camas">Camas libres: {{ turno.camasDisponibles }}</div>
+
+                <!-- Solo mostramos reservas si están activas -->
+                <div class="reservas" *ngIf="turno.reservas?.length > 0">
+                  <div *ngFor="let r of turno.reservas">
+                    <ng-container *ngIf="r.estado === 'reservado' && (rolUsuario === 'admin' || turno.nivel.toLowerCase() === usuarioNivel.toLowerCase())">
+                      {{ r.nombre }} {{ r.apellido }}
+                    </ng-container>
                   </div>
                 </div>
-              </ng-container>
+                
+              </div>
+            </ng-container>
+
             </ng-container>
           </ng-container>
 

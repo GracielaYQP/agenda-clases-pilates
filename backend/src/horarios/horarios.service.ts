@@ -70,45 +70,6 @@ async reservar(id: number, nombre: string, apellido: string, userId?: number): P
     return turnoActualizado;
   }
 
-
-
-  // async reservar(id: number, nombre: string, apellido: string, userId?: number): Promise<Horario> {
-  //   const turno = await this.horariosRepository.findOne({
-  //     where: { id },
-  //     relations: ['reservas'],
-  //   });
-
-  //   if (!turno) throw new Error('Turno no encontrado');
-  //   if (turno.camasReservadas >= turno.totalCamas) {
-  //     throw new Error('No hay turnos disponibles');
-  //   }
-
-  // // Buscar el usuario
-  //   const user = await this.userRepository.findOneBy({ id: userId });
-  //   if (!user) throw new Error('Usuario no encontrado');
-
-
-  //   const nuevaReserva = new Reserva();
-  //   nuevaReserva.nombre = nombre;
-  //   nuevaReserva.apellido = apellido;
-  //   nuevaReserva.horario = turno;   // ✅ Asignar objeto completo
-  //   nuevaReserva.usuario = user;
-
-  //   await this.reservasRepository.save(nuevaReserva);
-
-  //   turno.camasReservadas += 1;
-  //   await this.horariosRepository.save(turno);
-
-  //   const turnoActualizado = await this.horariosRepository.findOne({
-  //     where: { id: turno.id },
-  //     relations: ['reservas'],
-  //   });
-
-  //   if (!turnoActualizado) throw new Error('No se pudo obtener el turno actualizado');
-
-  //   return turnoActualizado;
-  // }
-
   async getHorariosSemana(userId?: number) {
     // Genera reservas recurrentes al iniciar la semana
     await this.reservaService.generarReservasRecurrentesSemanaActual();

@@ -100,7 +100,6 @@ export class GestionTurnosComponent implements OnInit {
 
       this.horarios = data;
       
-
       // 🧠 Días únicos con fecha formateada
       const diasUnicos = Array.from(
         new Set(data.map(h => `${h.dia} ${this.formatearFecha(h.fecha)}`))
@@ -125,7 +124,6 @@ export class GestionTurnosComponent implements OnInit {
 
     });
   }
-
 
   getNivelParaHorario(hora: string): string {
     if (['08:00', '09:00'].includes(hora)) return 'Avanzado';
@@ -175,7 +173,7 @@ export class GestionTurnosComponent implements OnInit {
 
   getTurnos(diaConFecha: string, hora: string) {
     const [dia, fecha] = diaConFecha.split(' ');
-    console.log('🔎 getTurnos:', dia, fecha, this.horarios);
+    // console.log('🔎 getTurnos:', dia, fecha, this.horarios);
     return this.horarios.filter(h =>
       h.dia === dia &&
       this.formatearFecha(h.fecha) === fecha &&
@@ -206,22 +204,27 @@ export class GestionTurnosComponent implements OnInit {
   anularReserva(reservaId: number) {
     if (confirm('¿Estás seguro de que querés anular esta reserva?')) {
       this.horariosService.anularReserva(reservaId, 'permanente').subscribe({
-        next: () => {
-          alert('✅ Reserva anulada');
-          this.cerrarModal(); // Cierra y refresca automáticamente
-        },
-        error: (err) => {
-          alert('❌ Error al anular la reserva: ' + err.error?.message || err.message);
-        }
+      next: () => {
+        this.mensajeAdminReserva = '✅ Reserva cancelada correctamente.';
+        this.esErrorAdmin = false;
+        this.mostrarConfirmacionAdmin = true;
+
+        // 🔁 REFRESCAR horarios actualizados
+        this.horariosService.getHorariosDeLaSemana().subscribe(horarios => {
+          this.horarios = horarios;
+          console.log('♻️ Horarios actualizados tras cancelar:', this.horarios);
+        });
+
+        setTimeout(() => {
+          this.mostrarConfirmacionAdmin = false;
+        }, 3000);
+      }
       });
     }
   }
 
   agregarReserva() {
     const turnoId = this.turnoSeleccionado?.idHorario;
-
-    console.log('🎯 Turno seleccionado:', this.turnoSeleccionado);
-
     if (!turnoId) {
       this.mensajeAdminReserva = '❌ ID de turno inválido';
       this.esErrorAdmin = true;
@@ -423,16 +426,20 @@ export class GestionTurnosComponent implements OnInit {
         // 🔄 Cerrar los modales
         this.mostrarModalTipoCancelacion = false;
         this.modalAbierto = false;
-
-        // ✅ Mensaje de éxito
         this.mensajeAdminReserva = '✅ Reserva cancelada correctamente';
         this.esErrorAdmin = false;
         this.mostrarConfirmacionAdmin = true;
         this.reservaSeleccionada = null;
-
-        // 🔄 Recargar horarios
-        this.horariosService.cargarHorarios();
-
+        // 🔁 REFRESCAR HORARIOS
+        this.horariosService.getHorariosDeLaSemana().subscribe({
+          next: (data) => {
+            this.horarios = data;
+            console.log('♻️ Turnos actualizados después de cancelar:', this.horarios);
+          },
+          error: (err) => {
+            console.error('❌ Error al actualizar los turnos:', err);
+          }
+        });
         // ⏱️ Ocultar mensaje luego de 3 segundos
         setTimeout(() => {
           this.mostrarConfirmacionAdmin = false;

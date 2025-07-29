@@ -105,7 +105,6 @@ export class ListarAlumnosComponent implements OnInit {
   irAFormularioRegistro() {
     this.router.navigate(['/register'], { queryParams: { admin: true } });
   }
-
  
   cerrarModalAsistencia() {
     this.modalAsistencia = false;

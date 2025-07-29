@@ -74,14 +74,12 @@ export class ReservaService {
     return this.reservaRepo.save(nuevaReserva);
   }
 
-
   async obtenerReservasPorHorario(horarioId: number) {
     return this.reservaRepo.find({
       where: { horario: { id: horarioId } },
       relations: ['usuario'],
     });
   }
-
 
   async obtenerReservasPorUsuario(userId: number) {
     try {
@@ -237,21 +235,48 @@ export class ReservaService {
   }
 
   async getAsistenciaMensual(userId: number) {
-    const reservas = await this.reservaRepo.find({ where: { usuario: { id: userId } } });
+    const reservas = await this.reservaRepo.find({
+      where: { usuario: { id: userId } },
+      relations: ['horario'],
+      order: { fechaTurno: 'ASC' }
+    });
 
-    const resumen: { [mes: string]: { asistencias: number; ausencias: number } } = {};
+    const resultado: Record<string, {
+      asistencias: number,
+      ausencias: number,
+      fechasAsistencias: string[],
+      fechasAusencias: string[]
+    }> = {};
 
     reservas.forEach(reserva => {
       const fecha = new Date(reserva.fechaTurno);
-      const mes = fecha.toLocaleString('default', { month: 'long', year: 'numeric' });
+      const diaSemana = fecha.getDay(); // 0 = domingo, 6 = sábado
+        // 🚫 Ignorar reservas en sábado o domingo
+        if (diaSemana === 0 || diaSemana === 6) {
+          return;
+        }
+      const mes = fecha.toLocaleString('es-AR', { month: 'long', year: 'numeric' }); // Ej: "julio 2025"
+      const fechaFormateada = fecha.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }); // Ej: "lun. 29/07"
 
-      if (!resumen[mes]) resumen[mes] = { asistencias: 0, ausencias: 0 };
+      if (!resultado[mes]) {
+        resultado[mes] = {
+          asistencias: 0,
+          ausencias: 0,
+          fechasAsistencias: [],
+          fechasAusencias: []
+        };
+      }
 
-      if (reserva.estado === 'reservado') resumen[mes].asistencias++;
-      if (reserva.estado === 'cancelado') resumen[mes].ausencias++;
+      if (reserva.estado === 'reservado') {
+        resultado[mes].asistencias++;
+        resultado[mes].fechasAsistencias.push(fechaFormateada);
+      } else if (reserva.estado === 'cancelado') {
+        resultado[mes].ausencias++;
+        resultado[mes].fechasAusencias.push(fechaFormateada);
+      }
     });
 
-    return resumen;
+    return resultado;
   }
 
   async cancelarReservaPorUsuario(id: number, tipo: 'momentanea' | 'permanente', user: any) {
@@ -268,29 +293,27 @@ export class ReservaService {
     if (!reserva) throw new NotFoundException('Reserva no encontrada');
 
     // 🔐 Permitir solo al dueño de la reserva o al admin
-    if (!reserva.usuario || (reserva.usuario.id !== user.id && user.rol !== 'admin')) {
+    const userId = user.id ?? user.sub; // usa 'id' o 'sub' según lo que venga
+    if (!reserva.usuario || (reserva.usuario.id !== userId && user.rol !== 'admin')) {
       throw new ForbiddenException('No podés cancelar esta reserva');
     }
-
-    console.log('🔎 Reserva.usuario.id:', reserva.usuario?.id);
-    console.log('🧾 Usuario logueado:', user.sub, user.rol);
 
     // ✅ Cancelación momentánea
     if (tipo === 'momentanea') {
       reserva.estado = 'cancelado';
       reserva.cancelacionMomentanea = true;
       reserva.fechaCancelacion = new Date();
+      reserva.automatica = false;
       await this.reservaRepo.save(reserva);
       return { mensaje: 'Turno cancelado por hoy. Se recuperará automáticamente en 24 hs.' };
     }
-    console.log('🔎 Reserva.usuario.id:', reserva.usuario?.id);
-    console.log('🧾 Usuario logueado:', user.sub, user.rol);
 
     // ✅ Cancelación permanente
     if (tipo === 'permanente') {
       reserva.estado = 'cancelado';
       reserva.cancelacionPermanente = true;
       reserva.fechaCancelacion = new Date();
+      reserva.automatica = false;
       await this.reservaRepo.save(reserva);
       return { mensaje: 'Turno cancelado permanentemente.' };
     }

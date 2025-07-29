@@ -65,16 +65,33 @@
         <tr>
           <th>Mes</th>
           <th>Asistencias</th>
-          <th>Ausencias</th>
+          <th>Inasistencias</th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let mes of asistenciaMeses">
-          <td>{{ mes }}</td>
-          <td>{{ asistenciaData[mes].asistencias }}</td>
-          <td>{{ asistenciaData[mes].ausencias }}</td>
-        </tr>
-      </tbody>
+        <tbody>
+          <tr *ngFor="let mes of asistenciaMeses">
+            <td>{{ mes }}</td>
+            
+            <td>
+              <div><strong>Total:</strong> {{ asistenciaData[mes].asistencias }}</div>
+              <div *ngIf="asistenciaData[mes].fechasAsistencias?.length">
+                <small *ngFor="let fecha of asistenciaData[mes].fechasAsistencias">
+                  • {{ fecha }}<br />
+                </small>
+              </div>
+            </td>
+
+            <td>
+              <div><strong>Total:</strong> {{ asistenciaData[mes].ausencias }}</div>
+              <div *ngIf="asistenciaData[mes].fechasAusencias?.length">
+                <small *ngFor="let fecha of asistenciaData[mes].fechasAusencias">
+                  • {{ fecha }}<br />
+                </small>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
     </table>
 
     <button class="btn-cerrar" (click)="cerrarModalAsistencia()">Cerrar</button>

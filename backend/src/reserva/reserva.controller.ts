@@ -60,7 +60,6 @@ export class ReservaController {
     return this.reservaService.reservar(horarioId, userId, body.nombre, body.apellido, body.fechaTurno);
   }
 
-
   // Obtener reservas de un horario
   @Get(':horarioId')
   getReservas(@Param('horarioId') horarioIdParam: string) {
@@ -72,7 +71,6 @@ export class ReservaController {
     return this.reservaService.obtenerReservasPorHorario(horarioId);
   }
   
-
   // Anular una reserva
   @UseGuards(AuthGuard('jwt'))
   @Post('anular/:reservaId')
