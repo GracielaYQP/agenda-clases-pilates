@@ -4,37 +4,47 @@
 
     <form (ngSubmit)="guardarCambios()">
       <div class="form-group">
-        <label>Apellido:</label>
-        <input type="text" [(ngModel)]="usuario.apellido" name="apellido" required />
+        <label for="apellido">Apellido:</label>
+        <input id="apellido" type="text" [(ngModel)]="usuario.apellido" name="apellido" required />
       </div>
 
       <div class="form-group">
-        <label>Nombre:</label>
-        <input type="text" [(ngModel)]="usuario.nombre" name="nombre" required />
+        <label for="nombre">Nombre:</label>
+        <input id="nombre" type="text" [(ngModel)]="usuario.nombre" name="nombre" required />
       </div>
 
       <div class="form-group">
-        <label>DNI:</label>
-        <input type="text" [(ngModel)]="usuario.dni" name="dni" required />
+        <label for="dni">DNI:</label>
+        <input id="dni" type="text" [(ngModel)]="usuario.dni" name="dni" required />
       </div>
 
       <div class="form-group">
-        <label>Teléfono:</label>
-        <input type="text" [(ngModel)]="usuario.telefono" name="telefono" />
+        <label for="telefono">Teléfono:</label>
+        <input id="telefono" type="text" [(ngModel)]="usuario.telefono" name="telefono" />
       </div>
 
       <div class="form-group">
-        <label>Email:</label>
-        <input type="email" [(ngModel)]="usuario.email" name="email" required />
+        <label for="email">Email:</label>
+        <input id="email" type="email" [(ngModel)]="usuario.email" name="email" required />
       </div>
 
       <div class="form-group">
-        <label>Nivel:</label>
-        <select [(ngModel)]="usuario.nivel" name="nivel" required>
+        <label for="nivel">Nivel:</label>
+        <select id="nivel" [(ngModel)]="usuario.nivel" name="nivel" required>
           <option value="">Seleccionar nivel</option>
           <option value="Inicial">Inicial</option>
           <option value="Intermedio">Intermedio</option>
           <option value="Avanzado">Avanzado</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="planMensual">Plan mensual:</label>
+        <select id="planMensual" [(ngModel)]="usuario.planMensual" name="planMensual" required>
+        <option value="">Seleccionar plan</option>
+        <option value="4">4 clases / mes</option>
+        <option value="8">8 clases / mes</option>
+        <option value="12">12 clases / mes</option>
         </select>
       </div>
 
@@ -44,5 +54,11 @@
     </form>
   </div>
 </div>
-
+<!-- ✅ MODAL DE CONFIRMACIÓN -->
+<div *ngIf="modalVisible" class="modal-overlay">
+  <div class="modal-content" [ngClass]="{'error': esError, 'success': !esError}">
+    <h3>{{ mensajeModal }}</h3>
+    <button class="btn-cerrar" (click)="modalVisible = false">Cerrar</button>
+  </div>
+</div>
 

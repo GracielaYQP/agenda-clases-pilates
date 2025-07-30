@@ -25,9 +25,23 @@ export class UsersController {
         return this.usersService.obtenerListadoUsuarios();
   }
 
-  @Patch("/modificarUsuario/:id")
-    update(@Param('id') id, @Body() Body){
-        return this.usersService.update( id, Body);
+@Patch("/modificarUsuario/:id")
+  update(@Param('id') id: string, @Body() body: any) {
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+      throw new BadRequestException('❌ ID inválido');
+    }
+    
+    // Opcional: Filtrar campos permitidos
+    const camposPermitidos = ['nombre', 'apellido', 'dni', 'telefono', 'email', 'nivel', 'planMensual'];
+    const dataFiltrada = Object.keys(body)
+      .filter(key => camposPermitidos.includes(key))
+      .reduce((acc, key) => {
+        acc[key] = body[key];
+        return acc;
+      }, {} as any);
+
+    return this.usersService.update(userId, dataFiltrada);
   }
 
   @Patch('/inactivar/:id')

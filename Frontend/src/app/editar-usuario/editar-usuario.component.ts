@@ -12,6 +12,7 @@ interface Usuario {
   telefono: string;
   email: string;
   nivel: string;
+  planMensual: string;  // 🔹 NUEVO
 }
 
 @Component({
@@ -30,7 +31,13 @@ export class EditarUsuarioComponent implements OnInit {
     telefono: '',
     email: '',
     nivel: '',
+    planMensual: ''   // 🔹 NUEVO
   };
+
+  // ✅ variables para modal de confirmación
+  modalVisible: boolean = false;
+  mensajeModal: string = '';
+  esError: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -59,9 +66,27 @@ export class EditarUsuarioComponent implements OnInit {
         `http://localhost:3000/users/modificarUsuario/${this.usuario.id}`,
         this.usuario
       )
-      .subscribe(() => {
-        alert('Usuario actualizado correctamente');
-        this.router.navigate(['/listar-alumnos']);
+      .subscribe({
+        next: () => {
+          // ✅ Mostrar modal de éxito
+          this.mensajeModal = '✅ Usuario actualizado correctamente';
+          this.esError = false;
+          this.modalVisible = true;
+
+          setTimeout(() => {
+            this.modalVisible = false;
+            this.router.navigate(['/listar-alumnos']);
+          }, 2500);
+        },
+        error: (err) => {
+          this.mensajeModal = '❌ Error al actualizar: ' + (err.error?.message || err.message);
+          this.esError = true;
+          this.modalVisible = true;
+
+          setTimeout(() => {
+            this.modalVisible = false;
+          }, 3000);
+        }
       });
   }
 }

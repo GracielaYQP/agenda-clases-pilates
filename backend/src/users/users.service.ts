@@ -68,7 +68,6 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-
   async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.userRepository.findOne({ where: { email } });
     return user === null ? undefined : user;
@@ -102,7 +101,6 @@ export class UsersService {
       .addOrderBy('user.nombre', 'ASC')
       .getMany();
   }
-
 
   async inactivarUsuario(id: number): Promise<void> {
     const user = await this.userRepository.findOne({
@@ -152,7 +150,6 @@ export class UsersService {
 
   }
 
-
   async findByEmailOrTelefono(usuario: string): Promise<User | undefined> {
     const user = await this.userRepository.findOne({
       where: [
@@ -181,7 +178,6 @@ export class UsersService {
   async findByResetToken(token: string) {
     return this.userRepository.findOne({ where: { resetToken: token } });
   }
-
 
   async findByTelefono(telefono: string) {
     return this.userRepository.findOne({ where: { telefono } });

@@ -255,3 +255,5 @@ tbody tr:hover {
   outline: none;
   box-shadow: 0 0 0 3px rgba(181, 52, 144, 0.3);
 }
+
+.acciones-centradas { text-align:center; }

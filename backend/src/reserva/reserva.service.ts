@@ -54,6 +54,7 @@ export class ReservaService {
         throw new BadRequestException(`Ya alcanzaste tu límite semanal de ${maxSemanales} clases según tu plan.`);
       }
     }
+    console.log('📦 Reservar: automatica =', automatica, 'fechaTurno =', fechaTurno);
 
     const fechaReserva = new Date().toISOString().split('T')[0]; // la fecha actual (YYYY-MM-DD)
 
@@ -280,46 +281,57 @@ export class ReservaService {
   }
 
   async cancelarReservaPorUsuario(id: number, tipo: 'momentanea' | 'permanente', user: any) {
+    // Traemos SIEMPRE las relaciones que necesitamos
     const reserva = await this.reservaRepo.findOne({
       where: { id },
-      relations: ['usuario', 'horario']
+      relations: ['usuario', 'horario'],
     });
-
-    console.log('🟣 ID de reserva:', id);
-    console.log('🟢 Usuario logueado: ID =', user.sub, '| Rol =', user.rol);
-    console.log('🔵 Dueño de la reserva:', reserva!.usuario?.id);
-
 
     if (!reserva) throw new NotFoundException('Reserva no encontrada');
 
-    // 🔐 Permitir solo al dueño de la reserva o al admin
-    const userId = user.id ?? user.sub; // usa 'id' o 'sub' según lo que venga
-    if (!reserva.usuario || (reserva.usuario.id !== userId && user.rol !== 'admin')) {
+    // ⚠️ ¡No loguees antes de verificar null!
+    const userId = user?.id ?? user?.sub;
+    const rol = user?.rol;
+
+    // 🔐 Permitir solo al dueño o al admin
+    if (!reserva.usuario || (reserva.usuario.id !== Number(userId) && user.rol !== 'admin')) {
       throw new ForbiddenException('No podés cancelar esta reserva');
     }
 
-    // ✅ Cancelación momentánea
+    // ✅ Si es una reserva de recuperación (automatica = false) → la borramos físicamente
+    if (!reserva.automatica) {
+      // liberamos cama
+      if (reserva.horario) {
+        reserva.horario.camasReservadas = Math.max(0, reserva.horario.camasReservadas - 1);
+        await this.horarioRepo.save(reserva.horario);
+      }
+      await this.reservaRepo.remove(reserva);   // 👈 BORRADO FÍSICO
+      return { mensaje: '✅ Reserva de recuperación eliminada.' };
+    }
+
+    // ✅ Si es recurrente (automatica = true) → cancelar momentánea/permanente
     if (tipo === 'momentanea') {
       reserva.estado = 'cancelado';
       reserva.cancelacionMomentanea = true;
-      reserva.fechaCancelacion = new Date();
-      reserva.automatica = false;
-      await this.reservaRepo.save(reserva);
-      return { mensaje: 'Turno cancelado por hoy. Se recuperará automáticamente en 24 hs.' };
-    }
-
-    // ✅ Cancelación permanente
-    if (tipo === 'permanente') {
+      reserva.cancelacionPermanente = false;
+    } else {
       reserva.estado = 'cancelado';
       reserva.cancelacionPermanente = true;
-      reserva.fechaCancelacion = new Date();
-      reserva.automatica = false;
-      await this.reservaRepo.save(reserva);
-      return { mensaje: 'Turno cancelado permanentemente.' };
+      reserva.cancelacionMomentanea = false;
     }
 
-    throw new BadRequestException('Tipo de cancelación no válido');
+    reserva.automatica = false;
+    reserva.fechaCancelacion = new Date();
+
+    if (reserva.horario) {
+      reserva.horario.camasReservadas = Math.max(0, reserva.horario.camasReservadas - 1);
+      await this.horarioRepo.save(reserva.horario);
+    }
+
+    await this.reservaRepo.save(reserva);
+    return { mensaje: '✅ Reserva cancelada.' };
   }
+
 
   async generarReservasRecurrentesSemanaActual() {
     const hoy = new Date();

@@ -33,7 +33,7 @@ export class ReservaController {
   reservar(
     @Param('horarioId') horarioIdParam: string,
     @Req() req: Request,
-    @Body() body: { nombre: string; apellido: string; userId?: number; fechaTurno: string }
+    @Body() body: { nombre: string; apellido: string; userId?: number; fechaTurno: string; automatica?: boolean }
   ) {
     const horarioId = Number(horarioIdParam);
     if (isNaN(horarioId)) {
@@ -42,7 +42,7 @@ export class ReservaController {
 
     const user = req.user as any;
     const rol = user?.rol;
-    const idFromToken = user?.id;
+    const idFromToken = user?.id ?? user?.sub;
     const userId = body.userId ?? idFromToken;
 
     if (!userId || isNaN(Number(userId))) {
@@ -57,7 +57,19 @@ export class ReservaController {
       throw new BadRequestException('Debe indicarse la fecha del turno');
     }
 
-    return this.reservaService.reservar(horarioId, userId, body.nombre, body.apellido, body.fechaTurno);
+    const automatica =
+      typeof body.automatica === 'boolean'
+        ? body.automatica
+        : (String(body.automatica ?? 'true').toLowerCase() === 'true');
+
+    return this.reservaService.reservar(
+      horarioId, 
+      Number(userId), 
+      body.nombre, 
+      body.apellido, 
+      body.fechaTurno, 
+      automatica,
+    );
   }
 
   // Obtener reservas de un horario

@@ -17,26 +17,25 @@
           <!-- Bloqueo específico para Viernes 8:00 y 19:00 -->
           <ng-container *ngIf="!(dia === 'Viernes' && (hora === '08:00' || hora === '18:00')); else bloqueado">
             <ng-container *ngIf="hasTurno(dia, hora); else sinTurno">
-            <ng-container *ngFor="let turno of getTurnos(dia, hora)">
-              <div
-                class="clickeable {{ turno.nivel.toLowerCase() }}"
-                (click)="abrirTurno(turno)">
-                
-                <div class="nivel">{{ turno.nivel }}</div>
-                <div class="camas">Camas libres: {{ turno.camasDisponibles }}</div>
+              <ng-container *ngFor="let turno of getTurnos(dia, hora)">
+                <div
+                  class="clickeable {{ turno.nivel.toLowerCase() }}"
+                  (click)="abrirTurno(turno)">
+                  
+                  <div class="nivel">{{ turno.nivel }}</div>
+                  <div class="camas">Camas libres: {{ turno.camasDisponibles }}</div>
 
-                <!-- Solo mostramos reservas si están activas -->
-                <div class="reservas" *ngIf="turno.reservas?.length > 0">
-                  <div *ngFor="let r of turno.reservas">
-                    <ng-container *ngIf="r.estado === 'reservado' && (rolUsuario === 'admin' || turno.nivel.toLowerCase() === usuarioNivel.toLowerCase())">
-                      {{ r.nombre }} {{ r.apellido }}
-                    </ng-container>
+                  <!-- Solo mostramos reservas si están activas -->
+                  <div class="reservas" *ngIf="turno.reservas?.length > 0">
+                    <div *ngFor="let r of turno.reservas">
+                      <ng-container *ngIf="r.estado === 'reservado' && (rolUsuario === 'admin' || turno.nivel.toLowerCase() === usuarioNivel.toLowerCase())">
+                        {{ r.nombre }} {{ r.apellido }}
+                      </ng-container>
+                    </div>
                   </div>
+                  
                 </div>
-                
-              </div>
-            </ng-container>
-
+              </ng-container>
             </ng-container>
           </ng-container>
 
@@ -131,14 +130,14 @@
     <!-- Checklist para indicar si es una recuperación -->
     <div class="form-group">
       <label for="tipoReserva"><strong>Tipo de reserva:</strong></label>
-      <select id="tipoReserva" [(ngModel)]="reservaAutomatica">
+      <select id="tipoReserva" [(ngModel)]="reservaAutomatica"[disabled]="uiBloqueadoAlumno">
         <option [ngValue]="true">Clase habitual (recurrente)</option>
         <option [ngValue]="false">Recuperación</option>
       </select>
     </div>
 
 
-    <button class="btn-confirmar" (click)="confirmarReserva()">✅ Confirmar</button>
+    <button class="btn-confirmar" (click)="confirmarReserva()"[disabled]="uiBloqueadoAlumno">✅ Confirmar</button>
     <button class="btn-cerrar" (click)="cerrarModalAlumno()">Cancelar</button>
 
     <div *ngIf="mostrarConfirmacion"
@@ -148,14 +147,28 @@
   
   </div>
 </div>
-<!-- 🔽 MODAL CONFIRMAR TIPO DE CANCELACIÓN -->
+<!--MODAL CONFIRMAR TIPO DE CANCELACIÓN -->
 <div *ngIf="mostrarModalTipoCancelacion" class="modal-confirmacion">
   <p>¿Querés cancelar la reserva de <b>{{ reservaSeleccionada.nombre }} {{ reservaSeleccionada.apellido }}</b>?</p>
 
-  <div style="text-align: center;">
+  <div class="modal-botones">
     <button class="btn-cancelar" (click)="confirmarCancelacion('momentanea')">🕒 Solo por esta vez</button>
     <button class="btn-cancelar" (click)="confirmarCancelacion('permanente')">❌ Cancelar permanentemente</button>
     <button class="btn-cerrar" (click)="cerrarModalTipo()">🚫 Cerrar</button>
+  </div>
+</div>
+<!-- NUEVO modal de confirmación final -->
+<div *ngIf="mostrarModalConfirmarAccion" class="modal-confirmacion">
+  <p *ngIf="tipoCancelacionSeleccionado === 'momentanea'">
+    ¿Querés cancelar la reserva del día <b>{{ turnoSeleccionado?.fecha }}</b>?
+  </p>
+  <p *ngIf="tipoCancelacionSeleccionado === 'permanente'">
+    ¿Querés cancelar permanentemente la reserva de <b>{{ reservaSeleccionada.nombre }} {{ reservaSeleccionada.apellido }}</b>?
+  </p>
+
+  <div class="modal-botones">
+    <button class="btn-confirmar" (click)="aceptarCancelacion()">✅ Sí, cancelar</button>
+    <button class="btn-cerrar" (click)="cerrarConfirmacion()">❌ No</button>
   </div>
 </div>
 

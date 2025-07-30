@@ -56,7 +56,7 @@
         <!-- Si hay invitación, mostrar solo valor precargado de telefono -->
         <div class="form-group" *ngIf="invitacionValida; else telefonoManual">
           <label for="telefono">Teléfono:</label>
-          <input type="text" [value]="telefono" readonly />
+          <input id="telefono" type="text" [value]="telefono" readonly />
         </div>
         <!-- Si NO hay invitación, mostrar campo editable de telefono -->
         <ng-template #telefonoManual>
@@ -82,8 +82,8 @@
 
         <!-- Si hay invitación, mostrar solo valor precargado de nivel -->
         <div class="form-group" *ngIf="invitacionValida; else nivelManual">
-          <label>Nivel asignado:</label>
-          <input type="text" [value]="nivel" readonly />
+          <label for="nivel">Nivel asignado:</label>
+          <input id="nivel" type="text" [value]="nivel" readonly />
         </div>
         <!-- Si NO hay invitación, mostrar campo editable de nivel -->
         <ng-template #nivelManual>

@@ -35,21 +35,48 @@
     </tbody>
   </table>
 </div>
-<!-- ✅ MODAL CANCELACIÓN USUARIO -->
+<!-- ✅ MODAL PARA RESERVAS PERMANENTES -->
 <div *ngIf="modalAbierto" class="modal-overlay">
   <div class="modal-content">
     <h3>¿Querés cancelar este turno?</h3>
     <p>
-      Día: <strong>{{ turnoAEliminar.horario.dia }}</strong><br>
-      Hora: <strong>{{ turnoAEliminar.horario.hora }}</strong><br>
-      Nivel: <strong>{{ turnoAEliminar.horario.nivel }}</strong>
+      Día: <strong>{{ turnoAEliminar?.horario?.dia }}</strong><br>
+      Hora: <strong>{{ turnoAEliminar?.horario?.hora }}</strong><br>
+      Fecha: <strong>{{ formatearFechaArg(turnoAEliminar?.fechaTurno) }}</strong><br>
+      Nivel: <strong>{{ turnoAEliminar?.horario?.nivel }}</strong>
     </p>
 
     <p>¿Cómo querés cancelarlo?</p>
-    <div style="text-align: center;">
-      <button class="btn-cancelar" (click)="confirmarCancelacion('momentanea')">🕒 Solo por esta vez</button>
-      <button class="btn-cancelar" (click)="confirmarCancelacion('permanente')">❌ Cancelar permanentemente</button>
+
+    <div class="acciones-centradas">
+      <button class="btn-cancelar"
+              (click)="confirmarCancelacion('momentanea')"
+              [disabled]="uiBloqueadoAlumnoCancel">🕒 Solo por esta vez</button>
+
+      <button class="btn-cancelar"
+              (click)="confirmarCancelacion('permanente')"
+              [disabled]="uiBloqueadoAlumnoCancel">❌ Cancelar permanentemente</button>
+
       <button class="btn-cerrar" (click)="cerrarModal()">🚫 Cerrar</button>
+    </div>
+
+    <!-- Zona de mensajes -->
+    <div *ngIf="mostrarConfirmacionUsuario"
+         [ngClass]="{'mensaje-confirmacion': true, 'success': !esErrorUsuarioCancel, 'error': esErrorUsuarioCancel}">
+      {{ mensajeUsuarioCancel }}
+    </div>
+  </div>
+</div>
+
+<!-- ✅ MODAL PARA RESERVAS TEMPORALES -->
+<div *ngIf="mostrarModalConfirmarAccion" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Cancelar reserva de recuperación</h3>
+    <p>{{ textoConfirmacion }}</p>
+
+    <div class="acciones-centradas">
+      <button class="btn-confirmar" (click)="aceptarCancelacion()">✅ Sí, cancelar</button>
+      <button class="btn-cerrar" (click)="cerrarConfirmacionFinal()">❌ No</button>
     </div>
   </div>
 </div>

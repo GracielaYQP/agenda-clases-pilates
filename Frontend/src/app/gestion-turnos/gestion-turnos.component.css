@@ -535,3 +535,6 @@ tbody tr:hover {
 #modal-tipo-cancelacion .btn-cerrar:hover {
   background-color: #666;
 }
+.modal-botones{
+  text-align: center;
+}

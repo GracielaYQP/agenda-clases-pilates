@@ -57,6 +57,11 @@ export class GestionTurnosComponent implements OnInit {
   reservaAutomatica: boolean = true;
   reservaSeleccionada: any = null;
   mostrarModalTipoCancelacion: boolean = false;
+  mostrarModalConfirmarAccion: boolean = false;
+  tipoCancelacionSeleccionado: 'momentanea' | 'permanente' = 'momentanea';
+  textoConfirmacion: string = '';
+  uiBloqueadoAlumno = false;
+  uiBloqueadoAdmin = false;
   
 
   constructor(
@@ -196,11 +201,6 @@ export class GestionTurnosComponent implements OnInit {
     console.log('🧩 Turno recibido:', turno);
   }
 
-  cerrarModal() {
-    this.modalAbierto = false;
-    this.turnoSeleccionado = null;
-  }
-
   anularReserva(reservaId: number) {
     if (confirm('¿Estás seguro de que querés anular esta reserva?')) {
       this.horariosService.anularReserva(reservaId, 'permanente').subscribe({
@@ -250,12 +250,15 @@ export class GestionTurnosComponent implements OnInit {
             apellido, 
             usuario.id, 
             this.turnoSeleccionado.fecha,
-            !this.esRecuperacion
+            this.reservaAutomatica
         ).subscribe({
             next: () => {
               this.mensajeAdminReserva = '✅ Reserva creada correctamente';
               this.esErrorAdmin = false;
               this.mostrarConfirmacionAdmin = true;
+              this.uiBloqueadoAdmin = true;
+
+              this.refrescarHorarios();
 
               setTimeout(() => {
                 this.mostrarConfirmacionAdmin = false;
@@ -266,6 +269,7 @@ export class GestionTurnosComponent implements OnInit {
               this.mensajeAdminReserva = '❌ Error al reservar: ' + (err.error.message || err.message);
               this.esErrorAdmin = true;
               this.mostrarConfirmacionAdmin = true;
+              this.uiBloqueadoAdmin = false;
             }
           });
         },
@@ -294,12 +298,13 @@ export class GestionTurnosComponent implements OnInit {
             usuario.apellido, 
             usuario.id, 
             this.turnoSeleccionado.fecha,
-            !this.esRecuperacion
+            this.reservaAutomatica
           ).subscribe({
             next: () => {
               this.mensajeAdminReserva = '✅ Reserva creada correctamente';
               this.esErrorAdmin = false;
               this.mostrarConfirmacionAdmin = true;
+              this.uiBloqueadoAdmin = true;
 
               setTimeout(() => {
                 this.mostrarConfirmacionAdmin = false;
@@ -310,6 +315,7 @@ export class GestionTurnosComponent implements OnInit {
               this.mensajeAdminReserva = '❌ Error al reservar: ' + (err.error.message || err.message);
               this.esErrorAdmin = true;
               this.mostrarConfirmacionAdmin = true;
+              this.uiBloqueadoAdmin = false;
             }
           });
         },
@@ -320,6 +326,13 @@ export class GestionTurnosComponent implements OnInit {
         }
       });
     }
+  }
+
+  cerrarModal() {
+    this.modalAbierto = false;
+    this.turnoSeleccionado = null;
+    this.uiBloqueadoAdmin = false;
+    this.refrescarHorarios();
   }
 
   iniciarEdicionReserva(reserva: any) {
@@ -343,15 +356,10 @@ export class GestionTurnosComponent implements OnInit {
       next: () => {
         alert('✅ Reserva actualizada');
         this.reservaEditandoId = null;
-        this.horariosService.cargarHorarios();
+        this.refrescarHorarios();
       },
       error: err => alert('❌ Error al actualizar: ' + err.error.message)
     });
-  }
-
-  cerrarModalAlumno() {
-    this.modalAlumnoAbierto = false;
-    this.turnoSeleccionado = null;
   }
 
   confirmarReserva() {
@@ -375,11 +383,12 @@ export class GestionTurnosComponent implements OnInit {
         this.mensajeReserva = '✅ ¡Turno reservado exitosamente!';
         this.esErrorReserva = false;
         this.mostrarConfirmacion = true;
+        this.uiBloqueadoAlumno = true;
 
         setTimeout(() => {
           this.mostrarConfirmacion = false;
           this.cerrarModalAlumno();
-        }, 2000);
+        }, 3000);
       },
       error: err => {
         const mensajeBackend = err?.error?.message || err?.message || 'Error desconocido';
@@ -403,8 +412,16 @@ export class GestionTurnosComponent implements OnInit {
     });
   }
 
+  cerrarModalAlumno() {
+    this.modalAlumnoAbierto = false;
+    this.turnoSeleccionado = null;
+    this.uiBloqueadoAlumno = false;
+    this.refrescarHorarios();
+  }
+
   confirmarCancelacion(tipo: 'momentanea' | 'permanente') {
     const id = this.reservaSeleccionada?.id;
+    
 
     // 🛑 Validación del ID
     if (!id || isNaN(+id)) {
@@ -418,29 +435,51 @@ export class GestionTurnosComponent implements OnInit {
       }, 3000);
       return;
     }
+     // Guardamos el tipo elegido y armamos el texto de confirmación
+    this.tipoCancelacionSeleccionado = tipo;
 
-    console.log('📤 Enviando cancelación para ID:', id, 'tipo:', tipo);
+    if (tipo === 'momentanea') {
+      // Usa la fecha del turno seleccionado para el mensaje
+      const fecha = this.turnoSeleccionado?.fecha || 'la fecha indicada';
+      this.textoConfirmacion = `¿Querés cancelar la reserva del día ${fecha}?`;
+    } else {
+      // Permanente: usa nombre y apellido del alumno
+      const alumno = `${this.reservaSeleccionada?.nombre ?? ''} ${this.reservaSeleccionada?.apellido ?? ''}`.trim();
+      this.textoConfirmacion = `¿Querés cancelar permanentemente la reserva de ${alumno || 'este alumno'}?`;
+    }
+      // Cerramos el modal de tipo y abrimos el modal de confirmación final
+      this.mostrarModalTipoCancelacion = false;
+      this.mostrarModalConfirmarAccion = true;
+    }
+    // 👇 Llama al backend SOLO si el usuario confirma en el segundo modal
+    aceptarCancelacion() {
+      const id = this.reservaSeleccionada?.id;
 
-    this.horariosService.anularReserva(+id, tipo).subscribe({
+      if (!id || isNaN(+id)) {
+        this.mensajeAdminReserva = '❌ No se pudo cancelar: ID de reserva inválido.';
+        this.esErrorAdmin = true;
+        this.mostrarConfirmacionAdmin = true;
+        this.mostrarModalConfirmarAccion = false;
+        return;
+      }
+
+    this.horariosService.anularReserva(+id, this.tipoCancelacionSeleccionado).subscribe({
       next: () => {
-        // 🔄 Cerrar los modales
-        this.mostrarModalTipoCancelacion = false;
-        this.modalAbierto = false;
-        this.mensajeAdminReserva = '✅ Reserva cancelada correctamente';
+    // Mensaje de éxito específico
+        this.mensajeAdminReserva = this.tipoCancelacionSeleccionado === 'momentanea'
+          ? '✅ La reserva fue cancelada por este día.'
+          : '✅ La reserva fue cancelada permanentemente.';
+
         this.esErrorAdmin = false;
         this.mostrarConfirmacionAdmin = true;
+
+        // Cerrar modal de confirmación y limpiar selección
+        this.mostrarModalConfirmarAccion = false;
         this.reservaSeleccionada = null;
-        // 🔁 REFRESCAR HORARIOS
-        this.horariosService.getHorariosDeLaSemana().subscribe({
-          next: (data) => {
-            this.horarios = data;
-            console.log('♻️ Turnos actualizados después de cancelar:', this.horarios);
-          },
-          error: (err) => {
-            console.error('❌ Error al actualizar los turnos:', err);
-          }
-        });
-        // ⏱️ Ocultar mensaje luego de 3 segundos
+
+        this.refrescarHorarios();
+
+        // Ocultar mensaje tras 3s
         setTimeout(() => {
           this.mostrarConfirmacionAdmin = false;
         }, 3000);
@@ -450,12 +489,19 @@ export class GestionTurnosComponent implements OnInit {
         this.mensajeAdminReserva = '❌ Error al cancelar: ' + (err.error?.message || err.message);
         this.esErrorAdmin = true;
         this.mostrarConfirmacionAdmin = true;
+        this.mostrarModalConfirmarAccion = false;
 
         setTimeout(() => {
           this.mostrarConfirmacionAdmin = false;
         }, 3000);
       }
     });
+  }
+
+  // 👇 Si el usuario cancela el segundo modal
+  cerrarConfirmacion() {
+    this.mostrarModalConfirmarAccion = false;
+    this.refrescarHorarios();
   }
 
   preguntarTipoCancelacion(reserva: any) {
@@ -475,6 +521,18 @@ export class GestionTurnosComponent implements OnInit {
 
   cerrarModalTipo() {
     this.mostrarModalTipoCancelacion = false;
+    this.refrescarHorarios();
   }
+
+  private refrescarHorarios() {
+    this.horariosService.getHorariosDeLaSemana().subscribe({
+      next: (data) => {
+        this.horarios = data;
+        console.log('♻️ Horarios actualizados:', this.horarios);
+      },
+      error: (err) => console.error('❌ Error al refrescar horarios', err)
+    });
+  }
+
 
 }
