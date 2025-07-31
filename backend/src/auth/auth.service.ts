@@ -5,6 +5,7 @@ import { CreateUserDto } from 'src/users/user.dto';
 import { MailerService } from './mailer/mailer.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcryptjs';
+import { User } from 'src/users/user.entity';
 
 
 @Injectable()
@@ -16,16 +17,8 @@ export class AuthService {
   ) {}
 
   // Registro normal
-  register(dto: CreateUserDto & { nivel: string }) {
-    return this.usersService.create({
-      email: dto.email,
-      nombre: dto.nombre,
-      apellido: dto.apellido,  
-      dni: dto.dni,
-      telefono: dto.telefono,
-      password: dto.password,
-      nivel: dto.nivel,
-    }); 
+  async register(dto: CreateUserDto) {
+    return this.usersService.create(dto); 
   }
 
   // Login normal
@@ -35,6 +28,9 @@ export class AuthService {
     const user = await this.usersService.findByEmailOrTelefono(usuario);
     if (!user) throw new UnauthorizedException('Usuario no encontrado');
     console.log('👤 Usuario encontrado:', user.telefono);
+    if (!user.activo) {
+    throw new UnauthorizedException('Tu cuenta está inactiva. Por favor, comunicate con el estudio para reactivarla.');
+  }
 
     const cleanPassword = password.trim(); // elimina espacios accidentales
     console.log('🔎 Contraseña limpia recibida desde el frontend:', cleanPassword);
@@ -56,26 +52,13 @@ export class AuthService {
     };
   }
 
-
   // Crear usuario desde invitación
-  async createUser(data: {
-    telefono: string; 
-    email: string; 
-    nombre: string; 
-    apellido: string; 
-    dni: string; 
-    password: string; 
-    nivel: string 
-}) {
-    // NO hacer hash aquí — lo hace UsersService.create
+ async createUser(data: CreateUserDto): Promise<User> {
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
     return this.usersService.create({
-      dni: data.dni,
-      nombre: data.nombre,
-      apellido: data.apellido,  
-      telefono: data.telefono,
-      email: data.email,
-      password: data.password, 
-      nivel: data.nivel,
+      ...data,
+      password: hashedPassword
     });
   }
 
@@ -109,7 +92,6 @@ export class AuthService {
         whatsappUrl: `https://wa.me/${user.telefono}?text=${encodeURIComponent(mensaje)}`
       };
   }
-
 
     async resetPassword(token: string, newPassword: string) {
     const user = await this.usersService.findByResetToken(token);

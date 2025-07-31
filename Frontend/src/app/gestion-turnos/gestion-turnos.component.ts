@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HorariosService } from '../services/horarios.service';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 export interface Reserva {
   id: number;
@@ -62,11 +63,15 @@ export class GestionTurnosComponent implements OnInit {
   textoConfirmacion: string = '';
   uiBloqueadoAlumno = false;
   uiBloqueadoAdmin = false;
+  mensajeBloqueoRecuperacion: string = '';
+  modalConfirmacionFinalAbierta = false;
+
   
 
   constructor(
     private horariosService: HorariosService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private http: HttpClient
   ) {}
   
   ngOnInit() {
@@ -137,8 +142,11 @@ export class GestionTurnosComponent implements OnInit {
     return '';
   }
 
-  abrirTurno(turno: any) {
+  async abrirTurno(turno: any) {
     const turnoId = turno.id || turno.idHorario;
+    console.log('🧪 DEBUG abrirTurno()');
+    console.log('Rol:', this.rolUsuario);
+    console.log('Turno:', turno);
 
     if (!turnoId) {
       console.warn('🚨 Turno sin ID:', turno);
@@ -147,13 +155,38 @@ export class GestionTurnosComponent implements OnInit {
 
     this.turnoSeleccionado = {
       ...turno,
-      idHorario: turnoId, // unificamos siempre en idHorario
+      idHorario: turnoId,
       fecha: turno.fecha
     };
 
+    console.log('🧪 Rol:', this.rolUsuario, 'Turno:', turno);
+
     if (this.rolUsuario === 'admin') {
+      this.uiBloqueadoAlumno = false;
       this.abrirEditorDeReservas(this.turnoSeleccionado);
     } else {
+      // 🛑 Validar si es feriado
+      const esFeriado = await this.esFeriado(turno.fecha);
+      if (esFeriado) {
+        this.uiBloqueadoAlumno = true;
+        this.mensajeBloqueoRecuperacion = '📅 No podés reservar clases de recuperación en días feriados.';
+        return; // No abre el modal
+      }
+
+      // ⏱️ Validar si falta menos de 1 hora
+      const ahora = new Date();
+      const fechaHoraTurno = new Date(`${turno.fecha}T${turno.hora}:00-03:00`);
+      const diferenciaMs = fechaHoraTurno.getTime() - ahora.getTime();
+      const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
+
+      if (diferenciaHoras < 1) {
+        this.uiBloqueadoAlumno = true;
+        this.mensajeBloqueoRecuperacion = '⚠️ No podés hacer una reserva de recuperación con menos de 1 hora de anticipación.';
+      } else {
+        this.uiBloqueadoAlumno = false;
+        this.mensajeBloqueoRecuperacion = '';
+      }
+
       this.nombreUsuario = localStorage.getItem('nombreUsuario') || 'Desconocido';
       this.apellidoUsuario = localStorage.getItem('apellidoUsuario') || 'Desconocido';
       this.modalAlumnoAbierto = true;
@@ -199,6 +232,10 @@ export class GestionTurnosComponent implements OnInit {
     this.turnoSeleccionado = turno;
     this.modalAbierto = true;
     console.log('🧩 Turno recibido:', turno);
+    console.log('✅ modalAbierto:', this.modalAbierto);
+    console.log('❓ mostrarFormAgregar:', this.mostrarFormAgregar);
+    console.log('❓ modalConfirmacionFinalAbierta:', this.modalConfirmacionFinalAbierta);
+    console.log('❓ mostrarModalTipoCancelacion:', this.mostrarModalTipoCancelacion);
   }
 
   anularReserva(reservaId: number) {
@@ -372,6 +409,32 @@ export class GestionTurnosComponent implements OnInit {
       return;
     }
 
+    // ⛔ Validación: no permitir recuperación con menos de 1 hora de anticipación
+    if (this.reservaAutomatica=== false) {
+      try {
+        const ahora = new Date();
+        const fechaStr = this.turnoSeleccionado.fecha; // yyyy-mm-dd
+        const horaStr = this.turnoSeleccionado.hora;   // HH:mm
+        const fechaHoraTurno = new Date(`${fechaStr}T${horaStr}:00-03:00`);
+        const diferenciaMinutos = (fechaHoraTurno.getTime() - ahora.getTime()) / (1000 * 60);
+
+        if (diferenciaMinutos < 60) {
+          this.mensajeReserva = '⚠️ Las clases de recuperación deben reservarse con al menos una hora de anticipación.';
+          this.esErrorReserva = true;
+          this.mostrarConfirmacion = true;
+
+          setTimeout(() => {
+            this.mostrarConfirmacion = false;
+          }, 3000);
+
+          return;
+        }
+      } catch (error) {
+        console.error('Error al calcular diferencia horaria:', error);
+      }
+    }
+
+    // 👉 Llamado al backend
     this.horariosService.reservar(
       idHorario,
       this.nombreUsuario,
@@ -394,9 +457,9 @@ export class GestionTurnosComponent implements OnInit {
         const mensajeBackend = err?.error?.message || err?.message || 'Error desconocido';
 
         if (mensajeBackend.includes('Ya alcanzaste tu límite mensual de')) {
-          this.mensajeReserva = '⚠️ Ya alcanzaste el máximo de clases de tu plan mensual. Usá esta reserva como recuperación.';
+          this.mensajeReserva = '⚠️ Ya alcanzaste el máximo de clases de tu plan mensual. Solo podés reservar como recuperación.';
         } else if (mensajeBackend.includes('Ya alcanzaste tu límite semanal de')) {
-          this.mensajeReserva = '⚠️ Ya alcanzaste el límite semanal de clases de tu plan. Probá como recuperación.';
+          this.mensajeReserva = '⚠️ Ya alcanzaste el límite semanal de clases de tu plan. Solo podés reservar como recuperación.';
         } else {
           this.mensajeReserva = '❌ No se pudo reservar: ' + mensajeBackend;
         }
@@ -408,7 +471,6 @@ export class GestionTurnosComponent implements OnInit {
           this.mostrarConfirmacion = false;
         }, 3000);
       }
-
     });
   }
 
@@ -419,40 +481,81 @@ export class GestionTurnosComponent implements OnInit {
     this.refrescarHorarios();
   }
 
+  abrirModalConfirmacionFinal() {
+    this.modalConfirmacionFinalAbierta = true;
+    this.mostrarFormAgregar = false;
+  }
+
+  cerrarModalConfirmacionFinal() {
+    this.modalConfirmacionFinalAbierta = false;
+    this.mostrarFormAgregar = true;
+  }
+
+  confirmarReservaFinal() {
+    this.agregarReserva();
+    this.modalConfirmacionFinalAbierta = false;
+    this.resetearCamposReserva();
+  }
+
+  abrirFormAgregar() {
+  this.mostrarFormAgregar = true;
+  this.modalAbierto = false; // cierra el modal principal
+}
+
+  cerrarFormAgregar() {
+    this.mostrarFormAgregar = false;
+    this.resetearCamposReserva();
+    this.modalAbierto = true; // vuelve al modal principal
+  }
+
+  resetearCamposReserva() {
+    this.nombreNuevo = '';
+    this.apellidoNuevo = '';
+    this.telefonoNuevo = '';
+    this.busquedaModo = 'nombre-apellido';
+  }
+  
   confirmarCancelacion(tipo: 'momentanea' | 'permanente') {
     const id = this.reservaSeleccionada?.id;
-    
 
-    // 🛑 Validación del ID
     if (!id || isNaN(+id)) {
       console.error('❌ ID de reserva inválido:', id);
       this.mensajeAdminReserva = '❌ No se pudo cancelar: ID de reserva inválido.';
       this.esErrorAdmin = true;
       this.mostrarConfirmacionAdmin = true;
-
-      setTimeout(() => {
-        this.mostrarConfirmacionAdmin = false;
-      }, 3000);
+      setTimeout(() => this.mostrarConfirmacionAdmin = false, 3000);
       return;
     }
-     // Guardamos el tipo elegido y armamos el texto de confirmación
+
     this.tipoCancelacionSeleccionado = tipo;
 
     if (tipo === 'momentanea') {
-      // Usa la fecha del turno seleccionado para el mensaje
       const fecha = this.turnoSeleccionado?.fecha || 'la fecha indicada';
       this.textoConfirmacion = `¿Querés cancelar la reserva del día ${fecha}?`;
     } else {
-      // Permanente: usa nombre y apellido del alumno
       const alumno = `${this.reservaSeleccionada?.nombre ?? ''} ${this.reservaSeleccionada?.apellido ?? ''}`.trim();
       this.textoConfirmacion = `¿Querés cancelar permanentemente la reserva de ${alumno || 'este alumno'}?`;
     }
-      // Cerramos el modal de tipo y abrimos el modal de confirmación final
-      this.mostrarModalTipoCancelacion = false;
-      this.mostrarModalConfirmarAccion = true;
-    }
-    // 👇 Llama al backend SOLO si el usuario confirma en el segundo modal
-    aceptarCancelacion() {
+
+    this.mostrarModalTipoCancelacion = false;
+    this.mostrarModalConfirmarAccion = true;
+  }
+
+  cerrarModalTipoCancelacion() {
+    this.mostrarModalTipoCancelacion = false;
+    this.modalAbierto = true; // vuelve al modal principal
+  }
+
+  cerrarModalConfirmarAccion() {
+    this.mostrarModalConfirmarAccion = false;
+    this.modalAbierto = true;
+  }
+
+  ejecutarCancelacion() {
+    this.aceptarCancelacion(); // ✅ Usa tu método centralizado
+  }
+ 
+  aceptarCancelacion() {
       const id = this.reservaSeleccionada?.id;
 
       if (!id || isNaN(+id)) {
@@ -498,7 +601,6 @@ export class GestionTurnosComponent implements OnInit {
     });
   }
 
-  // 👇 Si el usuario cancela el segundo modal
   cerrarConfirmacion() {
     this.mostrarModalConfirmarAccion = false;
     this.refrescarHorarios();
@@ -510,19 +612,12 @@ export class GestionTurnosComponent implements OnInit {
   }
 
   abrirModalTipoCancelacion(reserva: any) {
-    this.reservaSeleccionada = {
-      ...reserva,
-      id: +reserva.id // forzamos que sea número
-    };
-
+    this.reservaSeleccionada = { ...reserva, id: +reserva.id };
     this.mostrarModalTipoCancelacion = true;
     this.modalAbierto = false;
-  }
-
-  cerrarModalTipo() {
-    this.mostrarModalTipoCancelacion = false;
-    this.refrescarHorarios();
-  }
+      //El admin NO tiene restricciones
+      this.uiBloqueadoAdmin = false; // ponerlo en el html!!!!!!!
+    }
 
   private refrescarHorarios() {
     this.horariosService.getHorariosDeLaSemana().subscribe({
@@ -534,5 +629,15 @@ export class GestionTurnosComponent implements OnInit {
     });
   }
 
+  esFeriado(fecha: string): Promise<boolean> {
+    return this.http.get<{ esFeriado: boolean }>(`http://localhost:3000/feriados/${fecha}`)
+      .toPromise()
+      .then(response => response?.esFeriado ?? false) // 👈 si no hay respuesta, devolvemos false
+      .catch(() => false); // 👈 si falla la petición, devolvemos false
+  }
 
+  onCambioTipoReserva() {
+    this.mensajeBloqueoRecuperacion = '';
+    this.uiBloqueadoAlumno = false;
+  }
 }

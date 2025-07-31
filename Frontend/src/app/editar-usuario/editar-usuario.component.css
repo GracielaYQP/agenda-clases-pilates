@@ -7,7 +7,7 @@
   height: calc(100vh - 36px - 48px);
   padding: 0 20px;
   box-sizing: border-box;
-  margin: 0;
+  margin: 60px 0 0 0;
 }
 
 .singin-container {
@@ -83,13 +83,7 @@ select {
 
 .btn-singin:hover {
   background-color: #af1155;
-}
-
-.center-button {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  width: 100%;
+  color: black;
 }
 
 .modal-overlay {
@@ -141,4 +135,40 @@ select {
 @keyframes fadeIn {
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+.btn-cerrarForm {
+  background-color: #a8a6a6;
+  color: #333;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 70%;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-cerrarForm:hover {
+  background-color: #535353;
+  color: white;
+}
+
+.botonera-horizontal {
+  display: flex;
+  flex-direction: row;        
+  justify-content: center;    
+  align-items: center;        
+  gap: 10px;                 
+  margin-top: 10px;
+}
+
+.botonera-horizontal button {
+  width: 160px;    
+  display: inline-block;
+  padding: 10px 0;
+  text-align: center;
 }

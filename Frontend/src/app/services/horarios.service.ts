@@ -60,7 +60,6 @@ export class HorariosService {
     return this.http.patch(`http://localhost:3000/reservas/cancelar/${reservaId}`, { tipo }, { headers });
   }
 
-
   buscarPorNombreApellido(nombre: string, apellido: string): Observable<any> {
     return this.http.get(`http://localhost:3000/users/buscar?nombre=${nombre}&apellido=${apellido}`);
   }
@@ -110,5 +109,8 @@ export class HorariosService {
     return this.http.post(`http://localhost:3000/reservas/marcar-recuperadas`, {});
 
   }
+
+
+
 
 }

@@ -20,11 +20,9 @@
               <ng-container *ngFor="let turno of getTurnos(dia, hora)">
                 <div
                   class="clickeable {{ turno.nivel.toLowerCase() }}"
-                  (click)="abrirTurno(turno)">
-                  
+                  (click)="abrirTurno(turno)">                  
                   <div class="nivel">{{ turno.nivel }}</div>
                   <div class="camas">Camas libres: {{ turno.camasDisponibles }}</div>
-
                   <!-- Solo mostramos reservas si están activas -->
                   <div class="reservas" *ngIf="turno.reservas?.length > 0">
                     <div *ngFor="let r of turno.reservas">
@@ -32,17 +30,14 @@
                         {{ r.nombre }} {{ r.apellido }}
                       </ng-container>
                     </div>
-                  </div>
-                  
+                  </div> 
                 </div>
               </ng-container>
             </ng-container>
           </ng-container>
-
           <ng-template #sinTurno>
             <div class="no-disponible"> -- </div>
           </ng-template>
-
           <ng-template #bloqueado>
             <div class="no-disponible">No disponible</div>
           </ng-template>
@@ -51,73 +46,113 @@
     </tbody>
   </table>
 </div>
-<!-- ✅ MODAL PARA ADMIN -->
-<div *ngIf="modalAbierto" class="modal-overlay">
+<!-- ✅ MODAL PRINCIPAL: EDITAR TURNO -->
+<div *ngIf="modalAbierto && !mostrarFormAgregar && !modalConfirmacionFinalAbierta && !mostrarModalTipoCancelacion" class="modal-overlay">
   <div class="modal-content">
     <h3>Editar Turno: {{ turnoSeleccionado.dia }} - {{ turnoSeleccionado.hora }}</h3>
     <p>Nivel: {{ turnoSeleccionado.nivel }}</p>
 
     <div *ngIf="turnoSeleccionado.reservas?.length > 0">
       <h4>Reservas actuales:</h4>
-
       <ul>
         <ng-container *ngFor="let r of turnoSeleccionado.reservas">
           <li>
-            {{ r.nombre }} {{ r.apellido }}
+            <span [ngStyle]="{ color: !r.automatica ? 'red' : 'inherit' }">
+              {{ r.nombre }} {{ r.apellido }} <span *ngIf="!r.automatica">(Recup)</span>
+            </span>
             <button class="btn-anular" (click)="abrirModalTipoCancelacion(r)">Anular</button>
           </li>
         </ng-container>
       </ul>
-
     </div>
 
     <div *ngIf="turnoSeleccionado.reservas?.length === 0">
       <p>No hay reservas aún en este turno.</p>
     </div>
 
-    <!-- 🔽 FORMULARIO PARA AGREGAR NUEVA RESERVA -->
-    <hr>
-    <button (click)="mostrarFormAgregar = !mostrarFormAgregar"
-      [ngClass]="mostrarFormAgregar ? 'btn-cancelar-toggle' : 'btn-agregar-toggle'">
-      {{ mostrarFormAgregar ? 'Cancelar' : '+ Agregar reserva para otro usuario' }}
-    </button>
-
-    <div *ngIf="mostrarFormAgregar" class="form-agregar">
-      <label for="modoBusqueda">Buscar usuario por:</label>
-      <select id="modoBusqueda" [(ngModel)]="busquedaModo">
-        <option value="nombre-apellido">Nombre y Apellido</option>
-        <option value="telefono">Teléfono</option>
-      </select>
-
-      <!-- Campos dinámicos -->
-      <div *ngIf="busquedaModo === 'nombre-apellido'">
-        <input type="text" [(ngModel)]="nombreNuevo" placeholder="Nombre" />
-        <input type="text" [(ngModel)]="apellidoNuevo" placeholder="Apellido" />
-      </div>
-
-      <div *ngIf="busquedaModo === 'telefono'">
-        <input type="text" [(ngModel)]="telefonoNuevo" placeholder="Teléfono" />
-      </div>
-      <!-- Checklist para indicar si es una recuperación -->
-      <div class="form-group">
-        <label for="tipoReserva"><strong>Tipo de reserva:</strong></label>
-        <select id="tipoReserva" [(ngModel)]="reservaAutomatica">
-          <option [ngValue]="true">Clase habitual (recurrente)</option>
-          <option [ngValue]="false">Recuperación</option>
-        </select>
-      </div>
-
-      <button (click)="agregarReserva()" class="btn-confirmar">Confirmar</button>
+    <div class="botones-modal-principal">
+      <button (click)="abrirFormAgregar()" class="btn-agregar-toggle">+ Agregar reserva para otro usuario</button>
+      <button class="btn-cerrar" (click)="cerrarModal()">Cerrar</button>
     </div>
-    <!-- ✅ Mensaje de confirmación para admin -->
-    <div *ngIf="mostrarConfirmacionAdmin"
-        [ngClass]="{'mensaje-confirmacion': true, 'success': !esErrorAdmin, 'error': esErrorAdmin}">
-      {{ mensajeAdminReserva }}
-    </div>
-    <!-- Botón para cerrar -->
-    <button class="btn-cerrar" (click)="cerrarModal()" class="btn-cerrar">Cerrar</button>
   </div>
 </div>
+
+<!-- ✅ MODAL PARA AGREGAR NUEVA RESERVA -->
+<div *ngIf="mostrarFormAgregar && !modalConfirmacionFinalAbierta" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Agregar nueva reserva</h3>
+    <p>Día: <strong>{{ turnoSeleccionado?.dia }}</strong></p>
+    <p>Hora: <strong>{{ turnoSeleccionado?.hora }}</strong></p>
+    <p>Nivel: <strong>{{ turnoSeleccionado?.nivel }}</strong></p>
+
+    <label for="modoBusqueda">Buscar usuario por:</label>
+    <select id="modoBusqueda" [(ngModel)]="busquedaModo">
+      <option value="nombre-apellido">Nombre y Apellido</option>
+      <option value="telefono">Teléfono</option>
+    </select>
+
+    <div *ngIf="busquedaModo === 'nombre-apellido'">
+      <input type="text" [(ngModel)]="nombreNuevo" placeholder="Nombre" />
+      <input type="text" [(ngModel)]="apellidoNuevo" placeholder="Apellido" />
+    </div>
+    <div *ngIf="busquedaModo === 'telefono'">
+      <input type="text" [(ngModel)]="telefonoNuevo" placeholder="Teléfono" />
+    </div>
+
+    <div class="form-group">
+      <label for="tipoReserva"><strong>Tipo de reserva:</strong></label>
+      <select id="tipoReserva" [(ngModel)]="reservaAutomatica">
+        <option [ngValue]="true">Clase habitual (recurrente)</option>
+        <option [ngValue]="false">Recuperación</option>
+      </select>
+    </div>
+
+    <div class="modal-botones">
+      <button class="btn-confirmar" (click)="abrirModalConfirmacionFinal()">Confirmar</button>
+      <button class="btn-cerrar" (click)="cerrarFormAgregar()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ NUEVO MODAL DE CONFIRMACIÓN FINAL PARA RESERVAS (ADMIN) -->
+<div *ngIf="modalConfirmacionFinalAbierta" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Confirmar nueva reserva</h3>
+    <p>¿Estás seguro de que querés agregar la reserva?</p>
+    <div class="modal-botones">
+      <button class="btn-confirmar" (click)="confirmarReservaFinal()">✅ Sí, agregar</button>
+      <button class="btn-cerrar" (click)="cerrarModalConfirmacionFinal()">❌ No</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ MODAL TIPO DE CANCELACIÓN -->
+<div *ngIf="mostrarModalTipoCancelacion" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Tipo de cancelación</h3>
+    <p>¿Querés cancelar momentáneamente o permanentemente la reserva de
+      <strong>{{ reservaSeleccionada?.nombre }} {{ reservaSeleccionada?.apellido }}</strong>?</p>
+    <div class="modal-botones">
+      <button class="btn-confirmar" (click)="confirmarCancelacion('momentanea')">Momentánea</button>
+      <button class="btn-confirmar" (click)="confirmarCancelacion('permanente')">Permanente</button>
+      <button class="btn-cerrar" (click)="cerrarModalTipoCancelacion()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ MODAL CONFIRMACIÓN FINAL DE CANCELACIÓN -->
+<div *ngIf="mostrarModalConfirmarAccion" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Confirmar cancelación</h3>
+    <p>{{ textoConfirmacion }}</p>
+    <div class="modal-botones">
+      <button class="btn-confirmar" (click)="ejecutarCancelacion()">✅ Aceptar</button>
+      <button class="btn-cerrar" (click)="cerrarModalConfirmarAccion()">❌ Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- ✅ MODAL  PARA ALUMNO -->
 <div *ngIf="modalAlumnoAbierto" class="modal-overlay">
   <div class="modal-content">
@@ -130,21 +165,25 @@
     <!-- Checklist para indicar si es una recuperación -->
     <div class="form-group">
       <label for="tipoReserva"><strong>Tipo de reserva:</strong></label>
-      <select id="tipoReserva" [(ngModel)]="reservaAutomatica"[disabled]="uiBloqueadoAlumno">
+      <select id="tipoReserva" [(ngModel)]="reservaAutomatica" (change)="onCambioTipoReserva()" [disabled]="uiBloqueadoAlumno">
         <option [ngValue]="true">Clase habitual (recurrente)</option>
         <option [ngValue]="false">Recuperación</option>
       </select>
     </div>
+    <div *ngIf="mensajeBloqueoRecuperacion && reservaAutomatica === false" class="mensaje-bloqueo">
+      {{ mensajeBloqueoRecuperacion }}
+    </div>
 
+    <button class="btn-confirmar"
+        (click)="confirmarReserva()"
+        [disabled]="reservaAutomatica === false && mensajeBloqueoRecuperacion">Confirmar</button>
 
-    <button class="btn-confirmar" (click)="confirmarReserva()"[disabled]="uiBloqueadoAlumno">✅ Confirmar</button>
     <button class="btn-cerrar" (click)="cerrarModalAlumno()">Cancelar</button>
 
     <div *ngIf="mostrarConfirmacion"
         [ngClass]="{'mensaje-confirmacion': true, 'success': !esErrorReserva, 'error': esErrorReserva}">
       {{ mensajeReserva }}
     </div>
-  
   </div>
 </div>
 <!--MODAL CONFIRMAR TIPO DE CANCELACIÓN -->
@@ -154,7 +193,7 @@
   <div class="modal-botones">
     <button class="btn-cancelar" (click)="confirmarCancelacion('momentanea')">🕒 Solo por esta vez</button>
     <button class="btn-cancelar" (click)="confirmarCancelacion('permanente')">❌ Cancelar permanentemente</button>
-    <button class="btn-cerrar" (click)="cerrarModalTipo()">🚫 Cerrar</button>
+    <button class="btn-cerrar" (click)="cerrarModalTipoCancelacion()">🚫 Cerrar</button>
   </div>
 </div>
 <!-- NUEVO modal de confirmación final -->

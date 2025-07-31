@@ -538,3 +538,21 @@ tbody tr:hover {
 .modal-botones{
   text-align: center;
 }
+
+.text-danger {
+  color: #c0392b;
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.mensaje-bloqueo {
+  color: #d32f2f;
+  font-weight: bold;
+  background-color: #ffe6e6;
+  border: 1px solid #d32f2f;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  text-align: center;
+}

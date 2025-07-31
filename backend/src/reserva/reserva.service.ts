@@ -7,6 +7,7 @@ import { User } from '../users/user.entity';
 import { addDays, format, startOfWeek } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Cron } from '@nestjs/schedule'; 
+import { FeriadosService } from 'src/feriados/feriados.service';
 
 @Injectable()
 export class ReservaService {
@@ -17,6 +18,7 @@ export class ReservaService {
     private horarioRepo: Repository<Horario>,
     @InjectRepository(User)
     private userRepo: Repository<User>,
+    private readonly feriadosService: FeriadosService,
   ) {}
 
   async reservar(
@@ -41,23 +43,46 @@ export class ReservaService {
     const usuario = await this.userRepo.findOne({ where: { id: userId } });
     if (!usuario) throw new Error('Usuario no encontrado');
 
-  // Validación mensual
+    // ✅ Validación para reservas automáticas
     if (automatica) {
+      // 1. Validación mensual
       const { actuales: mensuales, maximas: maxMensuales } = await this.contarReservasAutomaticasDelMes(userId, fechaTurno);
       if (mensuales >= maxMensuales) {
         throw new BadRequestException(`Ya alcanzaste tu límite mensual de ${maxMensuales} clases.`);
       }
 
-      // Validación semanal
+      // 2.Validación semanal
       const { actuales: semanales, maximas: maxSemanales } = await this.contarReservasAutomaticasDeLaSemana(userId, fechaTurno);
       if (semanales >= maxSemanales) {
         throw new BadRequestException(`Ya alcanzaste tu límite semanal de ${maxSemanales} clases según tu plan.`);
       }
     }
-    console.log('📦 Reservar: automatica =', automatica, 'fechaTurno =', fechaTurno);
+    const fechaReserva = new Date().toISOString().split('T')[0];
+    // ✅ Validación para reservas de recuperación    
+    if (!automatica) {  
+      const fecha = new Date(`${fechaTurno}T00:00:00-03:00`);
+      // 1. No permitir recuperar en feriados
+      const esFeriado = await this.feriadosService.esFeriado(fecha);
+      if (esFeriado) {
+        throw new BadRequestException('No podés reservar una clase de recuperación en un día feriado.');
+      }
 
-    const fechaReserva = new Date().toISOString().split('T')[0]; // la fecha actual (YYYY-MM-DD)
+      // 2. No permitir si falta menos de 1 hora    
+      const ahora = new Date();
+      const fechaHoraTurno = new Date(`${fechaTurno}T${horario.hora}:00-03:00`); // suponiendo que horario.hora = '08:00'
+      const diferenciaMinutos = (fechaHoraTurno.getTime() - ahora.getTime()) / (1000 * 60);
+      if (diferenciaMinutos < 60) {
+        throw new BadRequestException('⏰ Las reservas de recuperación deben hacerse al menos una hora antes del inicio de la clase.');
+      }
+      
+      // 3. Validar si tiene recuperaciones disponibles
+      const recuperacionesDisponibles = await this.contarCancelacionesMomentaneasDelMes(userId, fechaTurno);
+      if (recuperacionesDisponibles <= 0) {
+        throw new BadRequestException('No tenés recuperaciones disponibles este mes.');
+      }
+    }
 
+    // ✅ Crear la reserva
     const nuevaReserva = this.reservaRepo.create({
       horario,
       usuario,
@@ -70,7 +95,6 @@ export class ReservaService {
     });
 
     horario.camasReservadas++;
-
     await this.horarioRepo.save(horario);
     return this.reservaRepo.save(nuevaReserva);
   }
@@ -236,6 +260,8 @@ export class ReservaService {
   }
 
   async getAsistenciaMensual(userId: number) {
+    const ahora = new Date();
+
     const reservas = await this.reservaRepo.find({
       where: { usuario: { id: userId } },
       relations: ['horario'],
@@ -250,14 +276,21 @@ export class ReservaService {
     }> = {};
 
     reservas.forEach(reserva => {
-      const fecha = new Date(reserva.fechaTurno);
-      const diaSemana = fecha.getDay(); // 0 = domingo, 6 = sábado
-        // 🚫 Ignorar reservas en sábado o domingo
-        if (diaSemana === 0 || diaSemana === 6) {
-          return;
-        }
-      const mes = fecha.toLocaleString('es-AR', { month: 'long', year: 'numeric' }); // Ej: "julio 2025"
-      const fechaFormateada = fecha.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }); // Ej: "lun. 29/07"
+      const fechaReserva = new Date(reserva.fechaTurno);
+
+      // 🚫 Ignorar reservas que aún no ocurrieron
+      if (fechaReserva > ahora) return;
+
+      // 🚫 Ignorar fines de semana
+      const diaSemana = fechaReserva.getDay();
+      if (diaSemana === 0 || diaSemana === 6) return;
+
+      const mes = fechaReserva.toLocaleString('es-AR', { month: 'long', year: 'numeric' });
+      const fechaFormateada = fechaReserva.toLocaleDateString('es-AR', {
+        weekday: 'short',
+        day: '2-digit',
+        month: '2-digit'
+      });
 
       if (!resultado[mes]) {
         resultado[mes] = {
@@ -281,7 +314,6 @@ export class ReservaService {
   }
 
   async cancelarReservaPorUsuario(id: number, tipo: 'momentanea' | 'permanente', user: any) {
-    // Traemos SIEMPRE las relaciones que necesitamos
     const reserva = await this.reservaRepo.findOne({
       where: { id },
       relations: ['usuario', 'horario'],
@@ -289,27 +321,42 @@ export class ReservaService {
 
     if (!reserva) throw new NotFoundException('Reserva no encontrada');
 
-    // ⚠️ ¡No loguees antes de verificar null!
     const userId = user?.id ?? user?.sub;
     const rol = user?.rol;
 
     // 🔐 Permitir solo al dueño o al admin
-    if (!reserva.usuario || (reserva.usuario.id !== Number(userId) && user.rol !== 'admin')) {
+    if (!reserva.usuario || (reserva.usuario.id !== Number(userId) && rol !== 'admin')) {
       throw new ForbiddenException('No podés cancelar esta reserva');
     }
 
-    // ✅ Si es una reserva de recuperación (automatica = false) → la borramos físicamente
+    const ahora = new Date();
+    const fechaHoraTurno = new Date(`${reserva.fechaTurno}T${reserva.horario.hora}:00-03:00`);
+    const diferenciaMs = fechaHoraTurno.getTime() - ahora.getTime();
+    const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
+
+    // ⛔️ Bloquear cancelación si el turno cae en feriado
+    const fechaTurno = new Date(`${reserva.fechaTurno}T00:00:00-03:00`);
+    const esFeriado = await this.feriadosService.esFeriado(fechaTurno);
+    if (esFeriado) {
+      throw new BadRequestException('No se puede cancelar una clase que cae en feriado.');
+    }
+
+    // ⏱️ Bloqueo solo para alumno (no admin)
+    if (rol !== 'admin' && diferenciaHoras < 2) {
+      throw new BadRequestException('Solo se puede cancelar hasta 2 horas antes del turno.');
+    }
+
+    // ✅ Recuperación → borrado físico
     if (!reserva.automatica) {
-      // liberamos cama
       if (reserva.horario) {
         reserva.horario.camasReservadas = Math.max(0, reserva.horario.camasReservadas - 1);
         await this.horarioRepo.save(reserva.horario);
       }
-      await this.reservaRepo.remove(reserva);   // 👈 BORRADO FÍSICO
+      await this.reservaRepo.remove(reserva);
       return { mensaje: '✅ Reserva de recuperación eliminada.' };
     }
 
-    // ✅ Si es recurrente (automatica = true) → cancelar momentánea/permanente
+    // ✅ Recurrente → cancelación momentánea o permanente
     if (tipo === 'momentanea') {
       reserva.estado = 'cancelado';
       reserva.cancelacionMomentanea = true;
@@ -331,7 +378,6 @@ export class ReservaService {
     await this.reservaRepo.save(reserva);
     return { mensaje: '✅ Reserva cancelada.' };
   }
-
 
   async generarReservasRecurrentesSemanaActual() {
     const hoy = new Date();
@@ -440,6 +486,41 @@ export class ReservaService {
   async marcarRecuperadasCron() {
     console.log('📆 Ejecutando CRON: domingo 04:00 → marcando reservas recuperadas...');
     await this.marcarReservasMomentaneasComoRecuperadas();
+  }
+
+  async contarCancelacionesMomentaneasDelMes(userId: number, fechaTurno: string): Promise<number> {
+    const fecha = new Date(fechaTurno);
+    const inicioMes = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+    const finMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
+
+    // Clases canceladas momentáneamente
+    const canceladas = await this.reservaRepo.count({
+      where: {
+        usuario: { id: userId },
+        automatica: false,
+        cancelacionMomentanea: true,
+        estado: 'cancelado',
+        fechaTurno: Between(
+          inicioMes.toISOString().split('T')[0],
+          finMes.toISOString().split('T')[0]
+        ),
+      },
+    });
+
+    // Clases ya recuperadas (reservas no automáticas ya realizadas)
+    const recuperadas = await this.reservaRepo.count({
+      where: {
+        usuario: { id: userId },
+        automatica: false,
+        estado: 'reservado',
+        fechaTurno: Between(
+          inicioMes.toISOString().split('T')[0],
+          finMes.toISOString().split('T')[0]
+        ),
+      },
+    });
+
+    return canceladas - recuperadas;
   }
 
 }

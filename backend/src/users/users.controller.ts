@@ -84,16 +84,17 @@ export class UsersController {
     return this.usersService.findById(id);
   }
 
-  @Patch('/reactivar/:id')
-  reactivarUsuario(@Param('id') id: number) {
-    return this.usersService.reactivarUsuario(id);
-  }
-
   @Get('telefono/:telefono')
   async buscarPorTelefono(@Param('telefono') telefono: string) {
     const user = await this.userRepository.findOneBy({ telefono });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
+
+  @Patch('reactivar/:id')
+  async reactivarUsuario(@Param('id') id: number) {
+    return this.usersService.actualizarEstado(id, true); // true = activar
+  }
+
 
 }

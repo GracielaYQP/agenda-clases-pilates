@@ -14,9 +14,7 @@ html, body {
   padding:80px 20px;
   box-sizing: border-box;
   padding-top: 90px;
-  padding-bottom: 30px;
-
-   
+  padding-bottom: 30px;   
 }   
 
 .input_registro {
@@ -77,12 +75,21 @@ input {
   background-color: #f5f5f5; 
 }
 
+select {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 6px;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+  background-color: #f5f5f5;
+}
+
 #registro_alumnos {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-
 
 .form-group {
   display: flex;
@@ -115,7 +122,29 @@ input {
 /* Hover más oscuro */
 .btn-singin:hover {
   background-color: #af1155;
+  color: black;
 }
+
+.btn-cerrar {
+  background-color: #a8a6a6;
+  color: #333;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 70%;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-cerrar:hover {
+  background-color: #535353;
+  color: white;
+}
+
 
 /* Centrado */
 .center-button {
@@ -124,6 +153,23 @@ input {
   margin-top: 20px;
   width: 100%;
 }
+
+.botonera-horizontal {
+  display: flex;
+  flex-direction: row;        
+  justify-content: center;    
+  align-items: center;        
+  gap: 10px;                 
+  margin-top: 10px;
+}
+
+.botonera-horizontal button {
+  width: 160px;    
+  display: inline-block;
+  padding: 10px 0;
+  text-align: center;
+}
+
 
 @media (max-width: 768px) {
   .registro-wrapper {
@@ -168,10 +214,10 @@ input {
 }
 
 .no-invitacion-text {
-  color: #b71c1c;                 /* Rojo oscuro */
-  font-size: 1.2rem;              /* Tamaño de letra más grande */
-  font-weight: bold;              /* Texto en negrita */
-  line-height: 1.5;               /* Espaciado de línea */
+  color: #b71c1c;                 
+  font-size: 1.2rem;              
+  font-weight: bold;             
+  line-height: 1.5;               
 }
 
 @media (max-width: 768px) {

@@ -32,6 +32,8 @@ export class AuthService {
     telefono: string;
     email: string;
     password: string;
+    nivel: string;
+    planMensual: string;
   }): Observable<any> {
     return this.http.post('http://localhost:3000/users', data);
   }
@@ -55,7 +57,9 @@ export class AuthService {
     return this.http.post<any>('http://localhost:3000/auth/reset-password', { token, newPassword });
   }
 
-
+  reactivarUsuario(id: number) {
+    return this.http.patch(`/api/users/reactivar/${id}`, {});
+  }
 
 }
 

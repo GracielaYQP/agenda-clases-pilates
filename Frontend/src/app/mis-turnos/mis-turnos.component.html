@@ -1,5 +1,8 @@
 <div class="table-container" *ngIf="dias.length && horas.length">
   <h2>Mis turnos</h2>
+  <div *ngIf="cantidadRecuperaciones > 0" class="aviso-recuperacion-fijo">
+    🔁 Tenés {{ cantidadRecuperaciones }} clase{{ cantidadRecuperaciones > 1 ? 's' : '' }} de recuperación esta semana.
+  </div>
 
   <table>
     <thead>
@@ -17,7 +20,12 @@
         <td *ngFor="let dia of dias">
           <ng-container *ngIf="hasReserva(dia, hora); else sinTurno">
             <div class="clickeable"
-              [ngClass]="[getNivel(dia, hora), hasReserva(dia, hora) ? 'con-reserva' : '']"
+              [ngClass]="[
+                getNivel(dia, hora),
+                hasReserva(dia, hora) ? 'con-reserva' : '',
+                esRecuperacion(dia, hora) ? 'recuperacion' : ''
+              ]"
+               [title]="esRecuperacion(dia, hora) ? 'Clase de recuperación' : 'Clase regular'" 
               (click)="abrirModalDesdeCelda(dia, hora)">
 
               <div class="nivel"> {{ getNivel(dia, hora) }}</div>
@@ -60,6 +68,11 @@
       <button class="btn-cerrar" (click)="cerrarModal()">🚫 Cerrar</button>
     </div>
 
+    <!-- Mensaje si está bloqueado -->
+    <p *ngIf="uiBloqueadoAlumnoCancel" class="text-danger">
+      ⚠️ Solo se puede cancelar un turno hasta 2 horas antes de su inicio.
+    </p>
+
     <!-- Zona de mensajes -->
     <div *ngIf="mostrarConfirmacionUsuario"
          [ngClass]="{'mensaje-confirmacion': true, 'success': !esErrorUsuarioCancel, 'error': esErrorUsuarioCancel}">
@@ -80,6 +93,18 @@
     </div>
   </div>
 </div>
+<!-- ✅ MODAL DE RECUPERACIONES -->
+<div *ngIf="mostrarModalRecuperacion" class="modal-overlay">
+  <div class="modal-content">
+    <h3>¡Tenés clases para recuperar!</h3>
+    <p>Actualmente tenés <strong>{{ cantidadRecuperaciones }}</strong> clase{{ cantidadRecuperaciones > 1 ? 's' : '' }} pendiente{{ cantidadRecuperaciones > 1 ? 's' : '' }} de recuperación.</p>
+
+    <div class="acciones-centradas">
+      <button class="btn-confirmar" (click)="mostrarModalRecuperacion = false">Aceptar</button>
+    </div>
+  </div>
+</div>
+
 
 
 

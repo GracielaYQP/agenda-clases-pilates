@@ -1,11 +1,16 @@
 <div class="table-container">
   <h2>Listado de Alumnos</h2>
   <div class="filtros-alumnos">
-    <input type="text" [(ngModel)]="filtroApellido" placeholder="Buscar por apellido">
-    <input type="text" [(ngModel)]="filtroDni" placeholder="Buscar por DNI">
-    <input type="text" [(ngModel)]="filtroTelefono" placeholder="Buscar por teléfono">
+    <input type="text" [(ngModel)]="filtroApellido" placeholder="Buscar por apellido" />
+    <input type="text" [(ngModel)]="filtroDni" placeholder="Buscar por DNI" />
+    <input type="text" [(ngModel)]="filtroTelefono" placeholder="Buscar por teléfono" />
+    <label class="filtro-checkbox">
+      <input type="checkbox" [(ngModel)]="mostrarInactivos" />
+      Mostrar alumnos inactivos
+    </label>
     <button class="nuevo-alumno-btn" (click)="irAFormularioRegistro()"> + Nuevo Alumno</button>
   </div>
+
 
   <table>
     <thead>
@@ -37,8 +42,24 @@
           <button class="action-btn edit-btn" (click)="editarAlumno(alumno.id)">
             ✏️
           </button>
-          <button class="action-btn delete-btn" (click)="inactivarAlumno(alumno.id)">
-            🗑️
+
+          <!-- 🔁 Cambia ícono y acción según el estado -->
+          <button
+            *ngIf="alumno.activo"
+            class="action-btn delete-btn"
+            (click)="inactivarAlumno(alumno.id)"
+            title="Inactivar alumno"
+          >
+            🚫
+          </button>
+
+          <button
+            *ngIf="!alumno.activo"
+            class="action-btn reactivate-btn"
+            (click)="reactivarAlumno(alumno)"
+            title="Reactivar alumno"
+          >
+            ♻️
           </button>
         </td>
       </tr>

@@ -24,9 +24,11 @@ export class MisTurnosComponent {
   mostrarConfirmacionUsuario = false;
   esErrorUsuarioCancel = false;
   uiBloqueadoAlumnoCancel = false;      // bloquea todo salvo “Cerrar” luego del éxito
+  modalRecuperacionPendiente = false;
+  mostrarModalRecuperacion = false;
+  cantidadRecuperaciones = 0;
 
-
-  constructor(private horariosService: HorariosService) {} 
+  constructor(private horariosService: HorariosService) {}
 
   ngOnInit() {
     this.generarDiasConFechas();
@@ -35,6 +37,12 @@ export class MisTurnosComponent {
         this.misReservas = data.filter(r => r.estado !== 'cancelado');
         console.log('🗓️ Mis reservas:', this.misReservas);
         this.cerrarModal();
+        // Buscar si hay alguna reserva que NO sea automática (recuperación)
+        
+        // ✅ Filtrar las reservas temporales para mostrar la cantidad de recuperaciones
+          const recuperaciones = this.misReservas.filter(r => !r.automatica);
+          this.cantidadRecuperaciones = recuperaciones.length;
+          this.mostrarModalRecuperacion = this.cantidadRecuperaciones > 0;
       },
       error: (err: any) => {
         console.error('❌ Error al cargar mis reservas', err);
@@ -78,6 +86,14 @@ export class MisTurnosComponent {
       r.horario.hora === hora
     );
     return reserva ? reserva.horario.nivel : '';
+  }
+
+  getReserva(diaCompleto: string, hora: string): any | null {
+    const fechaFormateada = this.obtenerFechaFormateadaDesdeDia(diaCompleto);
+    return this.misReservas.find(r =>
+      r.fechaTurno === fechaFormateada &&
+      r.horario.hora === hora
+    ) || null;
   }
 
   private obtenerFechaFormateadaDesdeDia(diaCompleto: string): string {
@@ -182,10 +198,9 @@ export class MisTurnosComponent {
     });
   }
 
-  abrirModalDesdeCelda(diaCompleto: string, hora: string) {
+abrirModalDesdeCelda(diaCompleto: string, hora: string) {
     const partes = diaCompleto.split(' '); // ["Martes", "30/07/2025"]
     const fechaTexto = partes[1]; // "30/07/2025"
-
     const fechaParts = fechaTexto.split('/'); // ["30", "07", "2025"]
     const fechaFormateada = `${fechaParts[2]}-${fechaParts[1]}-${fechaParts[0]}`; // "2025-07-30"
 
@@ -197,7 +212,12 @@ export class MisTurnosComponent {
     if (reserva) {
       this.turnoAEliminar = reserva;
 
-      // 👇 Lógica nueva: diferenciar por tipo de reserva
+      // 🔒 Bloquear cancelación si faltan menos de 2 horas
+      const fechaHoraReserva = new Date(`${reserva.fechaTurno}T${reserva.horario.hora}:00-03:00`);
+      const ahora = new Date();
+      const diferenciaHoras = (fechaHoraReserva.getTime() - ahora.getTime()) / (1000 * 60 * 60);
+      this.uiBloqueadoAlumnoCancel = diferenciaHoras < 2;
+
       if (reserva.automatica) {
         // 🔹 Reserva permanente: mostrar modal con opciones
         this.modalAbierto = true;
@@ -240,5 +260,10 @@ export class MisTurnosComponent {
     const [y, m, d] = yyyyMmDd.split('-');
     return `${d}/${m}/${y}`;
   }
+
+  esRecuperacion(dia: string, hora: string): boolean {
+  const reserva = this.getReserva(dia, hora);
+  return reserva ? !reserva.automatica : false;
+}
 
 }

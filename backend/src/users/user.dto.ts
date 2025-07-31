@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, Matches } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -12,6 +12,10 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   nivel: string;
+
+  @IsNotEmpty()
+  @IsIn(['4', '8', '12'])
+  planMensual: '4' | '8' | '12';
 
   @IsNotEmpty()
   telefono: string;

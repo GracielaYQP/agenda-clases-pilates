@@ -39,6 +39,7 @@ export class AuthController {
       telefono: invitacion.telefono,
       password: dto.password,
       nivel: invitacion.nivel_asignado,
+      planMensual: dto.planMensual
     });
 
     // Marcar la invitación como usada para que no se pueda reutilizar

@@ -1,5 +1,5 @@
 // src/auth/dto/register-invitacion.dto.ts
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsIn } from 'class-validator';
 
 export class RegisterInvitacionDto {
   
@@ -22,6 +22,10 @@ export class RegisterInvitacionDto {
   @IsString()
   @IsNotEmpty()
   email: string;
+
+  @IsNotEmpty()
+  @IsIn(['4', '8', '12'])
+  planMensual: '4' | '8' | '12';
 
   @IsString()
   @IsNotEmpty()

@@ -10,6 +10,8 @@ import { MailerService } from './auth/mailer/mailer.service';
 import { ReservaModule } from './reserva/reserva.module';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { FeriadosService } from './feriados/feriados.service';
+import { FeriadosModule } from './feriados/feriados.module';
 
 
 
@@ -35,10 +37,11 @@ import { ScheduleModule } from '@nestjs/schedule';
       envFilePath: '.env',
      }),
      ScheduleModule.forRoot(),
+     FeriadosModule,
     
   ],
   controllers: [AppController],
-  providers: [AppService, MailerService,],
+  providers: [AppService, MailerService],
 })
 export class AppModule {}
 

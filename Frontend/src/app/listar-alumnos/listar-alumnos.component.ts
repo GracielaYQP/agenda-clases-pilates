@@ -14,6 +14,7 @@ interface Alumno {
   email: string;
   nivel: string;
   planMensual: string;
+  activo: boolean;
 }
 
 @Component({
@@ -37,7 +38,8 @@ export class ListarAlumnosComponent implements OnInit {
   asistenciaNombre: string = '';
   asistenciaApellido: string = '';
   asistenciaData: any = {};
-  asistenciaMeses: string[] = [];
+  asistenciaMeses: string[] = []; // los que se muestran según filtro
+  mostrarInactivos: boolean = false; // por defecto solo activos
 
   constructor(private http: HttpClient, private router: Router, private horariosService: HorariosService) {}
 
@@ -49,6 +51,7 @@ export class ListarAlumnosComponent implements OnInit {
     this.http
       .get<Alumno[]>('http://localhost:3000/users/obtenerListadoUsuarios')
       .subscribe((data) => {
+        console.log('📋 Alumnos recibidos:', data); // 👈
         this.alumnos = data
           // 1) Filtra los que NO son admin
           .filter(alumno => alumno.nivel?.toLowerCase() !== 'admin')
@@ -65,13 +68,25 @@ export class ListarAlumnosComponent implements OnInit {
       });
   }
 
-  get alumnosFiltrados() {
-  return this.alumnos.filter(alumno =>
-    alumno.apellido.toLowerCase().includes(this.filtroApellido.toLowerCase()) &&
-    alumno.dni.toString().includes(this.filtroDni) &&
-    alumno.telefono.toString().includes(this.filtroTelefono)
-  );
+get alumnosFiltrados() {
+  return this.alumnos
+    .filter(alumno =>
+      alumno.apellido.toLowerCase().includes(this.filtroApellido.toLowerCase()) &&
+      alumno.dni.toString().includes(this.filtroDni) &&
+      alumno.telefono.toString().includes(this.filtroTelefono) &&
+      (this.mostrarInactivos || alumno.activo) // 👈 esto es clave
+    )
+    .sort((a, b) => {
+      const apellidoA = a.apellido?.toLowerCase() || '';
+      const apellidoB = b.apellido?.toLowerCase() || '';
+      if (apellidoA < apellidoB) return -1;
+      if (apellidoA > apellidoB) return 1;
+      const nombreA = a.nombre?.toLowerCase() || '';
+      const nombreB = b.nombre?.toLowerCase() || '';
+      return nombreA.localeCompare(nombreB);
+    });
 }
+
 
   editarAlumno(id: number) {
     // Redirige a una ruta de edición, por ejemplo:
@@ -119,6 +134,15 @@ export class ListarAlumnosComponent implements OnInit {
       this.asistenciaApellido = apellido;
       this.modalAsistencia = true;
     });
-}
+  }
+
+  reactivarAlumno(alumno: Alumno) {
+    this.http.patch(`http://localhost:3000/users/reactivar/${alumno.id}`, {})
+      .subscribe(() => {
+        this.obtenerAlumnos();
+        this.horariosService.refrescarHorarios(); 
+      });
+  }
+
 
 }

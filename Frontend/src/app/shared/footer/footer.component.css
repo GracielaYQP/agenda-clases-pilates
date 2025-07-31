@@ -91,7 +91,17 @@ footer {
 }
 
 .logo-inline {
-  height: 40px; /* Ajustá según el tamaño de tu logo */
+  height: 50px; 
   width: auto;
 }
 
+.iconos-contacto {
+  width: 24px;
+  height: 24px;
+}
+
+.iconos-redes {
+  width: 36px;
+  height: 36px;
+
+}

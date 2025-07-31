@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -26,6 +26,7 @@ export class UsersService {
     telefono: string; 
     password: string;
     nivel: string;
+    planMensual: '4' | '8' | '12';
   }): Promise<User> {
     // Validar email único
     const existingEmail = await this.userRepository.findOne({
@@ -63,6 +64,7 @@ export class UsersService {
       telefono: userData.telefono,
       password: hashedPassword,
       nivel: userData.nivel,
+      planMensual: userData.planMensual,
     });
 
     return await this.userRepository.save(user);
@@ -95,12 +97,12 @@ export class UsersService {
   async obtenerListadoUsuarios() {
     return await this.userRepository
       .createQueryBuilder('user')
-      .where('user.activo = :activo', { activo: true })
-      .andWhere('LOWER(user.rol) != :rol', { rol: 'admin' })
+      .where('LOWER(user.rol) != :rol', { rol: 'admin' }) // ⛔ Excluye admins
       .orderBy('user.apellido', 'ASC')
       .addOrderBy('user.nombre', 'ASC')
-      .getMany();
+      .getMany(); // ✅ Incluye activos e inactivos
   }
+
 
   async inactivarUsuario(id: number): Promise<void> {
     const user = await this.userRepository.findOne({
@@ -183,19 +185,11 @@ export class UsersService {
     return this.userRepository.findOne({ where: { telefono } });
   }
 
-  async reactivarUsuario(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  async actualizarEstado(id: number, activo: boolean) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
 
-    if (!user) {
-      throw new BadRequestException('Usuario no encontrado');
-    }
-
-    if (user.activo) {
-      throw new BadRequestException('El usuario ya está activo');
-    }
-
-    user.activo = true;
-    return await this.userRepository.save(user);
+    user.activo = activo;
+    return this.userRepository.save(user);
   }
-  
 }

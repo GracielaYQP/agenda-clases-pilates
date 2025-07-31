@@ -6,7 +6,7 @@
   height: 100vh; 
   padding: 0, 20px;
   box-sizing: border-box;
-  margin: 0;
+  margin: 40px 0 0 0;
   height: calc(100vh - 36px - 48px);
   
 } 
@@ -182,3 +182,9 @@ input {
   font-size: 1.2rem;
   color: #555;
 }
+.mensaje-error {
+  font-size: 1.2rem;  /* Podés usar 18px o más si querés */
+  font-weight: bold;
+  text-align: center;
+}
+

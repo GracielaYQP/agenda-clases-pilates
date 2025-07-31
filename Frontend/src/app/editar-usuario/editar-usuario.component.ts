@@ -89,4 +89,8 @@ export class EditarUsuarioComponent implements OnInit {
         }
       });
   }
+
+  cerrarFormulario() {
+    this.router.navigate(['/listar-alumnos']);
+  }
 }

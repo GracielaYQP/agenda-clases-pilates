@@ -105,15 +105,16 @@ export class RegistroComponent {
       ...this.form.value,
       telefono: this.invitacionValida ? this.telefono : this.form.value.telefono,
       nivel: this.invitacionValida ? this.nivel : this.form.value.nivel,
+      planMensual: this.form.value.planMensual
     };
 
     this.auth.register(data).subscribe({
       next: () => {
-        this.successMessage = '¡Registro exitoso! Serás redirigido al login...';
+        this.successMessage = '¡Registro exitoso!';
         this.error = '';
 
         setTimeout(() => {
-          this.router.navigate(['/login']);
+          this.router.navigate(['/']);
         }, 3000);
       },
       error: () => {
@@ -147,4 +148,11 @@ export class RegistroComponent {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
+
+  cerrarFormulario() {
+  this.invitacionValida = false;
+  this.esAdmin = false;
+  this.router.navigate(['/listar-alumnos']);
+}
+
 }
